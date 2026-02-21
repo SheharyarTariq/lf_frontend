@@ -1,5 +1,6 @@
 import React from 'react'
 import Button from '@/components/common/Button'
+import Link from 'next/link'
 function Header() {
     return (
         <>
@@ -12,8 +13,8 @@ function Header() {
                 <div className="flex items-center justify-between px-[30px] py-[19px]">
                     <div>
                         <div className="flex items-center gap-4 font-[500]">
-                            <Button variant='secondary' className='text-[20px]'>Area</Button>
-                            <p className='text-[20px]'>Category</p>
+                            <Link href="/" className='text-[20px]'>Area</Link>
+                            <Link href="/category" className='text-[20px]'>Category</Link>
                             <p className='text-[20px]'>Orders</p>
                             <p className='text-[20px]'>User</p>
                         </div>
