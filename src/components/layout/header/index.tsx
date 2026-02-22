@@ -1,8 +1,12 @@
+"use client"
 import React from 'react'
-import Button from '@/components/common/Button'
 import Link from 'next/link'
 import { routes } from '@/components/common/utils/routes'
+import { usePathname } from 'next/navigation'
+import Button from '@/components/common/Button'
+
 function Header() {
+    const currentPage = usePathname()
     return (
         <>
             <header className='bg-black'>
@@ -14,10 +18,10 @@ function Header() {
                 <div className="flex items-center justify-between px-[30px] py-[19px]">
                     <div>
                         <div className="flex items-center gap-4 font-[500]">
-                            <Link href={routes.ui.areas} className='text-[20px]'>Area</Link>
-                            <Link href={routes.ui.category} className='text-[20px]'>Category</Link>
-                            <p className='text-[20px]'>Orders</p>
-                            <p className='text-[20px]'>User</p>
+                            <Button variant={`${currentPage == routes.ui.areas ? "secondary" : "outline"}`} className={`text-[20px] ${currentPage == routes.ui.areas ? "" : "text-white"}`}><Link href={routes.ui.areas}>Area</Link></Button>
+                            <Button variant={`${currentPage == routes.ui.category ? "secondary" : "outline"}`} className={`text-[20px] ${currentPage == routes.ui.category ? "" : "text-white"}`}><Link href={routes.ui.category}>Category</Link></Button>
+                            <Button variant={`outline`} className='text-[20px] text-white ${currentPage == routes.ui.orders ? "" : "text-white"}'>Orders</Button>
+                            <Button variant={`outline`} className='text-[20px] text-white ${currentPage == routes.ui.user ? "" : "text-white"}'>User</Button>
                         </div>
                     </div>
                     <div>
