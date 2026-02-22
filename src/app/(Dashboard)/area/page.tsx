@@ -1,9 +1,7 @@
 import Area from "@/components/area";
-import Header from "@/components/layout/header";
-export default function Home() {
+export default function Page() {
   return (
     <div className="">
-      <Header/>
       <Area />
     </div>
   );

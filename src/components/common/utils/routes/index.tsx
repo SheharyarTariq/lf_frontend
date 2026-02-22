@@ -1,7 +1,12 @@
+
 export const routes = {
   ui: {
-    areas: "/",
+    indexRoute:"/",
+    signIn: "/auth/sign-in",
+    areas: "/area",
     category: "/category",
+    orders:"/orders",
+    users:"/users",
   },
 
   api: {
