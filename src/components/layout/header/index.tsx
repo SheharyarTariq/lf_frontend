@@ -26,8 +26,8 @@ function Header() {
                 <div className="flex items-center justify-between px-[30px] py-[19px]">
                     <div>
                         <div className="flex items-center gap-4 font-[500]">
-                            <Button variant={`${currentPage == routes.ui.areas ? "secondary" : "outline"}`} className={`text-[20px] ${currentPage == routes.ui.areas ? "" : "text-white"}`}><Link href={routes.ui.areas}>Area</Link></Button>
-                            <Button variant={`${currentPage == routes.ui.category ? "secondary" : "outline"}`} className={`text-[20px] ${currentPage == routes.ui.category ? "" : "text-white"}`}><Link href={routes.ui.category}>Category</Link></Button>
+                            <Button onClick={() => router.push(routes.ui.areas)} variant={`${currentPage == routes.ui.areas ? "secondary" : "outline"}`} className={`text-[20px] ${currentPage == routes.ui.areas ? "" : "text-white"}`}>Area</Button>
+                            <Button onClick={() => router.push(routes.ui.category)} variant={`${currentPage == routes.ui.category ? "secondary" : "outline"}`} className={`text-[20px] ${currentPage == routes.ui.category ? "" : "text-white"}`}>Category</Button>
                             <Button variant={`outline`} className='text-[20px] text-white ${currentPage == routes.ui.orders ? "" : "text-white"}'>Orders</Button>
                             <Button variant={`outline`} className='text-[20px] text-white ${currentPage == routes.ui.user ? "" : "text-white"}'>User</Button>
                         </div>

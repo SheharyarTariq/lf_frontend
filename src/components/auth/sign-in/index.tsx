@@ -16,6 +16,7 @@ function SignIn() {
     const [email, setEmail] = useState("")
     const [showPassword, setShowPassword] = useState(false);
     const router = useRouter();
+
     const handleLogin = async () => {
         const response = await apiCall<LoginResponse>({
             endpoint: routes.api.login,
@@ -35,6 +36,7 @@ function SignIn() {
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
     };
+
     return (
         <div className='flex items-center justify-center min-h-screen bg-white text-black'>
             <div className='w-full max-w-[480px] px-4'>
@@ -44,7 +46,7 @@ function SignIn() {
                 </div>
                 <div className='space-y-5'>
                     <div className='space-y-2 text-left'>
-                        <label className='text-black font-[400] text-[14px] ' htmlFor="email">Email</label>
+                        <label className='text-black font-[400] text-[14px]' htmlFor="email">Email</label>
                         <Input
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
@@ -74,7 +76,8 @@ function SignIn() {
                     </div>
                     <Button
                         onClick={() => handleLogin()}
-                        className='w-full py-3 mt-2 text-[20px]'>
+                        className='w-full py-3 mt-2 text-[20px]'
+                    >
                         Log in
                     </Button>
                 </div>
@@ -82,4 +85,5 @@ function SignIn() {
         </div>
     );
 }
+
 export default SignIn;

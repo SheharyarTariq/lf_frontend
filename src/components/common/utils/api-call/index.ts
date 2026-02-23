@@ -19,6 +19,14 @@ interface ApiResponse<T = unknown> {
   message: string;
 }
 
+const getCookie = (name: string) => {
+  if (typeof document === "undefined") return null;
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(";").shift();
+  return null;
+};
+
 export default async function apiCall<T = unknown>({
   endpoint,
   method,
@@ -28,11 +36,14 @@ export default async function apiCall<T = unknown>({
   successMessage,
 }: ApiCallParams): Promise<ApiResponse<T>> {
   try {
+    const token = getCookie("authtoken");
+
     const axiosConfig: AxiosRequestConfig = {
       url: `${BASE_URL}${endpoint}`,
       method,
       headers: {
         "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...headers,
       },
     };
