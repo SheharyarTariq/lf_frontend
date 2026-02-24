@@ -8,6 +8,7 @@
   --muted: #EAEAEA;
   --neutral: #8F8F8F;
   --placeholder: #C1C1C1;
+  --limeGreen: #D6FF4B;
 }
 
 @theme inline {
@@ -18,6 +19,7 @@
   --color-muted: var(--muted);
   --color-neutral: var(--neutral);
   --font-sans: var(--font-poppins);
+  --color-limeGreen: var(--limeGreen);
 }
 
 @media (prefers-color-scheme: dark) {
