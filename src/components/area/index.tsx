@@ -1,11 +1,12 @@
 "use client"
 import React, { useEffect, useState } from 'react'
-import Input from '../common/Input'
 import { Plus } from 'lucide-react'
 import AreaTable from './area-table'
 import apiCall from '@/components/common/utils/api-call'
 import { routes } from '@/components/common/utils/routes'
 import FormDialog from '../common/form-dailog'
+import Input from '../common/Input'
+import SearchInput from '../common/SearchInput'
 
 interface AreaData {
     id: string;
@@ -64,6 +65,14 @@ function Area() {
         return false
     }
 
+    const handleSearchResults = (data: AreaResponse | null) => {
+        if (data && data.member) {
+            setAreaResponse(data.member)
+        } else {
+            getArea()
+        }
+    }
+
     return (
         <>
             <div className='px-[50px] mt-[51px]'>
@@ -72,9 +81,11 @@ function Area() {
                 </div>
 
                 <div className='w-full flex items-center gap-[24px]'>
-                    <Input
+                    <SearchInput<AreaResponse>
+                        endpoint={routes.api.getArea}
+                        searchKey="name"
                         placeholder="Search Area"
-                        search
+                        onResults={handleSearchResults}
                     />
                     <FormDialog
                         title="Area Name"

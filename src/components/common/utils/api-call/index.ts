@@ -1,7 +1,8 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import toast from "react-hot-toast";
+import { config } from "../../../../../config";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const BASE_URL = config.apiUrl;
 
 interface ApiCallParams {
   endpoint: string;

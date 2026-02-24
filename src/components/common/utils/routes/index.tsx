@@ -5,13 +5,14 @@ export const routes = {
     signIn: "/auth/sign-in",
     areas: "/area",
     category: "/category",
-    orders:"/orders",
-    users:"/users",
+    orders: "/orders",
+    users: "/users",
   },
 
   api: {
     getArea: 'areas',
+    searchArea: 'areas?name=ashtead',
     login: "login-check",
-    
+
   },
 };
