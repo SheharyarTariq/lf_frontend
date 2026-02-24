@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { unauthorized } from "next/navigation";
-import { config } from "../../../../../config";
+import { config } from "../../../config";
 
 type ApiRequestOptions = {
   endpoint: string;

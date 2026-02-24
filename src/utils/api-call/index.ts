@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import toast from "react-hot-toast";
-import { config } from "../../../../../config";
+import { config } from "../../../config";
 
 const BASE_URL = config.apiUrl;
 
