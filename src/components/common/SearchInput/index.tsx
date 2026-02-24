@@ -1,7 +1,7 @@
 "use client"
 import React, { useState, useEffect, useRef } from 'react'
 import { Search } from 'lucide-react'
-import apiCall from '@/components/common/utils/api-call'
+import apiCall from '@/utils/api-call'
 
 interface SearchInputProps<T> {
     endpoint: string;

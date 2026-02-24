@@ -1,7 +1,7 @@
 "use client"
 import React, { useState } from 'react'
 import Link from 'next/link'
-import { routes } from '@/components/common/utils/routes'
+import { routes } from '@/utils/routes'
 import { usePathname } from 'next/navigation'
 import Button from '@/components/common/Button'
 import { useRouter } from 'next/navigation'

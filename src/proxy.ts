@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
-import { routes } from "./components/common/utils/routes"
+import { routes } from "./utils/routes"
 
 const protectedRoutes = [routes.ui.areas, routes.ui.category, routes.ui.orders, routes.ui.users]
 const authRoutes = [routes.ui.signIn]

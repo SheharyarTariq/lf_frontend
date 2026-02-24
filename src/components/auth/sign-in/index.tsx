@@ -3,8 +3,8 @@ import Button from '@/components/common/Button';
 import Input from '@/components/common/Input';
 import { Eye, EyeOff } from 'lucide-react';
 import React, { useState } from 'react';
-import apiCall from '@/components/common/utils/api-call';
-import { routes } from '@/components/common/utils/routes';
+import apiCall from '@/utils/api-call';
+import { routes } from '@/utils/routes';
 import { useRouter } from 'next/navigation';
 
 interface LoginResponse {
