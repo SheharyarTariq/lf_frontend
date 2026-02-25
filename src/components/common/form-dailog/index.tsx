@@ -70,7 +70,7 @@ export default function FormDialog({
   return (
     <>
       <button
-        className={`px-4 py-[5px] rounded-[8px] font-[500] text-[20px] cursor-pointer transition-colors duration-200 ${triggerStyles[triggerVariant]}`}
+        className={`px-4 py-[5px] rounded-[8px] font-[500] text-[20px] cursor-pointer transition-colors duration-200 [font-family:var(--font-poppins)] ${triggerStyles[triggerVariant]}`}
         onClick={handleClickOpen}
       >
         {buttonText}
@@ -84,7 +84,7 @@ export default function FormDialog({
         slotProps={{
           paper: {
             sx: {
-              borderRadius: '14px',
+              borderRadius: '6px',
               fontFamily: 'var(--font-poppins)',
             },
           },
@@ -121,8 +121,8 @@ export default function FormDialog({
           </>
         ) : (
           <>
-            <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: '30px', borderBottom: '1px solid #EAEAEA' }}>
-              <span className="text-[20px] font-[600] text-black">{title}</span>
+            <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: '30px', pt: '25px', pb: '10px' }}>
+              <span className="text-[18px] font-[400] text-black [font-family:var(--font-poppins)]">{title}</span>
               <button
                 onClick={handleClose}
                 className="text-neutral hover:text-black transition-colors cursor-pointer"
@@ -137,9 +137,9 @@ export default function FormDialog({
               </DialogContent>
             )}
 
-            <DialogActions sx={{ p: '30px', borderTop: children ? '1px solid #EAEAEA' : 'none' }}>
+            <DialogActions sx={{ px: '30px', py: '15px', borderTop: children ? '1px solid #EAEAEA' : 'none' }}>
               <button
-                className={`px-6 py-2 rounded-[8px] font-[500] cursor-pointer transition-colors duration-200 ${submitStyles[submitVariant]} disabled:opacity-50 disabled:cursor-not-allowed`}
+                className={`px-8 py-2 rounded-[8px] font-[500] cursor-pointer transition-colors duration-200 ${submitStyles[submitVariant]} disabled:opacity-50 disabled:cursor-not-allowed`}
                 onClick={handleSubmit}
                 disabled={isSubmitting || loading}
               >
