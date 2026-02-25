@@ -11,7 +11,6 @@ function Area() {
             <div className='px-[50px] mt-[51px]'>
                 <div className="flex items-center justify-between mb-8">
                     <h1 className='text-black text-[32px] font-[500]'>Areas</h1>
-
                 </div>
 
                 <div className='w-full flex items-center gap-[24px]'>
