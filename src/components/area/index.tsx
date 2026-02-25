@@ -1,11 +1,78 @@
 "use client"
-import React from 'react'
-import Input from '../common/Input'
-import Button from '../common/Button'
+import React, { useEffect, useState } from 'react'
 import { Plus } from 'lucide-react'
 import AreaTable from './area-table'
+import apiCall from '@/utils/api-call'
+import { routes } from '@/utils/routes'
+import FormDialog from '../common/form-dailog'
+import Input from '../common/Input'
+import SearchInput from '../common/SearchInput'
+
+interface AreaData {
+    id: string;
+    name: string;
+    code: string;
+    city: string;
+    status: string;
+}
+
+interface AreaResponse {
+    member: AreaData[];
+}
+
+interface CreateAreaResponse {
+    id: string;
+    name: string;
+    code: string;
+    city: string;
+    status: string;
+}
 
 function Area() {
+    const [areaResponse, setAreaResponse] = useState<AreaData[]>([])
+    const [areaName, setAreaName] = useState('')
+    const [loading, setLoading] = useState(false)
+
+    const getArea = async () => {
+        const response = await apiCall<AreaResponse>({
+            endpoint: routes.api.getArea,
+            method: "GET",
+        })
+        if (response.success && response.data?.member) {
+            setAreaResponse(response.data.member)
+        }
+    }
+
+    useEffect(() => {
+        getArea()
+    }, [])
+
+    const handleCreateArea = async (): Promise<boolean> => {
+        setLoading(true)
+        const response = await apiCall<CreateAreaResponse>({
+            endpoint: routes.api.getArea,
+            method: "POST",
+            data: { name: areaName },
+            showSuccessToast: true,
+            successMessage: "Area created successfully",
+        })
+        setLoading(false)
+        if (response.success && response.data) {
+            setAreaResponse((prev) => [...prev, response.data as AreaData])
+            setAreaName('')
+            return true
+        }
+        return false
+    }
+
+    const handleSearchResults = (data: AreaResponse | null) => {
+        if (data && data.member) {
+            setAreaResponse(data.member)
+        } else {
+            getArea()
+        }
+    }
+
     return (
         <>
             <div className='px-[50px] mt-[51px]'>
@@ -14,16 +81,28 @@ function Area() {
                 </div>
 
                 <div className='w-full flex items-center gap-[24px]'>
-                    <Input
+                    <SearchInput<AreaResponse>
+                        endpoint={routes.api.getArea}
+                        searchKey="name"
                         placeholder="Search Area"
-                        search
+                        onResults={handleSearchResults}
                     />
-                    <Button className="flex items-center gap-2">
-                        <Plus size={20} />
-                        Create
-                    </Button>
+                    <FormDialog
+                        title="Area Name"
+                        buttonText={<span className="flex items-center gap-2 px-[16px] py-[8px]"><Plus size={20} />Create</span>}
+                        saveButtonText="Save"
+                        onSubmit={handleCreateArea}
+                        loading={loading}
+                    >
+                        <Input
+                            placeholder="e.g. Arsenal"
+                            value={areaName}
+                            onChange={(e) => setAreaName(e.target.value)}
+                            className=''
+                        />
+                    </FormDialog>
                 </div>
-                <AreaTable />
+                <AreaTable areaResponse={areaResponse} />
             </div>
         </>
     )
