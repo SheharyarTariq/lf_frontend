@@ -8,7 +8,8 @@ import FormDialog from '../common/form-dailog'
 import Input from '../common/Input'
 import SearchInput from '../common/SearchInput'
 
-interface AreaData {
+export interface AreaData {
+    "@id": string;
     id: string;
     name: string;
     code: string;
@@ -39,6 +40,7 @@ function Area() {
             method: "GET",
         })
         if (response.success && response.data?.member) {
+            console.log(response)
             setAreaResponse(response.data.member)
         }
     }
@@ -89,7 +91,7 @@ function Area() {
                     />
                     <FormDialog
                         title="Area Name"
-                        buttonText={<span className="flex items-center gap-2 px-[16px] py-[8px]"><Plus size={20} />Create</span>}
+                        buttonText={<span className="flex items-center gap-2"><Plus size={20} />Create</span>}
                         saveButtonText="Save"
                         onSubmit={handleCreateArea}
                         loading={loading}

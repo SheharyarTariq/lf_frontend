@@ -2,11 +2,12 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #000000;
   --delete: #D62626;
   --secondary: #C1F11D;
   --muted: #EAEAEA;
   --neutral: #8F8F8F;
+  --silver: #667085;
   --placeholder: #C1C1C1;
   --limeGreen: #D6FF4B;
 }
@@ -20,12 +21,14 @@
   --color-neutral: var(--neutral);
   --font-sans: var(--font-poppins);
   --color-limeGreen: var(--limeGreen);
+  --color-silver: var(--silver);
+
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #ffffff;
-    --foreground: #ededed;
+    --foreground: #000000;
   }
 }
 

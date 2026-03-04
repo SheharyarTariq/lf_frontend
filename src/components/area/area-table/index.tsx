@@ -1,7 +1,10 @@
 import React from 'react'
 import GenericTable, { Column } from '@/components/common/GenericTable'
+import { useRouter } from 'next/navigation'
+import { routes } from '@/utils/routes'
 
 interface AreaData {
+    "@id": string;
     id: string;
     name: string;
     code: string;
@@ -23,10 +26,14 @@ const columns: Column<AreaData>[] = [
 ];
 
 function AreaTable({ areaResponse }: { areaResponse: AreaData[] }) {
+    const router = useRouter()
     return (
         <>
             <div className='mt-[30px]'>
-                <GenericTable columns={columns} data={areaResponse} />
+                <GenericTable columns={columns} data={areaResponse} onRowClick={(row) => {
+                    const areaId = row["@id"]?.split('/').pop() || row.id
+                    router.push(`${routes.ui.areaDetails(areaId)}?name=${encodeURIComponent(row.name)}`)
+                }} />
             </div>
         </>
     )

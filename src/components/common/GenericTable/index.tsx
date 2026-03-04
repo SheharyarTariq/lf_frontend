@@ -7,6 +7,7 @@ export interface Column<T> {
     accessor: keyof T | ((row: T) => React.ReactNode);
     className?: string;
     sortable?: boolean;
+    isAction?: boolean;
 }
 
 export interface GenericTableProps<T> {
@@ -87,6 +88,8 @@ function GenericTable<T>({ columns, data, onRowClick, className = "", pageSize =
         return typeof column.accessor !== 'function' && column.sortable !== false;
     };
 
+    const hasActionColumn = columns.some((col) => col.isAction);
+
     return (
         <div className={`overflow-x-auto border border-muted rounded-[14px] ${className}`}>
             <table className="min-w-full text-left border-collapse">
@@ -95,7 +98,7 @@ function GenericTable<T>({ columns, data, onRowClick, className = "", pageSize =
                         {columns.map((column, index) => (
                             <th
                                 key={index}
-                                className={`py-[16px] px-[25px] font-[500] text-black  ${isSortable(column) ? 'cursor-pointer select-none' : ''} ${column.className || ''}`}
+                                className={`py-[16px] px-[25px] font-[500] text-black ${hasActionColumn && !column.isAction ? 'w-[1%] whitespace-nowrap' : ''} ${isSortable(column) ? 'cursor-pointer select-none' : ''} ${column.className || ''}`}
                                 onClick={() => isSortable(column) && handleSort(column.accessor as keyof T)}
                             >
                                 {isSortable(column) ? (
@@ -103,10 +106,10 @@ function GenericTable<T>({ columns, data, onRowClick, className = "", pageSize =
                                         {column.header}
                                         {sortConfig?.key === (column.accessor as string) ? (
                                             sortConfig.direction === 'asc'
-                                                ? <ArrowUp size={16} className="text-neutral" />
-                                                : <ArrowDown size={16} className="text-neutral" />
+                                                ? <ArrowUp size={16} className="text-silver" />
+                                                : <ArrowDown size={16} className="text-silver" />
                                         ) : (
-                                            <ArrowDown size={16} className="text-neutral opacity-40" />
+                                            <ArrowDown size={16} className="text-silver" />
                                         )}
                                     </div>
                                 ) : (
@@ -126,7 +129,7 @@ function GenericTable<T>({ columns, data, onRowClick, className = "", pageSize =
                             {columns.map((column, colIndex) => (
                                 <td
                                     key={colIndex}
-                                    className={`py-[16px] px-[25px] text-black ${column.className || ''}`}
+                                    className={`py-[16px] px-[25px] text-black ${hasActionColumn && !column.isAction ? 'w-[1%] whitespace-nowrap text-center' : ''} ${column.className || ''}`}
                                 >
                                     {renderCell(row, column)}
                                 </td>
