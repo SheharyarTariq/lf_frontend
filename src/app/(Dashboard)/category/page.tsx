@@ -1,7 +1,5 @@
 import Category from '@/components/category'
 
-function page() {
+export default function page() {
   return <Category />
 }
-
-export default page
