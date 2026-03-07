@@ -23,6 +23,7 @@ function AreaDetails() {
         const response = await apiCall({
             endpoint: routes.api.editArea(areaId),
             method: "PATCH",
+            headers:{"content-type": "application/merge-patch+json"},
             data: { name: areaName },
             showSuccessToast: true,
             successMessage: "Area updated successfully",

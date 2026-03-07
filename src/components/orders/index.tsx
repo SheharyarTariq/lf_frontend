@@ -2,6 +2,7 @@ import React from 'react'
 import Input from '../common/Input'
 import Button from '../common/Button'
 import { Plus } from 'lucide-react'
+import OrdersTable from './orders-table'
 
 function Orders() {
     return (
@@ -10,14 +11,9 @@ function Orders() {
                 <h1 className='text-[32px] font-[500] text-black'>Orders</h1>
                 <div className='w-full flex items-center gap-[24px] mt-5'>
                     <Input placeholder="Search Orders" search />
-                    <div className='flex items-center relative'>
-                        <Button className='flex gap-[10px]'>
-                            <Plus size={20} />
-                            Create
-                        </Button>
-                    </div>
                 </div>
             </div>
+            <OrdersTable />
         </div>
     )
 }

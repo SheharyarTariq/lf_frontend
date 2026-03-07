@@ -3,6 +3,7 @@ import { ChevronDown } from 'lucide-react';
 interface Option {
     label: string;
     value: string | number;
+    disabled?: boolean;
 }
 
 interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'children'> {
@@ -28,7 +29,7 @@ function Select({ options, placeholder = "Select", startIcon, fullWidth = false,
                 {...props}
             >
                 {options.map((option) => (
-                    <option key={option.value} value={option.value}>
+                    <option key={option.value} value={option.value} disabled={option.disabled}>
                         {option.label}
                     </option>
                 ))}

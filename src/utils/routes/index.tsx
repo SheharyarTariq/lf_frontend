@@ -8,6 +8,7 @@ export const routes = {
     users: "/users",
     areaDetails: (id: string | number) => `area/${id}`,
     categoryDetails: (id: string | number) => `category/${id}`,
+    orderDetails: (id: string | number) => `orders/${id}`,
   },
 
   api: {
@@ -32,5 +33,14 @@ export const routes = {
     createItems: "items",
     deleteItems: (id: string) => `items/${id}`,
     updateItems: (id: string) => `items/${id}`,
+    getOrders: "orders/admin-list",
+    getOrderDetails: (id: string) => `orders/${id}/admin-detail`,
+    getOrderItems: (id: string) => `orders/${id}/order-items`,
+    cancelOrder: (id: string) => `orders/${id}/mark-as-cancelled`,
+    finaliseOrder: (id: string) => `orders/${id}/finalise`,
+    createRegularItem: "order-items",
+    createOpenItem: "order-items/open-item",
+    deleteOrderItem: (id: string) => `order-items/${id}`,
+    updateOrderItem: (id: string) => `order-items/${id}`,
   },
 };

@@ -141,6 +141,7 @@ function Category() {
             data={categories}
             onRowClick={(row) => router.push(`${routes.ui.categoryDetails(row.id)}?name=${encodeURIComponent(row.name)}`)}
           />
+          <GenericTable columns={columns} data={categories} />
         </div>
       </div>
     </div>
