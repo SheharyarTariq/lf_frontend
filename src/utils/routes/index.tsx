@@ -7,6 +7,7 @@ export const routes = {
     orders: "/orders",
     users: "/users",
     areaDetails: (id: string | number) => `area/${id}`,
+    categoryDetails: (id: string | number) => `category/${id}`,
   },
 
   api: {
@@ -23,6 +24,13 @@ export const routes = {
     createPostcode: "postcodes",
     markPostcodeActive: (id: string) => `postcodes/${id}/mark-as-active`,
     markPostcodeInactive: (id: string) => `postcodes/${id}/mark-as-inactive`,
-
+    getItemCategories: "item-categories/admin-list",
+    createItemCategory: "item-categories",
+    updateItemCategory: (id: string) => `item-categories/${id}`,
+    deleteItemCategory: (id: string) => `item-categories/${id}`,
+    getItemCategoryDetails: (id: string) => `item-categories/${id}/items`,
+    createItems: "items",
+    deleteItems: (id: string) => `items/${id}`,
+    updateItems: (id: string) => `items/${id}`,
   },
 };
