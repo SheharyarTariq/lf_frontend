@@ -7,7 +7,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 
-type TriggerVariant = "primary" | "delete" | "logout";
+type TriggerVariant = "primary" | "delete" | "logout" | "icon";
 type SubmitVariant = "primary" | "delete";
 
 interface FormDialogProps {
@@ -24,7 +24,8 @@ interface FormDialogProps {
 const triggerStyles: Record<TriggerVariant, string> = {
   primary: "bg-black text-white hover:bg-neutral-700",
   delete: "bg-delete text-white hover:bg-red-700",
-  logout: "bg-white text-black hover:bg-muted",
+  logout: "bg-white text-black hover:bg-muted !px-4 !py-2",
+  icon: "bg-transparent p-0",
 };
 
 const submitStyles: Record<SubmitVariant, string> = {
@@ -70,7 +71,7 @@ export default function FormDialog({
   return (
     <>
       <button
-        className={`px-4 py-[5px] rounded-[8px] font-[500] text-[20px] cursor-pointer transition-colors duration-200 [font-family:var(--font-poppins)] ${triggerStyles[triggerVariant]}`}
+        className={`${triggerVariant === "icon" ? "px-2 cursor-pointer" : "px-[25px] py-[14px] rounded-[8px] font-[500] text-[20px] cursor-pointer transition-colors duration-200 [font-family:var(--font-poppins)] whitespace-nowrap"} ${triggerStyles[triggerVariant]}`}
         onClick={handleClickOpen}
       >
         {buttonText}
