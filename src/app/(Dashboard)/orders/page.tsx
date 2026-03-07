@@ -1,7 +1,5 @@
 import Orders from '@/components/orders'
 
-function page() {
+export default function page() {
     return <Orders />
 }
-
-export default page

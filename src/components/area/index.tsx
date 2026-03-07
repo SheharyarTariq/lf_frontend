@@ -40,7 +40,6 @@ function Area() {
             method: "GET",
         })
         if (response.success && response.data?.member) {
-            console.log(response)
             setAreaResponse(response.data.member)
         }
     }
