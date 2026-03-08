@@ -8,6 +8,9 @@ import CustomerInfo from './customer-info'
 import SpecialNotes from './special-notes'
 import OrderInformation from './order-information'
 import OrderItems from './order-items'
+import FormDialog from '@/components/common/form-dailog'
+import Button from '@/components/common/Button'
+import toast from 'react-hot-toast'
 
 interface OrderSlot {
     "@context"?: string;
@@ -70,15 +73,19 @@ interface OrderDetail {
 const statusStyles: Record<string, string> = {
     created: "bg-[#E3ECF6] text-[#3A4F6C]",
     delivered: "bg-[#D1FAE5] text-[#065F46]",
-    "in progress": "bg-[#E0E7FF] text-[#3730A3]",
-    "in-progress": "bg-[#E0E7FF] text-[#3730A3]",
     cancelled: "bg-[#FEE2E2] text-[#991B1B]",
+    processing: "bg-[#DBEAFE] text-[#1E40AF]",
+    awaiting_review: "bg-[#FEF3C7] text-[#92400E]",
+    payment_failed: "bg-[#FDE8E8] text-[#9B1C1C]",
+    payment_pending: "bg-[#F3E8FF] text-[#6B21A8]",
 }
 
 function OrderDetails() {
     const params = useParams()
     const orderId = params["order-details"] as string
     const [order, setOrder] = useState<OrderDetail | null>(null)
+    const [cancelLoading, setCancelLoading] = useState(false)
+    const [finaliseLoading, setFinaliseLoading] = useState(false)
 
     const getOrderDetails = async () => {
         const response = await apiCall<OrderDetail>({
@@ -91,6 +98,42 @@ function OrderDetails() {
         }
     }
 
+    const handleCancelOrder = async (): Promise<boolean> => {
+        setCancelLoading(true)
+        const response = await apiCall({
+            endpoint: routes.api.cancelOrder(orderId),
+            method: "POST",
+            headers: { "Content-Type": "application/ld+json" },
+            showSuccessToast: true,
+            successMessage: "Order cancelled successfully",
+            data: {}
+        })
+        setCancelLoading(false)
+        if (response.success) {
+            await getOrderDetails()
+            return true
+        }
+        return false
+    }
+
+    const handleFinaliseOrder = async (): Promise<boolean> => {
+        setFinaliseLoading(true)
+        const response = await apiCall({
+            endpoint: routes.api.finaliseOrder(orderId),
+            method: "POST",
+            headers: { "Content-Type": "application/ld+json" },
+            showSuccessToast: true,
+            successMessage: "Order finalised successfully",
+            data: {}
+        })
+        setFinaliseLoading(false)
+        if (response.success) {
+            await getOrderDetails()
+            return true
+        }
+        return false
+    }
+
     useEffect(() => {
         getOrderDetails()
     }, [])
@@ -99,6 +142,8 @@ function OrderDetails() {
 
     const statusLabel = order.status.replace(/-/g, " ")
     const statusStyle = statusStyles[order.status.toLowerCase()] || "bg-gray-100 text-gray-600"
+    const isCancelled = order.status.toLowerCase() === "cancelled"
+    const hasOrderItems = order.orderItems && order.orderItems.length > 0
 
     return (
         <div className="px-[30px] pt-3 pb-10">
@@ -115,12 +160,43 @@ function OrderDetails() {
                 <div className="flex items-center justify-between mt-[20px] mx-[30px] mb-[30px]">
 
                     <div className="flex items-center gap-[12px]">
-                        <button className="px-6 py-[10px] rounded-[8px] font-[500] text-[20px] cursor-pointer transition-colors duration-200 border border-delete text-delete hover:bg-[#FEE2E2] flex items-center gap-[6px]">
-                            ✕ Cancel Order
-                        </button>
-                        <button className="px-6 py-[10px] rounded-[8px] font-[500] text-[20px] cursor-pointer transition-colors duration-200 bg-black text-white hover:bg-neutral-700 flex items-center gap-[6px]">
-                            ✓ Finalize Order
-                        </button>
+                        {!isCancelled ? (
+                            <FormDialog
+                                title="Cancel Order"
+                                buttonText="✕ Cancel Order"
+                                saveButtonText="Yes"
+                                onSubmit={handleCancelOrder}
+                                loading={cancelLoading}
+                                triggerVariant="delete"
+                                submitVariant="delete"
+                            >
+                                Are you sure you want to cancel this order?
+                            </FormDialog>
+                        ) : (
+                            <button className='bg-muted text-placeholder cursor-not-allowed rounded-md py-4 px-6 text-[20px] font-[500]'
+                                onClick={() => toast.error("This order is already cancelled", { id: "cancel-error" })}
+                            >
+                                ✕ Cancel Order
+                            </button>
+                        )}
+                        {hasOrderItems ? (
+                            <FormDialog
+                                title="Finalize Order"
+                                buttonText="✓ Finalize Order"
+                                saveButtonText="Confirm"
+                                onSubmit={handleFinaliseOrder}
+                                loading={finaliseLoading}
+                            >
+                                Are you sure you want to finalize this order?
+                            </FormDialog>
+                        ) : (
+                            <button className='bg-muted text-placeholder cursor-not-allowed cursor-delete  rounded-md py-4 px-6 text-[20px] font-[500]'
+                                onClick={() => toast.error("Add an Item First TO Finalise The Order", { id: "finalise-error" })}
+                            >
+                                ✓ Finalize Order
+                            </button>
+                        )
+                        }
                     </div>
                 </div>
             </div>
@@ -137,7 +213,7 @@ function OrderDetails() {
                     />
                 </div>
                 <div className="flex-1">
-                    <OrderItems orderId={orderId} revenue={order.revenue} />
+                    <OrderItems orderId={orderId} revenue={order.revenue} onItemsChange={getOrderDetails} />
                 </div>
             </div>
         </div>
@@ -145,3 +221,4 @@ function OrderDetails() {
 }
 
 export default OrderDetails
+

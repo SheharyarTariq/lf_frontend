@@ -41,7 +41,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${poppins.variable}`}>
       <body className="antialiased">
-        <Toaster position="bottom-center" />
+        <Toaster position="bottom-center" toastOptions={{ duration: 5000 }} />
         {children}
       </body>
     </html>

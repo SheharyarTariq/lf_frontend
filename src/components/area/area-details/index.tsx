@@ -8,6 +8,7 @@ import Input from '@/components/common/Input'
 import apiCall from '@/utils/api-call'
 import { routes } from '@/utils/routes'
 import Postcodes from './postcodes'
+import Button from '@/components/common/Button'
 
 function AreaDetails() {
     const params = useParams()
@@ -60,6 +61,10 @@ function AreaDetails() {
 
             <Slots areaId={areaId} />
             <Postcodes areaId={areaId}/>
+            <Button 
+            className='text-right mt-6 bg-muted text-placeholder cursor-not-allowed rounded-md py-4 px-6 text-[20px] font-[500]'>
+            ✕ Delete Area
+            </Button>
         </div>
     )
 }

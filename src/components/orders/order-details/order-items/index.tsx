@@ -32,6 +32,13 @@ interface ItemCategory {
     washingLabel: string;
 }
 
+interface RegularItemOption {
+    id: string;
+    atId: string;
+    name: string;
+    washingLabel: string;
+}
+
 interface OrderItemsData {
     totalItems: number;
     member: OrderItem[];
@@ -50,20 +57,28 @@ const cleaningMethodOptions = [
     { label: "Dry Clean", value: "dry_cleaning" },
 ]
 
-function OrderItems({ orderId, revenue }: { orderId: string; revenue: number }) {
+function OrderItems({ orderId, revenue, onItemsChange }: { orderId: string; revenue: number; onItemsChange?: () => void }) {
     const [orderItems, setOrderItems] = useState<OrderItem[]>([])
-    const [openItemName, setOpenItemName] = useState("")
-    const [quantity, setQuantity] = useState("")
-    const [pieces, setPieces] = useState("")
-    const [cleaningMethod, setCleaningMethod] = useState("")
-    const [pricePerUnit, setPricePerUnit] = useState("")
+    const [openItemData, setOpenItemData] = useState({
+        openItemName: "",
+        quantity: "",
+        piece: "",
+        cleaningMethod: "",
+        pricePerUnit: "",
+    })
     const [createLoading, setCreateLoading] = useState(false)
+    const [isDeletingItem, setIsDeletingItem] = useState(false)
+    const [deleteItemId, setDeleteItemId] = useState<string>("")
+
 
     const [itemCategories, setItemCategories] = useState<ItemCategory[]>([])
-    const [regularItem, setRegularItem] = useState("")
-    const [regularQuantity, setRegularQuantity] = useState("1")
-    const [regularCleaningMethod, setRegularCleaningMethod] = useState("")
-    const [regularPricePerUnit, setRegularPricePerUnit] = useState("")
+    const [allItems, setAllItems] = useState<RegularItemOption[]>([])
+    const [regularItemData, setRegularItemData] = useState({
+        item: "",
+        quantity: "1",
+        cleaningMethod: "",
+        pricePerUnit: "",
+    })
     const [createRegularLoading, setCreateRegularLoading] = useState(false)
 
     const handleCreateOpenItem = async (): Promise<boolean> => {
@@ -72,11 +87,11 @@ function OrderItems({ orderId, revenue }: { orderId: string; revenue: number }) 
             endpoint: routes.api.createOpenItem,
             method: "POST",
             data: {
-                openItemName,
-                quantity: quantity ? Number(quantity) : 1,
-                piece: pieces ? Number(pieces) : 0,
-                cleaningMethod,
-                pricePerUnit: pricePerUnit ? Number(pricePerUnit) : 0,
+                openItemName: openItemData.openItemName,
+                quantity: openItemData.quantity ? Number(openItemData.quantity) : 1,
+                piece: openItemData.piece ? Number(openItemData.piece) : 0,
+                cleaningMethod: openItemData.cleaningMethod,
+                pricePerUnit: openItemData.pricePerUnit ? Number(openItemData.pricePerUnit) : 0,
                 order: `/orders/${orderId}`,
             },
             showSuccessToast: true,
@@ -84,12 +99,15 @@ function OrderItems({ orderId, revenue }: { orderId: string; revenue: number }) 
         })
         setCreateLoading(false)
         if (response.success) {
-            setOpenItemName("")
-            setQuantity("")
-            setPieces("")
-            setCleaningMethod("")
-            setPricePerUnit("")
+            setOpenItemData({
+                openItemName: "",
+                quantity: "",
+                piece: "",
+                cleaningMethod: "",
+                pricePerUnit: "",
+            })
             await getOrderItems()
+            onItemsChange?.()
             return true
         }
         return false
@@ -99,7 +117,6 @@ function OrderItems({ orderId, revenue }: { orderId: string; revenue: number }) 
         const response = await apiCall<OrderItemsData>({
             endpoint: routes.api.getOrderItems(orderId),
             method: "GET",
-            headers: { "Accept": "application/ld+json" },
         })
         if (response.success && response?.data) {
             setOrderItems(response.data.member)
@@ -114,10 +131,33 @@ function OrderItems({ orderId, revenue }: { orderId: string; revenue: number }) 
         })
         if (response.success && response?.data) {
             setItemCategories(response.data.member)
+            await fetchAllItems(response.data.member)
         }
     }
 
-    const selectedItemData = itemCategories.find(item => item["@id"] === regularItem)
+    const fetchAllItems = async (categories: ItemCategory[]) => {
+        const itemsList: RegularItemOption[] = []
+        for (const category of categories) {
+            const response = await apiCall<{ member: { "@id"?: string; id: string; name: string }[] }>({
+                endpoint: routes.api.getItemCategoryDetails(category.id),
+                method: "GET",
+                headers: { "Accept": "application/ld+json" },
+            })
+            if (response.success && response.data) {
+                response.data.member.forEach(item => {
+                    itemsList.push({
+                        id: item.id,
+                        atId: item["@id"] || `/items/${item.id}`,
+                        name: item.name,
+                        washingLabel: category.washingLabel,
+                    })
+                })
+            }
+        }
+        setAllItems(itemsList)
+    }
+
+    const selectedItemData = allItems.find(item => item.atId === regularItemData.item)
 
     const getRegularCleaningOptions = () => {
         if (!selectedItemData) return cleaningMethodOptions
@@ -140,27 +180,50 @@ function OrderItems({ orderId, revenue }: { orderId: string; revenue: number }) 
     }
 
     const handleCreateRegularItem = async (): Promise<boolean> => {
-        setCreateRegularLoading(true)
+        const payload = {
+            item: regularItemData.item,
+            quantity: regularItemData.quantity ? Number(regularItemData.quantity) : 1,
+            cleaningMethod: regularItemData.cleaningMethod,
+            pricePerUnit: regularItemData.pricePerUnit ? Number(regularItemData.pricePerUnit) : 0,
+            order: `/orders/${orderId}`,
+        }
+        console.log("Regular Item Payload:", JSON.stringify(payload))
         const response = await apiCall({
             endpoint: routes.api.createRegularItem,
             method: "POST",
-            data: {
-                item: regularItem,
-                quantity: regularQuantity ? Number(regularQuantity) : 1,
-                cleaningMethod: regularCleaningMethod,
-                pricePerUnit: regularPricePerUnit ? Number(regularPricePerUnit) : 0,
-                order: `/orders/${orderId}`,
-            },
+            data: payload,
             showSuccessToast: true,
             successMessage: "Regular item created successfully",
         })
         setCreateRegularLoading(false)
         if (response.success) {
-            setRegularItem("")
-            setRegularQuantity("1")
-            setRegularCleaningMethod("")
-            setRegularPricePerUnit("")
+            setRegularItemData({
+                item: "",
+                quantity: "1",
+                cleaningMethod: "",
+                pricePerUnit: "",
+            })
             await getOrderItems()
+            onItemsChange?.()
+            return true
+        }
+        return false
+    }
+
+
+
+    const handleDeleteOrderItem = async (): Promise<boolean> => {
+        setIsDeletingItem(true)
+        const response = await apiCall({
+            endpoint: routes.api.deleteOrderItem(deleteItemId),
+            method: "DELETE",
+            showSuccessToast: true,
+            successMessage: "Item deleted successfully",
+        })
+        setIsDeletingItem(false)
+        if (response.success) {
+            await getOrderItems()
+            onItemsChange?.()
             return true
         }
         return false
@@ -173,7 +236,11 @@ function OrderItems({ orderId, revenue }: { orderId: string; revenue: number }) 
 
     const columns = [
         {
-            accessor: (row: OrderItem) => row.openItemName || "-",
+            accessor: (row: OrderItem) => {
+                if (row.openItemName) return row.openItemName
+                const matched = allItems.find(i => i.atId === row.item || `/items/${i.id}` === row.item)
+                return matched?.name || "-"
+            },
             header: "Item Name",
             sortable: false,
         },
@@ -197,17 +264,27 @@ function OrderItems({ orderId, revenue }: { orderId: string; revenue: number }) 
             sortable: false,
         },
         {
-            accessor: () => (
-                <button
-                    className="text-delete hover:text-red-700 font-[400] text-[20px] transition-colors cursor-pointer"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                    }}
-                >
-                    ✕
-                </button>
+            accessor: (row: OrderItem) => (
+                <div className='flex items-center justify-end'>
+                    <FormDialog
+                        title="Delete Item"
+                        buttonText={
+                            <div onClick={() => setDeleteItemId(row.id)}>
+                                <img src="/assets/trashEnabled.svg" alt="Delete" className="cursor-pointer h-[38px] w-[38px]" />
+                            </div>
+                        }
+                        saveButtonText="Yes"
+                        onSubmit={handleDeleteOrderItem}
+                        loading={isDeletingItem}
+                        triggerVariant="icon"
+                        submitVariant="delete"
+                    >
+                        Are you sure you want to delete this item?
+                        <span className="mt-[8px] block">This action cannot be undone.</span>
+                    </FormDialog>
+                </div>
             ),
-            header: "Total",
+            header: "Action",
             sortable: false,
             className: "text-right",
             isAction: true,
@@ -232,8 +309,8 @@ function OrderItems({ orderId, revenue }: { orderId: string; revenue: number }) 
                                     <label className="text-black font-[500] text-[14px] mb-[8px] block">Item Name</label>
                                     <Input
                                         placeholder="e.g. Formal Shirt"
-                                        value={openItemName}
-                                        onChange={(e) => setOpenItemName(e.target.value)}
+                                        value={openItemData.openItemName}
+                                        onChange={(e) => setOpenItemData(prev => ({ ...prev, openItemName: e.target.value }))}
                                         type="text"
                                     />
                                 </div>
@@ -242,8 +319,8 @@ function OrderItems({ orderId, revenue }: { orderId: string; revenue: number }) 
                                         <label className="text-black font-[500] text-[14px] mb-[8px] block">Quantity</label>
                                         <Input
                                             placeholder="1"
-                                            value={quantity}
-                                            onChange={(e) => setQuantity(e.target.value)}
+                                            value={openItemData.quantity}
+                                            onChange={(e) => setOpenItemData(prev => ({ ...prev, quantity: e.target.value }))}
                                             type="number"
                                         />
                                     </div>
@@ -251,8 +328,8 @@ function OrderItems({ orderId, revenue }: { orderId: string; revenue: number }) 
                                         <label className="text-black font-[500] text-[14px] mb-[8px] block">Pieces</label>
                                         <Input
                                             placeholder="e.g. 2"
-                                            value={pieces}
-                                            onChange={(e) => setPieces(e.target.value)}
+                                            value={openItemData.piece}
+                                            onChange={(e) => setOpenItemData(prev => ({ ...prev, piece: e.target.value }))}
                                             type="number"
                                         />
                                     </div>
@@ -263,8 +340,8 @@ function OrderItems({ orderId, revenue }: { orderId: string; revenue: number }) 
                                         <Select
                                             options={cleaningMethodOptions}
                                             placeholder="Select"
-                                            value={cleaningMethod}
-                                            onChange={(e) => setCleaningMethod(e.target.value)}
+                                            value={openItemData.cleaningMethod}
+                                            onChange={(e) => setOpenItemData(prev => ({ ...prev, cleaningMethod: e.target.value }))}
                                             fullWidth
                                         />
                                     </div>
@@ -272,8 +349,8 @@ function OrderItems({ orderId, revenue }: { orderId: string; revenue: number }) 
                                         <label className="text-black font-[500] text-[14px] mb-[8px] block">Price Per Unit</label>
                                         <Input
                                             placeholder="e.g. 5000"
-                                            value={pricePerUnit}
-                                            onChange={(e) => setPricePerUnit(e.target.value)}
+                                            value={openItemData.pricePerUnit}
+                                            onChange={(e) => setOpenItemData(prev => ({ ...prev, pricePerUnit: e.target.value }))}
                                             type="number"
                                         />
                                     </div>
@@ -293,24 +370,23 @@ function OrderItems({ orderId, revenue }: { orderId: string; revenue: number }) 
                                         <label className="text-black font-[500] text-[14px] mb-[8px] block">Item</label>
                                         <Select
                                             options={[
-                                                { label: "Select", value: "" },
-                                                ...itemCategories.map(item => ({ label: item.name, value: item["@id"] || item.id }))
+                                                ...allItems.map(item => ({ label: item.name, value: item.atId }))
                                             ]}
                                             placeholder="Select"
-                                            value={regularItem}
+                                            value={regularItemData.item}
                                             onChange={(e) => {
-                                                setRegularItem(e.target.value)
-                                                setRegularCleaningMethod("")
+                                                setRegularItemData(prev => ({ ...prev, item: e.target.value, cleaningMethod: "" }))
                                             }}
                                             fullWidth
+                                            searchable
                                         />
                                     </div>
                                     <div className="flex-1">
                                         <label className="text-black font-[500] text-[14px] mb-[8px] block">Quantity</label>
                                         <Input
                                             placeholder="1"
-                                            value={regularQuantity}
-                                            onChange={(e) => setRegularQuantity(e.target.value)}
+                                            value={regularItemData.quantity}
+                                            onChange={(e) => setRegularItemData(prev => ({ ...prev, quantity: e.target.value }))}
                                             type="number"
                                         />
                                     </div>
@@ -321,18 +397,21 @@ function OrderItems({ orderId, revenue }: { orderId: string; revenue: number }) 
                                         <Select
                                             options={getRegularCleaningOptions()}
                                             placeholder="Select"
-                                            value={regularCleaningMethod}
-                                            onChange={(e) => setRegularCleaningMethod(e.target.value)}
+                                            value={regularItemData.cleaningMethod}
+                                            onChange={(e) => {
+                                                console.log("Cleaning method selected:", e.target.value)
+                                                setRegularItemData(prev => ({ ...prev, cleaningMethod: e.target.value }))
+                                            }}
                                             fullWidth
-                                            disabled={!regularItem}
+                                            disabled={!regularItemData.item}
                                         />
                                     </div>
                                     <div className="flex-1">
                                         <label className="text-black font-[500] text-[14px] mb-[8px] block">Price Per Unit</label>
                                         <Input
                                             placeholder="e.g. 5000"
-                                            value={regularPricePerUnit}
-                                            onChange={(e) => setRegularPricePerUnit(e.target.value)}
+                                            value={regularItemData.pricePerUnit}
+                                            onChange={(e) => setRegularItemData(prev => ({ ...prev, pricePerUnit: e.target.value }))}
                                             type="number"
                                         />
                                     </div>

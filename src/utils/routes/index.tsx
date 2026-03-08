@@ -42,5 +42,7 @@ export const routes = {
     createOpenItem: "order-items/open-item",
     deleteOrderItem: (id: string) => `order-items/${id}`,
     updateOrderItem: (id: string) => `order-items/${id}`,
+    getItemCategoryById: (id: string) => `item-categories/${id}`,
+    getUsers: "users/admin-list",
   },
 };
