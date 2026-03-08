@@ -48,9 +48,11 @@ interface OrdersData {
 const statusStyles: Record<string, string> = {
     created: "bg-[#E3ECF6] text-[#3A4F6C]",
     delivered: "bg-[#D1FAE5] text-[#065F46]",
-    "in progress": "bg-[#E0E7FF] text-[#3730A3]",
-    "in-progress": "bg-[#E0E7FF] text-[#3730A3]",
     cancelled: "bg-[#FEE2E2] text-[#991B1B]",
+    processing: "bg-[#DBEAFE] text-[#1E40AF]",
+    awaiting_review: "bg-[#FEF3C7] text-[#92400E]",
+    payment_failed: "bg-[#FDE8E8] text-[#9B1C1C]",
+    payment_pending: "bg-[#F3E8FF] text-[#6B21A8]",
 }
 
 const formatDate = (dateStr: string) => {
