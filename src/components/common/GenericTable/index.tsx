@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, ArrowDown, ArrowUp } from 'lucide-react';
 export interface Column<T> {
     header: string;
     accessor: keyof T | ((row: T) => React.ReactNode);
+    render?: (row: T) => React.ReactNode;
     className?: string;
     sortable?: boolean;
     isAction?: boolean;
@@ -78,6 +79,9 @@ function GenericTable<T>({ columns, data, onRowClick, className = "", pageSize =
     };
 
     const renderCell = (row: T, column: Column<T>) => {
+        if (column.render) {
+            return column.render(row);
+        }
         if (typeof column.accessor === 'function') {
             return column.accessor(row);
         }
