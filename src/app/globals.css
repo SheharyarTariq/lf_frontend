@@ -20,6 +20,7 @@
   --color-muted: var(--muted);
   --color-neutral: var(--neutral);
   --font-sans: var(--font-poppins);
+  --color-placeholder: var(--placeholder);
   --color-limeGreen: var(--limeGreen);
   --color-silver: var(--silver);
 

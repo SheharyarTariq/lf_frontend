@@ -1,4 +1,5 @@
-import React from 'react'
+"use client"
+import React, { useEffect } from 'react'
 import Input from '../common/Input'
 import Button from '../common/Button'
 import { Plus } from 'lucide-react'

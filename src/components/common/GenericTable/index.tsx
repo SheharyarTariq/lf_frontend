@@ -8,6 +8,7 @@ export interface Column<T> {
     render?: (row: T) => React.ReactNode;
     className?: string;
     sortable?: boolean;
+    sortKey?: keyof T;
     isAction?: boolean;
 }
 
@@ -30,8 +31,13 @@ function GenericTable<T>({ columns, data, onRowClick, className = "", pageSize =
     const [currentPage, setCurrentPage] = useState(0);
     const [sortConfig, setSortConfig] = useState<SortConfig | null>(null);
 
-    const handleSort = (accessor: keyof T) => {
-        const key = accessor as string;
+    const getSortKey = (column: Column<T>): string => {
+        if (column.sortKey) return column.sortKey as string;
+        return column.accessor as string;
+    };
+
+    const handleSort = (column: Column<T>) => {
+        const key = getSortKey(column);
         setSortConfig((prev) => {
             if (prev && prev.key === key) {
                 return { key, direction: prev.direction === 'asc' ? 'desc' : 'asc' };
@@ -89,6 +95,7 @@ function GenericTable<T>({ columns, data, onRowClick, className = "", pageSize =
     };
 
     const isSortable = (column: Column<T>) => {
+        if (column.sortable === true) return true;
         return typeof column.accessor !== 'function' && column.sortable !== false;
     };
 
@@ -103,12 +110,12 @@ function GenericTable<T>({ columns, data, onRowClick, className = "", pageSize =
                             <th
                                 key={index}
                                 className={`py-[16px] px-[25px] font-[500] text-black ${hasActionColumn && !column.isAction ? 'w-[1%] whitespace-nowrap' : ''} ${isSortable(column) ? 'cursor-pointer select-none' : ''} ${column.className || ''}`}
-                                onClick={() => isSortable(column) && handleSort(column.accessor as keyof T)}
+                                onClick={() => isSortable(column) && handleSort(column)}
                             >
                                 {isSortable(column) ? (
                                     <div className="flex items-center gap-2">
                                         {column.header}
-                                        {sortConfig?.key === (column.accessor as string) ? (
+                                        {sortConfig?.key === getSortKey(column) ? (
                                             sortConfig.direction === 'asc'
                                                 ? <ArrowUp size={16} className="text-silver" />
                                                 : <ArrowDown size={16} className="text-silver" />

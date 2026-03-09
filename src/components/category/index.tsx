@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Input from '../common/Input'
-import Button from '../common/Button'
 import { Plus } from 'lucide-react'
 import GenericTable, { Column } from '@/components/common/GenericTable'
 import apiCall from '@/utils/api-call'
@@ -141,6 +140,7 @@ function Category() {
             data={categories}
             onRowClick={(row) => router.push(`${routes.ui.categoryDetails(row.id)}?name=${encodeURIComponent(row.name)}`)}
           />
+          <GenericTable columns={columns} data={categories} />
         </div>
       </div>
     </div>
