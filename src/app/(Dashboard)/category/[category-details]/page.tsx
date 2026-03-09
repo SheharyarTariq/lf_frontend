@@ -1,5 +1,5 @@
-import CategoryDetails from '@/components/category/category-details'
+import CategoryDetails from "@/components/category/category-details";
 
 export default function page() {
-    return <CategoryDetails />
+  return <CategoryDetails />;
 }

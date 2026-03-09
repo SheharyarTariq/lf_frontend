@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from 'react'
-import apiCall from '@/utils/api-call'
-import { routes } from '@/utils/routes'
-import Card from '@/components/common/Card'
-import GenericTable from '@/components/common/GenericTable'
-import Image from 'next/image'
-import FormDialog from '@/components/common/form-dailog'
-import Input from '@/components/common/Input'
+import React, { useEffect, useState } from "react";
+import apiCall from "@/utils/api-call";
+import { routes } from "@/utils/routes";
+import Card from "@/components/common/Card";
+import GenericTable from "@/components/common/GenericTable";
+import Image from "next/image";
+import FormDialog from "@/components/common/form-dailog";
+import Input from "@/components/common/Input";
+import { validateAndSetErrors } from "@/utils/validation";
+import { postcodeSchema } from "../../schema";
 
 interface Postcode {
   "@context"?: string;
@@ -16,8 +18,8 @@ interface Postcode {
 }
 
 const getPostcodeId = (postcode: Postcode): string => {
-  return postcode["@id"]?.split("/").pop() || ""
-}
+  return postcode["@id"]?.split("/").pop() || "";
+};
 
 interface PostcodesData {
   totalItems: number;
@@ -25,37 +27,41 @@ interface PostcodesData {
 }
 
 function Postcodes({ areaId }: { areaId: string }) {
-  const [postcodes, setPostcodes] = useState<Postcode[]>([])
-  const [searchQuery, setSearchQuery] = useState("")
-  const [newPostcode, setNewPostcode] = useState("")
-  const [createLoading, setCreateLoading] = useState(false)
+  const [postcodes, setPostcodes] = useState<Postcode[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [newPostcode, setNewPostcode] = useState("");
+  const [createLoading, setCreateLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const getPostcodes = async () => {
+    setLoading(true);
     const response = await apiCall<PostcodesData>({
       endpoint: routes.api.getPostcodes(areaId),
       method: "GET",
-    })
+    });
     if (response.success && response?.data) {
-      setPostcodes(response.data.member)
+      setPostcodes(response.data.member);
     }
-  }
+    setLoading(false);
+  };
 
   const handleToggle = async (postcodeId: string, isActive: boolean) => {
     const endpoint = isActive
       ? routes.api.markPostcodeInactive(postcodeId)
-      : routes.api.markPostcodeActive(postcodeId)
+      : routes.api.markPostcodeActive(postcodeId);
 
     const response = await apiCall({
       endpoint,
       method: "POST",
       data: {},
       showSuccessToast: true,
-    })
+    });
 
     if (response.success) {
-      await getPostcodes()
+      await getPostcodes();
     }
-  }
+  };
 
   const handleDelete = async (postcodeId: string): Promise<boolean> => {
     const response = await apiCall({
@@ -63,16 +69,24 @@ function Postcodes({ areaId }: { areaId: string }) {
       method: "DELETE",
       showSuccessToast: true,
       successMessage: "Postcode deleted successfully",
-    })
+    });
     if (response.success) {
-      await getPostcodes()
-      return true
+      await getPostcodes();
+      return true;
     }
-    return false
-  }
+    return false;
+  };
 
   const handleCreatePostcode = async (): Promise<boolean> => {
-    setCreateLoading(true)
+    if (
+      !(await validateAndSetErrors(
+        postcodeSchema,
+        { postcodeString: newPostcode },
+        setErrors
+      ))
+    )
+      return false;
+    setCreateLoading(true);
     const response = await apiCall({
       endpoint: routes.api.createPostcode,
       method: "POST",
@@ -83,29 +97,32 @@ function Postcodes({ areaId }: { areaId: string }) {
       },
       showSuccessToast: true,
       successMessage: "Postcode created successfully",
-    })
-    setCreateLoading(false)
+    });
+    setCreateLoading(false);
     if (response.success) {
-      setNewPostcode("")
-      await getPostcodes()
-      return true
+      setErrors({});
+      setNewPostcode("");
+      await getPostcodes();
+      return true;
     }
-    return false
-  }
+    return false;
+  };
 
   useEffect(() => {
-    getPostcodes()
-  }, [])
+    getPostcodes();
+  }, []);
 
   const filteredPostcodes = postcodes.filter((p) =>
     p.postcodeString.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  );
 
   return (
-    <div className='mt-[30px]'>
+    <div className="mt-[30px]">
       <Card>
-        <h2 className='text-black font-[500] text-[24px] mb-[25px]'>Postcodes</h2>
-        <div className='flex items-center justify-between mb-[30px] gap-[20px]'>
+        <h2 className="text-black font-[500] text-[24px] mb-[25px]">
+          Postcodes
+        </h2>
+        <div className="flex items-center justify-between mb-[30px] gap-[20px]">
           <Input
             search
             placeholder="Search Postcode"
@@ -121,12 +138,19 @@ function Postcodes({ areaId }: { areaId: string }) {
           >
             <div className="flex flex-col gap-[20px]">
               <div>
-                <label className="text-black font-[500] text-[14px] mb-[8px] block">Postcode</label>
+                <label className="text-black font-[500] text-[14px] mb-[8px] block">
+                  Postcode
+                </label>
                 <Input
                   placeholder="e.g. KT211PG"
                   value={newPostcode}
-                  onChange={(e) => setNewPostcode(e.target.value)}
+                  onChange={(e) => {
+                    setNewPostcode(e.target.value);
+                    if (errors.postcodeString)
+                      setErrors((prev) => ({ ...prev, postcodeString: "" }));
+                  }}
                   type="text"
+                  error={errors.postcodeString}
                 />
               </div>
             </div>
@@ -134,6 +158,7 @@ function Postcodes({ areaId }: { areaId: string }) {
         </div>
         <GenericTable
           data={filteredPostcodes}
+          isLoading={loading}
           columns={[
             { accessor: "postcodeString", header: "Postcode" },
             {
@@ -144,21 +169,31 @@ function Postcodes({ areaId }: { areaId: string }) {
                       e.stopPropagation();
                       handleToggle(getPostcodeId(row), row.isActive);
                     }}
-                    className={`relative w-[44px] h-[24px] rounded-full transition-colors duration-200 cursor-pointer ${row.isActive ? 'bg-[#34C759]' : 'bg-[#D1D5DB]'}`}
+                    className={`relative w-[44px] h-[24px] rounded-full transition-colors duration-200 cursor-pointer ${row.isActive ? "bg-[#34C759]" : "bg-[#D1D5DB]"}`}
                   >
                     <span
-                      className={`absolute top-[2px] left-[2px] w-[20px] h-[20px] bg-white rounded-full shadow transition-transform duration-200 ${row.isActive ? 'translate-x-[20px]' : 'translate-x-0'}`}
+                      className={`absolute top-[2px] left-[2px] w-[20px] h-[20px] bg-white rounded-full shadow transition-transform duration-200 ${row.isActive ? "translate-x-[20px]" : "translate-x-0"}`}
                     />
                   </button>
                   {row.isActive ? (
-                    <span className="p-[6px] opacity-100 pointer-events-none cursor-not-allowed">
-                      <Image src="/assets/TrashDisabled.svg" alt="Delete disabled" width={30} height={30} />
+                    <span className="px-2 opacity-100 pointer-events-none cursor-not-allowed">
+                      <Image
+                        src="/assets/TrashDisabled.svg"
+                        alt="Delete disabled"
+                        width={30}
+                        height={30}
+                      />
                     </span>
                   ) : (
                     <FormDialog
                       title="Delete Postcode"
                       buttonText={
-                        <Image src="/assets/TrashEnabled.svg" alt="Delete" width={30} height={30} />
+                        <Image
+                          src="/assets/TrashEnabled.svg"
+                          alt="Delete"
+                          width={30}
+                          height={30}
+                        />
                       }
                       saveButtonText="Yes"
                       onSubmit={() => handleDelete(getPostcodeId(row))}
@@ -166,7 +201,9 @@ function Postcodes({ areaId }: { areaId: string }) {
                       submitVariant="delete"
                     >
                       Are you sure you want to delete this Postcode?
-                      <span className="mt-[8px] block">This action cannot be undone.</span>
+                      <span className="mt-[8px] block">
+                        This action cannot be undone.
+                      </span>
                     </FormDialog>
                   )}
                 </div>
@@ -180,7 +217,7 @@ function Postcodes({ areaId }: { areaId: string }) {
         />
       </Card>
     </div>
-  )
+  );
 }
 
-export default Postcodes
+export default Postcodes;

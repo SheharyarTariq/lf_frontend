@@ -3,13 +3,13 @@
 :root {
   --background: #ffffff;
   --foreground: #000000;
-  --delete: #D62626;
-  --secondary: #C1F11D;
-  --muted: #EAEAEA;
-  --neutral: #8F8F8F;
+  --delete: #d62626;
+  --secondary: #c1f11d;
+  --muted: #eaeaea;
+  --neutral: #8f8f8f;
   --silver: #667085;
-  --placeholder: #C1C1C1;
-  --limeGreen: #D6FF4B;
+  --placeholder: #c1c1c1;
+  --limeGreen: #d6ff4b;
 }
 
 @theme inline {
@@ -23,7 +23,6 @@
   --color-placeholder: var(--placeholder);
   --color-limeGreen: var(--limeGreen);
   --color-silver: var(--silver);
-
 }
 
 @media (prefers-color-scheme: dark) {

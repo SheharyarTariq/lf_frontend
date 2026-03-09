@@ -81,22 +81,28 @@ export default async function apiCall<T = unknown>({
 
       switch (status) {
         case 400:
-          errorMessage = backendMessage || "Invalid request. Please check your input.";
+          errorMessage =
+            backendMessage || "Invalid request. Please check your input.";
           break;
         case 401:
-          errorMessage = backendMessage || "Session expired. Please login again.";
+          errorMessage =
+            backendMessage || "Session expired. Please login again.";
           break;
         case 403:
-          errorMessage = backendMessage || "You don't have permission to perform this action.";
+          errorMessage =
+            backendMessage ||
+            "You don't have permission to perform this action.";
           break;
         case 404:
-          errorMessage = backendMessage || "The requested resource was not found.";
+          errorMessage =
+            backendMessage || "The requested resource was not found.";
           break;
         case 409:
           errorMessage = backendMessage || "This resource already exists.";
           break;
         case 422:
-          errorMessage = backendMessage || "Validation failed. Please check your input.";
+          errorMessage =
+            backendMessage || "Validation failed. Please check your input.";
           break;
         case 429:
           errorMessage = "Too many requests. Please try again later.";
@@ -107,10 +113,12 @@ export default async function apiCall<T = unknown>({
         case 502:
         case 503:
         case 504:
-          errorMessage = "Server is currently unavailable. Please try again later.";
+          errorMessage =
+            "Server is currently unavailable. Please try again later.";
           break;
         default:
-          errorMessage = backendMessage || "Something went wrong. Please try again.";
+          errorMessage =
+            backendMessage || "Something went wrong. Please try again.";
       }
 
       toast.error(errorMessage);

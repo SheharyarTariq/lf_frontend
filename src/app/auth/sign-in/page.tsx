@@ -1,8 +1,7 @@
-import React from 'react'
-import SignIn from '@/components/auth/sign-in'
+import React from "react";
+import SignIn from "@/components/auth/sign-in";
 function page() {
-    
-  return <SignIn/>
+  return <SignIn />;
 }
 
-export default page
+export default page;

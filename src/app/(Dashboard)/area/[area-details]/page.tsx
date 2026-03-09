@@ -1,7 +1,7 @@
-import AreaDetails from '@/components/area/area-details'
+import AreaDetails from "@/components/area/area-details";
 
 function page() {
-  return <AreaDetails/>
+  return <AreaDetails />;
 }
 
-export default page
+export default page;

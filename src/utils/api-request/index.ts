@@ -21,7 +21,7 @@ export async function apiRequest(options: ApiRequestOptions) {
   const res = await fetch(`${config.apiUrl}${endpoint}`, {
     ...restOptions,
     headers,
-    cache: 'no-store',
+    cache: "no-store",
   });
 
   if (res.status === 401) {

@@ -1,10 +1,14 @@
-import Header from '@/components/layout/header'
+import Header from "@/components/layout/header";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-    return (
-        <>
-            <Header />
-            {children}
-        </>
-    )
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <>
+      <Header />
+      {children}
+    </>
+  );
 }
