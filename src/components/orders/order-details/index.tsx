@@ -1,17 +1,16 @@
 "use client"
-import React, { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
 import apiCall from '@/utils/api-call'
-import { routes } from '@/utils/routes'
 import BackArrow from '@/components/common/BackArrow'
 import CustomerInfo from './customer-info'
 import SpecialNotes from './special-notes'
 import OrderInformation from './order-information'
 import OrderItems from './order-items'
 import FormDialog from '@/components/common/form-dailog'
-import Button from '@/components/common/Button'
 import toast from 'react-hot-toast'
 import Loader from '@/components/common/Loader'
+import { useEffect, useState } from 'react'
+import { useParams } from 'next/navigation'
+import { routes } from '@/utils/routes'
 
 interface OrderSlot {
   "@context"?: string;
@@ -208,11 +207,11 @@ function OrderDetails() {
           <CustomerInfo user={order?.user} isLoading={!order} />
           <SpecialNotes note={order?.note} isLoading={!order} />
           <OrderInformation
-            createdAt={order?.createdAt}
-            pickupDate={order?.pickupDate}
-            pickupSlot={order?.pickupSlot}
-            dropoffDate={order?.dropoffDate}
-            dropoffSlot={order?.dropoffSlot}
+            createdAt={order?.createdAt || ""}
+            pickupDate={order?.pickupDate || ""}
+            pickupSlot={order?.pickupSlot ?? null}
+            dropoffDate={order?.dropoffDate || ""}
+            dropoffSlot={order?.dropoffSlot ?? null}
             isLoading={!order}
           />
         </div>

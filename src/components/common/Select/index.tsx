@@ -14,9 +14,10 @@ interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>
     startIcon?: React.ReactNode;
     fullWidth?: boolean;
     searchable?: boolean;
+    error?: string;
 }
 
-function Select({ options, placeholder = "Select", startIcon, fullWidth = false, searchable = false, className = "", onChange, value, disabled, ...props }: SelectProps) {
+function Select({ options, placeholder = "Select", startIcon, fullWidth = false, searchable = false, error, className = "", onChange, value, disabled, ...props }: SelectProps) {
     const baseStyles = `py-4 px-6 pr-14 appearance-none placeholder:font-[400] placeholder:text-[#C1C1C1] text-black border-muted border border-[1px] focus:outline-none rounded-[8px] bg-white cursor-pointer ${fullWidth ? 'w-full' : 'min-w-[305px]'}`;
     const iconStyles = startIcon ? "pl-10" : "";
 
@@ -41,28 +42,31 @@ function Select({ options, placeholder = "Select", startIcon, fullWidth = false,
 
     if (!searchable) {
         return (
-            <div className={`relative ${fullWidth ? 'w-full' : 'w-fit'}`}>
-                {startIcon && (
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral">
-                        {startIcon}
+            <div className={`${fullWidth ? 'w-full' : 'w-fit'}`}>
+                <div className="relative">
+                    {startIcon && (
+                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral">
+                            {startIcon}
+                        </div>
+                    )}
+                    <select
+                        className={`${baseStyles} ${iconStyles} ${error ? 'border-red-500' : ''} ${className}`}
+                        onChange={onChange}
+                        value={value}
+                        disabled={disabled}
+                        {...props}
+                    >
+                        {options.map((option) => (
+                            <option key={option.value} value={option.value} disabled={option.disabled}>
+                                {option.label}
+                            </option>
+                        ))}
+                    </select>
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-neutral ">
+                        <ChevronDown size={20} color="black" />
                     </div>
-                )}
-                <select
-                    className={`${baseStyles} ${iconStyles} ${className}`}
-                    onChange={onChange}
-                    value={value}
-                    disabled={disabled}
-                    {...props}
-                >
-                    {options.map((option) => (
-                        <option key={option.value} value={option.value} disabled={option.disabled}>
-                            {option.label}
-                        </option>
-                    ))}
-                </select>
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-neutral ">
-                    <ChevronDown size={20} color="black" />
                 </div>
+                {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
             </div>
         );
     }
@@ -85,7 +89,8 @@ function Select({ options, placeholder = "Select", startIcon, fullWidth = false,
     }
 
     return (
-        <div className={`relative ${fullWidth ? 'w-full' : 'w-fit'}`} ref={dropdownRef}>
+        <div className={`${fullWidth ? 'w-full' : 'w-fit'}`}>
+        <div className={`relative w-full`} ref={dropdownRef}>
             <div
                 ref={triggerRef}
                 className={`${baseStyles} ${iconStyles} ${className} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
@@ -147,6 +152,8 @@ function Select({ options, placeholder = "Select", startIcon, fullWidth = false,
                     </div>
                 </div>
             )}
+        </div>
+        {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
         </div>
     );
 }

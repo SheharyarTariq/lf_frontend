@@ -7,6 +7,8 @@ import { routes } from '@/utils/routes'
 import FormDialog from '../common/form-dailog'
 import Input from '../common/Input'
 import SearchInput from '../common/SearchInput'
+import { validateForm } from '@/utils/validation'
+import { areaNameSchema } from './schema'
 
 export interface AreaData {
   "@id": string;
@@ -33,6 +35,7 @@ function Area() {
   const [areaResponse, setAreaResponse] = useState<AreaData[]>([])
   const [areaName, setAreaName] = useState('')
   const [loading, setLoading] = useState(false)
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   const getArea = async () => {
     setLoading(true)
@@ -51,6 +54,11 @@ function Area() {
   }, [])
 
   const handleCreateArea = async (): Promise<boolean> => {
+    const validationErrors = await validateForm(areaNameSchema, { name: areaName });
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return false;
+    }
     setLoading(true)
     const response = await apiCall<CreateAreaResponse>({
       endpoint: routes.api.getArea,
@@ -61,6 +69,7 @@ function Area() {
     })
     setLoading(false)
     if (response.success && response.data) {
+      setErrors({})
       setAreaResponse((prev) => [...prev, response.data as AreaData])
       setAreaName('')
       return true
@@ -100,8 +109,11 @@ function Area() {
             <Input
               placeholder="e.g. Arsenal"
               value={areaName}
-              onChange={(e) => setAreaName(e.target.value)}
-              className=''
+              onChange={(e) => {
+                setAreaName(e.target.value);
+                if (errors.name) setErrors(prev => ({ ...prev, name: '' }));
+              }}
+              error={errors.name}
             />
           </FormDialog>
         </div>

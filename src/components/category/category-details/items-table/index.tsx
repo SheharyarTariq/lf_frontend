@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Input from '@/components/common/Input'
 import FormDialog from '@/components/common/form-dailog'
 import SearchInput from '@/components/common/SearchInput'
@@ -7,6 +7,8 @@ import GenericTable, { Column } from '@/components/common/GenericTable'
 import apiCall from '@/utils/api-call'
 import { routes } from '@/utils/routes'
 import { Plus } from 'lucide-react'
+import { validateForm } from '@/utils/validation'
+import { categoryItemSchema } from '../../schema'
 
 interface CategoryItem {
   "@context"?: string;
@@ -38,6 +40,7 @@ function ItemsTable({ categoryId, onItemsChange }: ItemsTableProps) {
   const [isCreatingItem, setIsCreatingItem] = useState(false)
   const [isDeletingItem, setIsDeletingItem] = useState(false)
   const [deleteItemId, setDeleteItemId] = useState<string>("")
+  const [errors, setErrors] = useState<Record<string, string>>({})
   const [createItemData, setCreateItemData] = useState<{
     name: string,
     priceWashing?: string,
@@ -50,6 +53,17 @@ function ItemsTable({ categoryId, onItemsChange }: ItemsTableProps) {
   })
 
   const handleCreateItem = async (): Promise<boolean> => {
+    const validationErrors = await validateForm(categoryItemSchema, {
+      name: createItemData.name,
+      priceType: createItemData.priceType,
+      priceWashing: createItemData.priceWashing,
+      priceDryCleaning: createItemData.priceDryCleaning,
+      position: createItemData.position,
+    });
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return false;
+    }
     setIsCreatingItem(true)
     const payload = {
       name: createItemData.name,
@@ -70,6 +84,7 @@ function ItemsTable({ categoryId, onItemsChange }: ItemsTableProps) {
     console.log("Create Item API Response:", response)
     setIsCreatingItem(false)
     if (response.success) {
+      setErrors({})
       setCreateItemData({ name: '', priceType: 'Fixed' })
       fetchItems()
       return true
@@ -205,7 +220,11 @@ function ItemsTable({ categoryId, onItemsChange }: ItemsTableProps) {
                 <Input
                   placeholder="e.g. Formal Shirt"
                   value={createItemData.name}
-                  onChange={(e) => setCreateItemData(prev => ({ ...prev, name: e.target.value }))}
+                  onChange={(e) => {
+                    setCreateItemData(prev => ({ ...prev, name: e.target.value }));
+                    if (errors.name) setErrors(prev => ({ ...prev, name: '' }));
+                  }}
+                  error={errors.name}
                 />
               </div>
               <div className="flex flex-col gap-2">
@@ -216,7 +235,11 @@ function ItemsTable({ categoryId, onItemsChange }: ItemsTableProps) {
                   min={0}
                   step="0.01"
                   value={createItemData.priceWashing ?? ''}
-                  onChange={(e) => setCreateItemData(prev => ({ ...prev, priceWashing: e.target.value }))}
+                  onChange={(e) => {
+                    setCreateItemData(prev => ({ ...prev, priceWashing: e.target.value }));
+                    if (errors.priceWashing) setErrors(prev => ({ ...prev, priceWashing: '' }));
+                  }}
+                  error={errors.priceWashing}
                 />
               </div>
               <div className="flex flex-col gap-2">
@@ -227,7 +250,11 @@ function ItemsTable({ categoryId, onItemsChange }: ItemsTableProps) {
                   min={0}
                   step="0.01"
                   value={createItemData.priceDryCleaning ?? ''}
-                  onChange={(e) => setCreateItemData(prev => ({ ...prev, priceDryCleaning: e.target.value }))}
+                  onChange={(e) => {
+                    setCreateItemData(prev => ({ ...prev, priceDryCleaning: e.target.value }));
+                    if (errors.priceDryCleaning) setErrors(prev => ({ ...prev, priceDryCleaning: '' }));
+                  }}
+                  error={errors.priceDryCleaning}
                 />
               </div>
               <div className="flex gap-4">
@@ -240,8 +267,12 @@ function ItemsTable({ categoryId, onItemsChange }: ItemsTableProps) {
                       { label: 'Kg', value: 'Kg' }
                     ]}
                     value={createItemData.priceType}
-                    onChange={(e) => setCreateItemData(prev => ({ ...prev, priceType: e.target.value }))}
+                    onChange={(e) => {
+                      setCreateItemData(prev => ({ ...prev, priceType: e.target.value }));
+                      if (errors.priceType) setErrors(prev => ({ ...prev, priceType: '' }));
+                    }}
                     fullWidth
+                    error={errors.priceType}
                   />
                 </div>
                 <div className="flex flex-col gap-2 flex-1">
@@ -251,7 +282,11 @@ function ItemsTable({ categoryId, onItemsChange }: ItemsTableProps) {
                     placeholder="1"
                     min={1}
                     value={createItemData.position ?? ''}
-                    onChange={(e) => setCreateItemData(prev => ({ ...prev, position: e.target.value ? Number(e.target.value) : undefined }))}
+                    onChange={(e) => {
+                      setCreateItemData(prev => ({ ...prev, position: e.target.value ? Number(e.target.value) : undefined }));
+                      if (errors.position) setErrors(prev => ({ ...prev, position: '' }));
+                    }}
+                    error={errors.position}
                   />
                 </div>
               </div>

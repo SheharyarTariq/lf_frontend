@@ -7,6 +7,8 @@ import GenericTable, { Column } from '@/components/common/GenericTable'
 import apiCall from '@/utils/api-call'
 import { routes } from '@/utils/routes'
 import FormDialog from '../common/form-dailog'
+import { validateForm } from '@/utils/validation'
+import { categorySchema } from './schema'
 
 interface ItemCategory {
   "@context"?: string;
@@ -28,6 +30,7 @@ function Category() {
   const [categories, setCategories] = useState<ItemCategory[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [createData, setCreateData] = useState<{ name: string, position?: number }>({ name: '' })
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   const getCategories = async () => {
     setIsLoading(true)
@@ -50,6 +53,14 @@ function Category() {
   }, [])
 
   const handleCreate = async () => {
+    const validationErrors = await validateForm(categorySchema, {
+      name: createData.name,
+      position: createData.position,
+    });
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return false;
+    }
     try {
       const response = await apiCall({
         endpoint: routes.api.createItemCategory,
@@ -59,6 +70,7 @@ function Category() {
         successMessage: "Category Created Successfully"
       });
       if (response.success) {
+        setErrors({});
         setCreateData({ name: '' });
         getCategories();
         return true;
@@ -120,7 +132,11 @@ function Category() {
                   <Input
                     placeholder="e.g. Curtains"
                     value={createData.name}
-                    onChange={(e) => setCreateData(prev => ({ ...prev, name: e.target.value }))}
+                    onChange={(e) => {
+                      setCreateData(prev => ({ ...prev, name: e.target.value }));
+                      if (errors.name) setErrors(prev => ({ ...prev, name: '' }));
+                    }}
+                    error={errors.name}
                   />
                 </div>
                 <div className="flex flex-col gap-2 w-[150px]">
@@ -130,7 +146,11 @@ function Category() {
                     placeholder="1"
                     min={1}
                     value={createData.position ?? ''}
-                    onChange={(e) => setCreateData(prev => ({ ...prev, position: e.target.value ? Number(e.target.value) : undefined }))}
+                    onChange={(e) => {
+                      setCreateData(prev => ({ ...prev, position: e.target.value ? Number(e.target.value) : undefined }));
+                      if (errors.position) setErrors(prev => ({ ...prev, position: '' }));
+                    }}
+                    error={errors.position}
                   />
                 </div>
               </div>

@@ -9,6 +9,8 @@ import apiCall from '@/utils/api-call'
 import { routes } from '@/utils/routes'
 import Postcodes from './postcodes'
 import Button from '@/components/common/Button'
+import { validateForm } from '@/utils/validation'
+import { areaNameSchema } from '../schema'
 
 function AreaDetails() {
     const params = useParams()
@@ -18,8 +20,14 @@ function AreaDetails() {
     const [areaName, setAreaName] = useState(getareaName)
     const [displayName, setDisplayName] = useState(getareaName)
     const [loading, setLoading] = useState(false)
+    const [errors, setErrors] = useState<Record<string, string>>({})
 
     const handleUpdateArea = async (): Promise<boolean> => {
+        const validationErrors = await validateForm(areaNameSchema, { name: areaName });
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return false;
+        }
         setLoading(true)
         const response = await apiCall({
             endpoint: routes.api.editArea(areaId),
@@ -31,6 +39,7 @@ function AreaDetails() {
         })
         setLoading(false)
         if (response.success) {
+            setErrors({})
             setDisplayName(areaName)
             return true
         }
@@ -53,8 +62,11 @@ function AreaDetails() {
                     <Input
                         placeholder="e.g. Arsenal"
                         value={areaName}
-                        onChange={(e) => setAreaName(e.target.value)}
-                        className=''
+                        onChange={(e) => {
+                            setAreaName(e.target.value);
+                            if (errors.name) setErrors(prev => ({ ...prev, name: '' }));
+                        }}
+                        error={errors.name}
                     />
                 </FormDialog>
             </div>

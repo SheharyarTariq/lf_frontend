@@ -7,6 +7,8 @@ import { routes } from '@/utils/routes'
 import FormDialog from '@/components/common/form-dailog'
 import Input from '@/components/common/Input'
 import Select from '@/components/common/Select'
+import { validateForm } from '@/utils/validation'
+import { openItemSchema, regularItemSchema } from '../../schema'
 
 interface OrderItem {
   "@context"?: string;
@@ -66,11 +68,11 @@ function OrderItems({ orderId, revenue, onItemsChange }: { orderId: string; reve
     cleaningMethod: "",
     pricePerUnit: "",
   })
+  const [openItemErrors, setOpenItemErrors] = useState<Record<string, string>>({})
   const [createLoading, setCreateLoading] = useState(false)
   const [isDeletingItem, setIsDeletingItem] = useState(false)
   const [deleteItemId, setDeleteItemId] = useState<string>("")
   const [loading, setLoading] = useState(true)
-
 
   const [itemCategories, setItemCategories] = useState<ItemCategory[]>([])
   const [allItems, setAllItems] = useState<RegularItemOption[]>([])
@@ -80,9 +82,21 @@ function OrderItems({ orderId, revenue, onItemsChange }: { orderId: string; reve
     cleaningMethod: "",
     pricePerUnit: "",
   })
+  const [regularItemErrors, setRegularItemErrors] = useState<Record<string, string>>({})
   const [createRegularLoading, setCreateRegularLoading] = useState(false)
 
   const handleCreateOpenItem = async (): Promise<boolean> => {
+    const validationErrors = await validateForm(openItemSchema, {
+      openItemName: openItemData.openItemName,
+      quantity: openItemData.quantity ? Number(openItemData.quantity) : undefined,
+      piece: openItemData.piece ? Number(openItemData.piece) : undefined,
+      cleaningMethod: openItemData.cleaningMethod,
+      pricePerUnit: openItemData.pricePerUnit ? Number(openItemData.pricePerUnit) : undefined,
+    });
+    if (Object.keys(validationErrors).length > 0) {
+      setOpenItemErrors(validationErrors);
+      return false;
+    }
     setCreateLoading(true)
     const response = await apiCall({
       endpoint: routes.api.createOpenItem,
@@ -100,6 +114,7 @@ function OrderItems({ orderId, revenue, onItemsChange }: { orderId: string; reve
     })
     setCreateLoading(false)
     if (response.success) {
+      setOpenItemErrors({})
       setOpenItemData({
         openItemName: "",
         quantity: "",
@@ -183,6 +198,15 @@ function OrderItems({ orderId, revenue, onItemsChange }: { orderId: string; reve
   }
 
   const handleCreateRegularItem = async (): Promise<boolean> => {
+    const validationErrors = await validateForm(regularItemSchema, {
+      item: regularItemData.item,
+      quantity: regularItemData.quantity ? Number(regularItemData.quantity) : undefined,
+      pricePerUnit: regularItemData.pricePerUnit ? Number(regularItemData.pricePerUnit) : undefined,
+    });
+    if (Object.keys(validationErrors).length > 0) {
+      setRegularItemErrors(validationErrors);
+      return false;
+    }
     const payload = {
       item: regularItemData.item,
       quantity: regularItemData.quantity ? Number(regularItemData.quantity) : 1,
@@ -200,6 +224,7 @@ function OrderItems({ orderId, revenue, onItemsChange }: { orderId: string; reve
     })
     setCreateRegularLoading(false)
     if (response.success) {
+      setRegularItemErrors({})
       setRegularItemData({
         item: "",
         quantity: "1",
@@ -212,8 +237,6 @@ function OrderItems({ orderId, revenue, onItemsChange }: { orderId: string; reve
     }
     return false
   }
-
-
 
   const handleDeleteOrderItem = async (): Promise<boolean> => {
     setIsDeletingItem(true)
@@ -313,8 +336,12 @@ function OrderItems({ orderId, revenue, onItemsChange }: { orderId: string; reve
                   <Input
                     placeholder="e.g. Formal Shirt"
                     value={openItemData.openItemName}
-                    onChange={(e) => setOpenItemData(prev => ({ ...prev, openItemName: e.target.value }))}
+                    onChange={(e) => {
+                      setOpenItemData(prev => ({ ...prev, openItemName: e.target.value }));
+                      if (openItemErrors.openItemName) setOpenItemErrors(prev => ({ ...prev, openItemName: '' }));
+                    }}
                     type="text"
+                    error={openItemErrors.openItemName}
                   />
                 </div>
                 <div className="flex gap-[20px]">
@@ -323,8 +350,12 @@ function OrderItems({ orderId, revenue, onItemsChange }: { orderId: string; reve
                     <Input
                       placeholder="1"
                       value={openItemData.quantity}
-                      onChange={(e) => setOpenItemData(prev => ({ ...prev, quantity: e.target.value }))}
+                      onChange={(e) => {
+                        setOpenItemData(prev => ({ ...prev, quantity: e.target.value }));
+                        if (openItemErrors.quantity) setOpenItemErrors(prev => ({ ...prev, quantity: '' }));
+                      }}
                       type="number"
+                      error={openItemErrors.quantity}
                     />
                   </div>
                   <div className="flex-1">
@@ -332,8 +363,12 @@ function OrderItems({ orderId, revenue, onItemsChange }: { orderId: string; reve
                     <Input
                       placeholder="e.g. 2"
                       value={openItemData.piece}
-                      onChange={(e) => setOpenItemData(prev => ({ ...prev, piece: e.target.value }))}
+                      onChange={(e) => {
+                        setOpenItemData(prev => ({ ...prev, piece: e.target.value }));
+                        if (openItemErrors.piece) setOpenItemErrors(prev => ({ ...prev, piece: '' }));
+                      }}
                       type="number"
+                      error={openItemErrors.piece}
                     />
                   </div>
                 </div>
@@ -344,8 +379,12 @@ function OrderItems({ orderId, revenue, onItemsChange }: { orderId: string; reve
                       options={cleaningMethodOptions}
                       placeholder="Select"
                       value={openItemData.cleaningMethod}
-                      onChange={(e) => setOpenItemData(prev => ({ ...prev, cleaningMethod: e.target.value }))}
+                      onChange={(e) => {
+                        setOpenItemData(prev => ({ ...prev, cleaningMethod: e.target.value }));
+                        if (openItemErrors.cleaningMethod) setOpenItemErrors(prev => ({ ...prev, cleaningMethod: '' }));
+                      }}
                       fullWidth
+                      error={openItemErrors.cleaningMethod}
                     />
                   </div>
                   <div className="flex-1">
@@ -353,8 +392,12 @@ function OrderItems({ orderId, revenue, onItemsChange }: { orderId: string; reve
                     <Input
                       placeholder="e.g. 5000"
                       value={openItemData.pricePerUnit}
-                      onChange={(e) => setOpenItemData(prev => ({ ...prev, pricePerUnit: e.target.value }))}
+                      onChange={(e) => {
+                        setOpenItemData(prev => ({ ...prev, pricePerUnit: e.target.value }));
+                        if (openItemErrors.pricePerUnit) setOpenItemErrors(prev => ({ ...prev, pricePerUnit: '' }));
+                      }}
                       type="number"
+                      error={openItemErrors.pricePerUnit}
                     />
                   </div>
                 </div>
@@ -378,10 +421,12 @@ function OrderItems({ orderId, revenue, onItemsChange }: { orderId: string; reve
                       placeholder="Select"
                       value={regularItemData.item}
                       onChange={(e) => {
-                        setRegularItemData(prev => ({ ...prev, item: e.target.value, cleaningMethod: "" }))
+                        setRegularItemData(prev => ({ ...prev, item: e.target.value, cleaningMethod: "" }));
+                        if (regularItemErrors.item) setRegularItemErrors(prev => ({ ...prev, item: '' }));
                       }}
                       fullWidth
                       searchable
+                      error={regularItemErrors.item}
                     />
                   </div>
                   <div className="flex-1">
@@ -389,8 +434,12 @@ function OrderItems({ orderId, revenue, onItemsChange }: { orderId: string; reve
                     <Input
                       placeholder="1"
                       value={regularItemData.quantity}
-                      onChange={(e) => setRegularItemData(prev => ({ ...prev, quantity: e.target.value }))}
+                      onChange={(e) => {
+                        setRegularItemData(prev => ({ ...prev, quantity: e.target.value }));
+                        if (regularItemErrors.quantity) setRegularItemErrors(prev => ({ ...prev, quantity: '' }));
+                      }}
                       type="number"
+                      error={regularItemErrors.quantity}
                     />
                   </div>
                 </div>
@@ -414,8 +463,12 @@ function OrderItems({ orderId, revenue, onItemsChange }: { orderId: string; reve
                     <Input
                       placeholder="e.g. 5000"
                       value={regularItemData.pricePerUnit}
-                      onChange={(e) => setRegularItemData(prev => ({ ...prev, pricePerUnit: e.target.value }))}
+                      onChange={(e) => {
+                        setRegularItemData(prev => ({ ...prev, pricePerUnit: e.target.value }));
+                        if (regularItemErrors.pricePerUnit) setRegularItemErrors(prev => ({ ...prev, pricePerUnit: '' }));
+                      }}
                       type="number"
+                      error={regularItemErrors.pricePerUnit}
                     />
                   </div>
                 </div>

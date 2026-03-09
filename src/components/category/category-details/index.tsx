@@ -7,6 +7,8 @@ import FormDialog from '@/components/common/form-dailog'
 import apiCall from '@/utils/api-call'
 import { routes } from '@/utils/routes'
 import ItemsTable from './items-table'
+import { validateForm } from '@/utils/validation'
+import { categoryNameSchema } from '../schema'
 
 function CategoryDetails() {
     const params = useParams()
@@ -20,8 +22,14 @@ function CategoryDetails() {
     const [isUpdating, setIsUpdating] = useState(false)
     const [isDeletingCategory, setIsDeletingCategory] = useState(false)
     const [hasItems, setHasItems] = useState(true)
+    const [errors, setErrors] = useState<Record<string, string>>({})
 
     const handleUpdateCategory = async (): Promise<boolean> => {
+        const validationErrors = await validateForm(categoryNameSchema, { name: editName });
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return false;
+        }
         setIsUpdating(true)
         const response = await apiCall({
             endpoint: routes.api.updateItemCategory(categoryId),
@@ -33,6 +41,7 @@ function CategoryDetails() {
         })
         setIsUpdating(false)
         if (response.success) {
+            setErrors({})
             setDisplayName(editName)
             return true
         }
@@ -73,7 +82,11 @@ function CategoryDetails() {
                         <Input
                             placeholder="e.g. Shirts"
                             value={editName}
-                            onChange={(e) => setEditName(e.target.value)}
+                            onChange={(e) => {
+                                setEditName(e.target.value);
+                                if (errors.name) setErrors(prev => ({ ...prev, name: '' }));
+                            }}
+                            error={errors.name}
                         />
                     </div>
                 </FormDialog>

@@ -6,6 +6,8 @@ import React, { useState } from 'react';
 import apiCall from '@/utils/api-call';
 import { routes } from '@/utils/routes';
 import { useRouter } from 'next/navigation';
+import { validateForm } from '@/utils/validation';
+import { signInSchema } from '../schema';
 
 interface LoginResponse {
   token: string;
@@ -16,20 +18,24 @@ function SignIn() {
   const [email, setEmail] = useState("")
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const router = useRouter();
 
   const handleLogin = async () => {
+    const validationErrors = await validateForm(signInSchema, { email, password });
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
     setIsLoading(true);
     try {
       const response = await apiCall<LoginResponse>({
         endpoint: routes.api.login,
         method: "POST",
-        data: {
-          email,
-          password
-        }
+        data: { email, password }
       })
       if (response.success === true) {
+        setErrors({});
         document.cookie = `authtoken=${response?.data?.token}; path=/`;
         router.push(routes.ui.areas)
         console.log(response.data)
@@ -55,10 +61,14 @@ function SignIn() {
             <label className='text-black font-[400] text-[14px]' htmlFor="email">Email</label>
             <Input
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (errors.email) setErrors(prev => ({ ...prev, email: '' }));
+              }}
               id="email"
               type='email'
               placeholder='Enter your email'
+              error={errors.email}
             />
           </div>
           <div className='space-y-2 text-left'>
@@ -67,14 +77,18 @@ function SignIn() {
               <Input
                 id="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (errors.password) setErrors(prev => ({ ...prev, password: '' }));
+                }}
                 type={showPassword ? 'text' : 'password'}
                 placeholder='Enter your password'
                 className='pr-12'
+                error={errors.password}
               />
               <div
                 onClick={togglePasswordVisibility}
-                className='absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer'
+                className='absolute right-4 top-[22px] -translate-y-1/2 cursor-pointer'
               >
                 {showPassword ? <EyeOff size={20} color="#8F8F8F" /> : <Eye size={20} color="#8F8F8F" />}
               </div>

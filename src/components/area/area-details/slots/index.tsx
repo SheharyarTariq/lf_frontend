@@ -7,6 +7,8 @@ import GenericTable from '@/components/common/GenericTable';
 import Image from 'next/image';
 import FormDialog from '@/components/common/form-dailog';
 import Input from '@/components/common/Input';
+import { validateForm } from '@/utils/validation';
+import { slotSchema } from '../../schema';
 
 interface Slot {
   "@context"?: string;
@@ -64,6 +66,7 @@ function Slots({ areaId }: { areaId: string }) {
   const [newSlotEndTime, setNewSlotEndTime] = useState<string>("")
   const [createLoading, setCreateLoading] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   const getSlots = async () => {
     setLoading(true)
@@ -110,6 +113,15 @@ function Slots({ areaId }: { areaId: string }) {
   }
 
   const handleCreateSlot = async (): Promise<boolean> => {
+    const validationErrors = await validateForm(slotSchema, {
+      weekDay: String(newSlotWeekDay),
+      startTime: newSlotStartTime,
+      endTime: newSlotEndTime,
+    });
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return false;
+    }
     setCreateLoading(true)
     const response = await apiCall({
       endpoint: routes.api.createSlot,
@@ -126,6 +138,7 @@ function Slots({ areaId }: { areaId: string }) {
     })
     setCreateLoading(false)
     if (response.success) {
+      setErrors({})
       setNewSlotWeekDay("")
       setNewSlotStartTime("")
       setNewSlotEndTime("")
@@ -162,17 +175,24 @@ function Slots({ areaId }: { areaId: string }) {
                 options={slotWeekDays}
                 placeholder="Select"
                 value={newSlotWeekDay}
-                onChange={(e) => setNewSlotWeekDay(e.target.value)}
+                onChange={(e) => {
+                  setNewSlotWeekDay(e.target.value);
+                  if (errors.weekDay) setErrors(prev => ({ ...prev, weekDay: '' }));
+                }}
                 fullWidth
+                error={errors.weekDay}
               />
               <div>
                 <label className="text-black font-[500] text-[14px] mb-[8px] block">Start Time</label>
                 <Input
                   placeholder="e.g. 10:00"
                   value={newSlotStartTime}
-                  onChange={(e) => setNewSlotStartTime(e.target.value)}
+                  onChange={(e) => {
+                    setNewSlotStartTime(e.target.value);
+                    if (errors.startTime) setErrors(prev => ({ ...prev, startTime: '' }));
+                  }}
                   type="text"
-                  className=''
+                  error={errors.startTime}
                 />
               </div>
               <div>
@@ -180,8 +200,12 @@ function Slots({ areaId }: { areaId: string }) {
                 <Input
                   placeholder="e.g. 12:00"
                   value={newSlotEndTime}
-                  onChange={(e) => setNewSlotEndTime(e.target.value)}
+                  onChange={(e) => {
+                    setNewSlotEndTime(e.target.value);
+                    if (errors.endTime) setErrors(prev => ({ ...prev, endTime: '' }));
+                  }}
                   type="text"
+                  error={errors.endTime}
                 />
               </div>
             </div>

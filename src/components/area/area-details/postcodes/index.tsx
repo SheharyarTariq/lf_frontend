@@ -6,6 +6,8 @@ import GenericTable from '@/components/common/GenericTable'
 import Image from 'next/image'
 import FormDialog from '@/components/common/form-dailog'
 import Input from '@/components/common/Input'
+import { validateForm } from '@/utils/validation'
+import { postcodeSchema } from '../../schema'
 
 interface Postcode {
   "@context"?: string;
@@ -30,6 +32,7 @@ function Postcodes({ areaId }: { areaId: string }) {
   const [newPostcode, setNewPostcode] = useState("")
   const [createLoading, setCreateLoading] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   const getPostcodes = async () => {
     setLoading(true)
@@ -75,6 +78,11 @@ function Postcodes({ areaId }: { areaId: string }) {
   }
 
   const handleCreatePostcode = async (): Promise<boolean> => {
+    const validationErrors = await validateForm(postcodeSchema, { postcodeString: newPostcode });
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return false;
+    }
     setCreateLoading(true)
     const response = await apiCall({
       endpoint: routes.api.createPostcode,
@@ -89,6 +97,7 @@ function Postcodes({ areaId }: { areaId: string }) {
     })
     setCreateLoading(false)
     if (response.success) {
+      setErrors({})
       setNewPostcode("")
       await getPostcodes()
       return true
@@ -128,8 +137,12 @@ function Postcodes({ areaId }: { areaId: string }) {
                 <Input
                   placeholder="e.g. KT211PG"
                   value={newPostcode}
-                  onChange={(e) => setNewPostcode(e.target.value)}
+                  onChange={(e) => {
+                    setNewPostcode(e.target.value);
+                    if (errors.postcodeString) setErrors(prev => ({ ...prev, postcodeString: '' }));
+                  }}
                   type="text"
+                  error={errors.postcodeString}
                 />
               </div>
             </div>
