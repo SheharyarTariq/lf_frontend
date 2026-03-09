@@ -7,7 +7,7 @@ import GenericTable, { Column } from '@/components/common/GenericTable'
 import apiCall from '@/utils/api-call'
 import { routes } from '@/utils/routes'
 import FormDialog from '../common/form-dailog'
-import { validateForm } from '@/utils/validation'
+import { validateAndSetErrors } from '@/utils/validation'
 import { categorySchema } from './schema'
 
 interface ItemCategory {
@@ -53,14 +53,7 @@ function Category() {
   }, [])
 
   const handleCreate = async () => {
-    const validationErrors = await validateForm(categorySchema, {
-      name: createData.name,
-      position: createData.position,
-    });
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return false;
-    }
+    if (!await validateAndSetErrors(categorySchema, { name: createData.name, position: createData.position }, setErrors)) return false;
     try {
       const response = await apiCall({
         endpoint: routes.api.createItemCategory,

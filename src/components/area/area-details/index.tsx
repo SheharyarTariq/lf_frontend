@@ -9,7 +9,7 @@ import apiCall from '@/utils/api-call'
 import { routes } from '@/utils/routes'
 import Postcodes from './postcodes'
 import Button from '@/components/common/Button'
-import { validateForm } from '@/utils/validation'
+import { validateAndSetErrors } from '@/utils/validation'
 import { areaNameSchema } from '../schema'
 
 function AreaDetails() {
@@ -23,11 +23,7 @@ function AreaDetails() {
     const [errors, setErrors] = useState<Record<string, string>>({})
 
     const handleUpdateArea = async (): Promise<boolean> => {
-        const validationErrors = await validateForm(areaNameSchema, { name: areaName });
-        if (Object.keys(validationErrors).length > 0) {
-            setErrors(validationErrors);
-            return false;
-        }
+        if (!await validateAndSetErrors(areaNameSchema, { name: areaName }, setErrors)) return false;
         setLoading(true)
         const response = await apiCall({
             endpoint: routes.api.editArea(areaId),

@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import apiCall from '@/utils/api-call';
 import { routes } from '@/utils/routes';
 import { useRouter } from 'next/navigation';
-import { validateForm } from '@/utils/validation';
+import { validateAndSetErrors } from '@/utils/validation';
 import { signInSchema } from '../schema';
 
 interface LoginResponse {
@@ -22,11 +22,7 @@ function SignIn() {
   const router = useRouter();
 
   const handleLogin = async () => {
-    const validationErrors = await validateForm(signInSchema, { email, password });
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
+    if (!await validateAndSetErrors(signInSchema, { email, password }, setErrors)) return;
     setIsLoading(true);
     try {
       const response = await apiCall<LoginResponse>({

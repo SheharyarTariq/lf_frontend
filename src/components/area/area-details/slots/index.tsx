@@ -7,7 +7,7 @@ import GenericTable from '@/components/common/GenericTable';
 import Image from 'next/image';
 import FormDialog from '@/components/common/form-dailog';
 import Input from '@/components/common/Input';
-import { validateForm } from '@/utils/validation';
+import { validateAndSetErrors } from '@/utils/validation';
 import { slotSchema } from '../../schema';
 
 interface Slot {
@@ -113,15 +113,7 @@ function Slots({ areaId }: { areaId: string }) {
   }
 
   const handleCreateSlot = async (): Promise<boolean> => {
-    const validationErrors = await validateForm(slotSchema, {
-      weekDay: String(newSlotWeekDay),
-      startTime: newSlotStartTime,
-      endTime: newSlotEndTime,
-    });
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return false;
-    }
+    if (!await validateAndSetErrors(slotSchema, { weekDay: String(newSlotWeekDay), startTime: newSlotStartTime, endTime: newSlotEndTime }, setErrors)) return false;
     setCreateLoading(true)
     const response = await apiCall({
       endpoint: routes.api.createSlot,

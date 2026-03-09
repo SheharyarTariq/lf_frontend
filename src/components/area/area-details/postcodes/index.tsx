@@ -6,7 +6,7 @@ import GenericTable from '@/components/common/GenericTable'
 import Image from 'next/image'
 import FormDialog from '@/components/common/form-dailog'
 import Input from '@/components/common/Input'
-import { validateForm } from '@/utils/validation'
+import { validateAndSetErrors } from '@/utils/validation'
 import { postcodeSchema } from '../../schema'
 
 interface Postcode {
@@ -78,11 +78,7 @@ function Postcodes({ areaId }: { areaId: string }) {
   }
 
   const handleCreatePostcode = async (): Promise<boolean> => {
-    const validationErrors = await validateForm(postcodeSchema, { postcodeString: newPostcode });
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return false;
-    }
+    if (!await validateAndSetErrors(postcodeSchema, { postcodeString: newPostcode }, setErrors)) return false;
     setCreateLoading(true)
     const response = await apiCall({
       endpoint: routes.api.createPostcode,

@@ -18,3 +18,16 @@ export async function validateForm<T extends object>(
     return {};
   }
 }
+
+export async function validateAndSetErrors<T extends object>(
+  schema: yup.ObjectSchema<any>,
+  data: T,
+  setErrors: (errors: Record<string, string>) => void
+): Promise<boolean> {
+  const errors = await validateForm(schema, data);
+  if (Object.keys(errors).length > 0) {
+    setErrors(errors);
+    return false;
+  }
+  return true;
+}

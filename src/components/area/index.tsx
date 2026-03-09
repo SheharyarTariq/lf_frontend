@@ -7,7 +7,7 @@ import { routes } from '@/utils/routes'
 import FormDialog from '../common/form-dailog'
 import Input from '../common/Input'
 import SearchInput from '../common/SearchInput'
-import { validateForm } from '@/utils/validation'
+import { validateAndSetErrors } from '@/utils/validation'
 import { areaNameSchema } from './schema'
 
 export interface AreaData {
@@ -54,11 +54,7 @@ function Area() {
   }, [])
 
   const handleCreateArea = async (): Promise<boolean> => {
-    const validationErrors = await validateForm(areaNameSchema, { name: areaName });
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return false;
-    }
+    if (!await validateAndSetErrors(areaNameSchema, { name: areaName }, setErrors)) return false;
     setLoading(true)
     const response = await apiCall<CreateAreaResponse>({
       endpoint: routes.api.getArea,

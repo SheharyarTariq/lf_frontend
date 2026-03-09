@@ -7,7 +7,7 @@ import GenericTable, { Column } from '@/components/common/GenericTable'
 import apiCall from '@/utils/api-call'
 import { routes } from '@/utils/routes'
 import { Plus } from 'lucide-react'
-import { validateForm } from '@/utils/validation'
+import { validateAndSetErrors } from '@/utils/validation'
 import { categoryItemSchema } from '../../schema'
 
 interface CategoryItem {
@@ -53,17 +53,7 @@ function ItemsTable({ categoryId, onItemsChange }: ItemsTableProps) {
   })
 
   const handleCreateItem = async (): Promise<boolean> => {
-    const validationErrors = await validateForm(categoryItemSchema, {
-      name: createItemData.name,
-      priceType: createItemData.priceType,
-      priceWashing: createItemData.priceWashing,
-      priceDryCleaning: createItemData.priceDryCleaning,
-      position: createItemData.position,
-    });
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return false;
-    }
+    if (!await validateAndSetErrors(categoryItemSchema, { name: createItemData.name, priceType: createItemData.priceType, priceWashing: createItemData.priceWashing, priceDryCleaning: createItemData.priceDryCleaning, position: createItemData.position }, setErrors)) return false;
     setIsCreatingItem(true)
     const payload = {
       name: createItemData.name,

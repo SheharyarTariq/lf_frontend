@@ -7,7 +7,7 @@ import FormDialog from '@/components/common/form-dailog'
 import apiCall from '@/utils/api-call'
 import { routes } from '@/utils/routes'
 import ItemsTable from './items-table'
-import { validateForm } from '@/utils/validation'
+import { validateAndSetErrors } from '@/utils/validation'
 import { categoryNameSchema } from '../schema'
 
 function CategoryDetails() {
@@ -25,11 +25,7 @@ function CategoryDetails() {
     const [errors, setErrors] = useState<Record<string, string>>({})
 
     const handleUpdateCategory = async (): Promise<boolean> => {
-        const validationErrors = await validateForm(categoryNameSchema, { name: editName });
-        if (Object.keys(validationErrors).length > 0) {
-            setErrors(validationErrors);
-            return false;
-        }
+        if (!await validateAndSetErrors(categoryNameSchema, { name: editName }, setErrors)) return false;
         setIsUpdating(true)
         const response = await apiCall({
             endpoint: routes.api.updateItemCategory(categoryId),

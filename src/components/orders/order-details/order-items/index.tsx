@@ -7,7 +7,7 @@ import { routes } from '@/utils/routes'
 import FormDialog from '@/components/common/form-dailog'
 import Input from '@/components/common/Input'
 import Select from '@/components/common/Select'
-import { validateForm } from '@/utils/validation'
+import { validateAndSetErrors } from '@/utils/validation'
 import { openItemSchema, regularItemSchema } from '../../schema'
 
 interface OrderItem {
@@ -86,17 +86,7 @@ function OrderItems({ orderId, revenue, onItemsChange }: { orderId: string; reve
   const [createRegularLoading, setCreateRegularLoading] = useState(false)
 
   const handleCreateOpenItem = async (): Promise<boolean> => {
-    const validationErrors = await validateForm(openItemSchema, {
-      openItemName: openItemData.openItemName,
-      quantity: openItemData.quantity ? Number(openItemData.quantity) : undefined,
-      piece: openItemData.piece ? Number(openItemData.piece) : undefined,
-      cleaningMethod: openItemData.cleaningMethod,
-      pricePerUnit: openItemData.pricePerUnit ? Number(openItemData.pricePerUnit) : undefined,
-    });
-    if (Object.keys(validationErrors).length > 0) {
-      setOpenItemErrors(validationErrors);
-      return false;
-    }
+    if (!await validateAndSetErrors(openItemSchema, { openItemName: openItemData.openItemName, quantity: openItemData.quantity ? Number(openItemData.quantity) : undefined, piece: openItemData.piece ? Number(openItemData.piece) : undefined, cleaningMethod: openItemData.cleaningMethod, pricePerUnit: openItemData.pricePerUnit ? Number(openItemData.pricePerUnit) : undefined }, setOpenItemErrors)) return false;
     setCreateLoading(true)
     const response = await apiCall({
       endpoint: routes.api.createOpenItem,
@@ -198,15 +188,7 @@ function OrderItems({ orderId, revenue, onItemsChange }: { orderId: string; reve
   }
 
   const handleCreateRegularItem = async (): Promise<boolean> => {
-    const validationErrors = await validateForm(regularItemSchema, {
-      item: regularItemData.item,
-      quantity: regularItemData.quantity ? Number(regularItemData.quantity) : undefined,
-      pricePerUnit: regularItemData.pricePerUnit ? Number(regularItemData.pricePerUnit) : undefined,
-    });
-    if (Object.keys(validationErrors).length > 0) {
-      setRegularItemErrors(validationErrors);
-      return false;
-    }
+    if (!await validateAndSetErrors(regularItemSchema, { item: regularItemData.item, quantity: regularItemData.quantity ? Number(regularItemData.quantity) : undefined, pricePerUnit: regularItemData.pricePerUnit ? Number(regularItemData.pricePerUnit) : undefined }, setRegularItemErrors)) return false;
     const payload = {
       item: regularItemData.item,
       quantity: regularItemData.quantity ? Number(regularItemData.quantity) : 1,
