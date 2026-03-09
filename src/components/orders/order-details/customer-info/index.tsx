@@ -1,7 +1,7 @@
-"use client"
-import React from 'react'
-import Card from '@/components/common/Card'
-import Loader from '@/components/common/Loader'
+"use client";
+import React from "react";
+import Card from "@/components/common/Card";
+import Loader from "@/components/common/Loader";
 
 interface OrderUser {
   "@context"?: string;
@@ -13,20 +13,28 @@ interface OrderUser {
   address?: string;
 }
 
-function CustomerInfo({ user, isLoading }: { user?: OrderUser | null, isLoading?: boolean }) {
+function CustomerInfo({
+  user,
+  isLoading,
+}: {
+  user?: OrderUser | null;
+  isLoading?: boolean;
+}) {
   if (isLoading) {
     return (
       <Card className="!p-0 w-full h-[200px] flex items-center justify-center">
         <Loader size={32} className="text-gray-400" />
       </Card>
-    )
+    );
   }
 
-  if (!user) return null
+  if (!user) return null;
 
   return (
     <Card className="!p-0 w-full">
-      <h3 className="text-[13px] font-[600] text-black uppercase p-6 mb-[16px] border-b border-muted">Customer</h3>
+      <h3 className="text-[13px] font-[600] text-black uppercase p-6 mb-[16px] border-b border-muted">
+        Customer
+      </h3>
 
       <div className="flex flex-col gap-[8px] px-6 py-4">
         <p className="text-[16px] font-[600] text-black">{user.name}</p>
@@ -45,7 +53,7 @@ function CustomerInfo({ user, isLoading }: { user?: OrderUser | null, isLoading?
         )}
       </div>
     </Card>
-  )
+  );
 }
 
-export default CustomerInfo
+export default CustomerInfo;

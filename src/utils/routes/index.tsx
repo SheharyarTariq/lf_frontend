@@ -12,8 +12,8 @@ export const routes = {
   },
 
   api: {
-    getArea: 'areas',
-    searchArea: 'areas?name=ashtead',
+    getArea: "areas",
+    searchArea: "areas?name=ashtead",
     editArea: (id: string | number) => `areas/${id}`,
     getAreaSlots: (id: string | number) => `areas/${id}/slots`,
     markSlotActive: (id: string) => `slots/${id}/mark-as-active`,

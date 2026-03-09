@@ -1,14 +1,14 @@
-"use client"
-import React, { useEffect, useState } from 'react'
-import { Plus } from 'lucide-react'
-import AreaTable from './area-table'
-import apiCall from '@/utils/api-call'
-import { routes } from '@/utils/routes'
-import FormDialog from '../common/form-dailog'
-import Input from '../common/Input'
-import SearchInput from '../common/SearchInput'
-import { validateAndSetErrors } from '@/utils/validation'
-import { areaNameSchema } from './schema'
+"use client";
+import React, { useEffect, useState } from "react";
+import { Plus } from "lucide-react";
+import AreaTable from "./area-table";
+import apiCall from "@/utils/api-call";
+import { routes } from "@/utils/routes";
+import FormDialog from "../common/form-dailog";
+import Input from "../common/Input";
+import SearchInput from "../common/SearchInput";
+import { validateAndSetErrors } from "@/utils/validation";
+import { areaNameSchema } from "./schema";
 
 export interface AreaData {
   "@id": string;
@@ -32,63 +32,70 @@ interface CreateAreaResponse {
 }
 
 function Area() {
-  const [areaResponse, setAreaResponse] = useState<AreaData[]>([])
-  const [areaName, setAreaName] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [areaResponse, setAreaResponse] = useState<AreaData[]>([]);
+  const [areaName, setAreaName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const getArea = async () => {
-    setLoading(true)
+    setLoading(true);
     const response = await apiCall<AreaResponse>({
       endpoint: routes.api.getArea,
       method: "GET",
-    })
+    });
     if (response.success && response.data?.member) {
-      setAreaResponse(response.data.member)
+      setAreaResponse(response.data.member);
     }
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
   useEffect(() => {
-    getArea()
-  }, [])
+    getArea();
+  }, []);
 
   const handleCreateArea = async (): Promise<boolean> => {
-    if (!await validateAndSetErrors(areaNameSchema, { name: areaName }, setErrors)) return false;
-    setLoading(true)
+    if (
+      !(await validateAndSetErrors(
+        areaNameSchema,
+        { name: areaName },
+        setErrors
+      ))
+    )
+      return false;
+    setLoading(true);
     const response = await apiCall<CreateAreaResponse>({
       endpoint: routes.api.getArea,
       method: "POST",
       data: { name: areaName },
       showSuccessToast: true,
       successMessage: "Area created successfully",
-    })
-    setLoading(false)
+    });
+    setLoading(false);
     if (response.success && response.data) {
-      setErrors({})
-      setAreaResponse((prev) => [...prev, response.data as AreaData])
-      setAreaName('')
-      return true
+      setErrors({});
+      setAreaResponse((prev) => [...prev, response.data as AreaData]);
+      setAreaName("");
+      return true;
     }
-    return false
-  }
+    return false;
+  };
 
   const handleSearchResults = (data: AreaResponse | null) => {
     if (data && data.member) {
-      setAreaResponse(data.member)
+      setAreaResponse(data.member);
     } else {
-      getArea()
+      getArea();
     }
-  }
+  };
 
   return (
     <>
-      <div className='px-[50px] mt-[51px]'>
+      <div className="px-[50px] mt-[51px]">
         <div className="flex items-center justify-between mb-8">
-          <h1 className='text-black text-[32px] font-[500]'>Areas</h1>
+          <h1 className="text-black text-[32px] font-[500]">Areas</h1>
         </div>
 
-        <div className='w-full flex items-center gap-[24px]'>
+        <div className="w-full flex items-center gap-[24px]">
           <SearchInput<AreaResponse>
             endpoint={routes.api.getArea}
             searchKey="name"
@@ -97,7 +104,12 @@ function Area() {
           />
           <FormDialog
             title="Area Name"
-            buttonText={<span className="flex items-center gap-2"><Plus size={20} />Create</span>}
+            buttonText={
+              <span className="flex items-center gap-2">
+                <Plus size={20} />
+                Create
+              </span>
+            }
             saveButtonText="Save"
             onSubmit={handleCreateArea}
             loading={loading}
@@ -107,7 +119,7 @@ function Area() {
               value={areaName}
               onChange={(e) => {
                 setAreaName(e.target.value);
-                if (errors.name) setErrors(prev => ({ ...prev, name: '' }));
+                if (errors.name) setErrors((prev) => ({ ...prev, name: "" }));
               }}
               error={errors.name}
             />
@@ -116,7 +128,7 @@ function Area() {
         <AreaTable areaResponse={areaResponse} isLoading={loading} />
       </div>
     </>
-  )
+  );
 }
 
-export default Area
+export default Area;

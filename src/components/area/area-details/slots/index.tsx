@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react'
-import apiCall from '@/utils/api-call'
-import { routes } from '@/utils/routes'
-import Card from '@/components/common/Card';
-import Select from '@/components/common/Select';
-import GenericTable from '@/components/common/GenericTable';
-import Image from 'next/image';
-import FormDialog from '@/components/common/form-dailog';
-import Input from '@/components/common/Input';
-import { validateAndSetErrors } from '@/utils/validation';
-import { slotSchema } from '../../schema';
+import React, { useEffect, useState } from "react";
+import apiCall from "@/utils/api-call";
+import { routes } from "@/utils/routes";
+import Card from "@/components/common/Card";
+import Select from "@/components/common/Select";
+import GenericTable from "@/components/common/GenericTable";
+import Image from "next/image";
+import FormDialog from "@/components/common/form-dailog";
+import Input from "@/components/common/Input";
+import { validateAndSetErrors } from "@/utils/validation";
+import { slotSchema } from "../../schema";
 
 interface Slot {
   "@context"?: string;
@@ -59,44 +59,44 @@ const slotWeekDays = [
 ];
 
 function Slots({ areaId }: { areaId: string }) {
-  const [slotsResponse, setSlotsResponse] = useState<Slot[]>([])
-  const [selectedDay, setSelectedDay] = useState<string>("")
-  const [newSlotWeekDay, setNewSlotWeekDay] = useState<string>("")
-  const [newSlotStartTime, setNewSlotStartTime] = useState<string>("")
-  const [newSlotEndTime, setNewSlotEndTime] = useState<string>("")
-  const [createLoading, setCreateLoading] = useState(false)
-  const [loading, setLoading] = useState(true)
-  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [slotsResponse, setSlotsResponse] = useState<Slot[]>([]);
+  const [selectedDay, setSelectedDay] = useState<string>("");
+  const [newSlotWeekDay, setNewSlotWeekDay] = useState<string>("");
+  const [newSlotStartTime, setNewSlotStartTime] = useState<string>("");
+  const [newSlotEndTime, setNewSlotEndTime] = useState<string>("");
+  const [createLoading, setCreateLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const getSlots = async () => {
-    setLoading(true)
+    setLoading(true);
     const response = await apiCall<SlotsData>({
       endpoint: routes.api.getAreaSlots(areaId),
       method: "GET",
-    })
+    });
     if (response.success && response?.data) {
-      setSlotsResponse(response.data.member)
-      console.log(response)
+      setSlotsResponse(response.data.member);
+      console.log(response);
     }
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
   const handleToggle = async (slotId: string, isActive: boolean) => {
     const endpoint = isActive
       ? routes.api.markSlotInactive(slotId)
-      : routes.api.markSlotActive(slotId)
+      : routes.api.markSlotActive(slotId);
 
     const response = await apiCall({
       endpoint,
       method: "POST",
       data: {},
       showSuccessToast: true,
-    })
+    });
 
     if (response.success) {
-      await getSlots()
+      await getSlots();
     }
-  }
+  };
 
   const handleDelete = async (slotId: string): Promise<boolean> => {
     const response = await apiCall({
@@ -104,17 +104,28 @@ function Slots({ areaId }: { areaId: string }) {
       method: "DELETE",
       showSuccessToast: true,
       successMessage: "Slot deleted successfully",
-    })
+    });
     if (response.success) {
-      await getSlots()
-      return true
+      await getSlots();
+      return true;
     }
-    return false
-  }
+    return false;
+  };
 
   const handleCreateSlot = async (): Promise<boolean> => {
-    if (!await validateAndSetErrors(slotSchema, { weekDay: String(newSlotWeekDay), startTime: newSlotStartTime, endTime: newSlotEndTime }, setErrors)) return false;
-    setCreateLoading(true)
+    if (
+      !(await validateAndSetErrors(
+        slotSchema,
+        {
+          weekDay: String(newSlotWeekDay),
+          startTime: newSlotStartTime,
+          endTime: newSlotEndTime,
+        },
+        setErrors
+      ))
+    )
+      return false;
+    setCreateLoading(true);
     const response = await apiCall({
       endpoint: routes.api.createSlot,
       method: "POST",
@@ -127,28 +138,28 @@ function Slots({ areaId }: { areaId: string }) {
       },
       showSuccessToast: true,
       successMessage: "Slot created successfully",
-    })
-    setCreateLoading(false)
+    });
+    setCreateLoading(false);
     if (response.success) {
-      setErrors({})
-      setNewSlotWeekDay("")
-      setNewSlotStartTime("")
-      setNewSlotEndTime("")
-      await getSlots()
-      return true
+      setErrors({});
+      setNewSlotWeekDay("");
+      setNewSlotStartTime("");
+      setNewSlotEndTime("");
+      await getSlots();
+      return true;
     }
-    return false
-  }
+    return false;
+  };
 
   useEffect(() => {
-    getSlots()
-  }, [])
+    getSlots();
+  }, []);
 
   return (
     <div>
       <Card>
-        <h2 className='text-black font-[500] text-[24px] mb-[25px]'>Slots</h2>
-        <div className='flex items-center justify-between mb-[30px]'>
+        <h2 className="text-black font-[500] text-[24px] mb-[25px]">Slots</h2>
+        <div className="flex items-center justify-between mb-[30px]">
           <Select
             options={weekDays}
             placeholder="All Days"
@@ -169,32 +180,39 @@ function Slots({ areaId }: { areaId: string }) {
                 value={newSlotWeekDay}
                 onChange={(e) => {
                   setNewSlotWeekDay(e.target.value);
-                  if (errors.weekDay) setErrors(prev => ({ ...prev, weekDay: '' }));
+                  if (errors.weekDay)
+                    setErrors((prev) => ({ ...prev, weekDay: "" }));
                 }}
                 fullWidth
                 error={errors.weekDay}
               />
               <div>
-                <label className="text-black font-[500] text-[14px] mb-[8px] block">Start Time</label>
+                <label className="text-black font-[500] text-[14px] mb-[8px] block">
+                  Start Time
+                </label>
                 <Input
                   placeholder="e.g. 10:00"
                   value={newSlotStartTime}
                   onChange={(e) => {
                     setNewSlotStartTime(e.target.value);
-                    if (errors.startTime) setErrors(prev => ({ ...prev, startTime: '' }));
+                    if (errors.startTime)
+                      setErrors((prev) => ({ ...prev, startTime: "" }));
                   }}
                   type="text"
                   error={errors.startTime}
                 />
               </div>
               <div>
-                <label className="text-black font-[500] text-[14px] mb-[8px] block">End Time</label>
+                <label className="text-black font-[500] text-[14px] mb-[8px] block">
+                  End Time
+                </label>
                 <Input
                   placeholder="e.g. 12:00"
                   value={newSlotEndTime}
                   onChange={(e) => {
                     setNewSlotEndTime(e.target.value);
-                    if (errors.endTime) setErrors(prev => ({ ...prev, endTime: '' }));
+                    if (errors.endTime)
+                      setErrors((prev) => ({ ...prev, endTime: "" }));
                   }}
                   type="text"
                   error={errors.endTime}
@@ -207,7 +225,10 @@ function Slots({ areaId }: { areaId: string }) {
           data={slotsResponse}
           isLoading={loading}
           columns={[
-            { accessor: (row) => weekDayMap[row.weekDay] || row.weekDay, header: "Weekday" },
+            {
+              accessor: (row) => weekDayMap[row.weekDay] || row.weekDay,
+              header: "Weekday",
+            },
             { accessor: "startTime", header: "Start Time" },
             { accessor: "endTime", header: "End Time" },
             {
@@ -218,21 +239,31 @@ function Slots({ areaId }: { areaId: string }) {
                       e.stopPropagation();
                       handleToggle(row.id, row.isActive);
                     }}
-                    className={`relative w-[44px] h-[24px] rounded-full transition-colors duration-200 cursor-pointer ${row.isActive ? 'bg-[#34C759]' : 'bg-[#D1D5DB]'}`}
+                    className={`relative w-[44px] h-[24px] rounded-full transition-colors duration-200 cursor-pointer ${row.isActive ? "bg-[#34C759]" : "bg-[#D1D5DB]"}`}
                   >
                     <span
-                      className={`absolute top-[2px] left-[2px] w-[20px] h-[20px] bg-white rounded-full shadow transition-transform duration-200 ${row.isActive ? 'translate-x-[20px]' : 'translate-x-0'}`}
+                      className={`absolute top-[2px] left-[2px] w-[20px] h-[20px] bg-white rounded-full shadow transition-transform duration-200 ${row.isActive ? "translate-x-[20px]" : "translate-x-0"}`}
                     />
                   </button>
                   {row.isActive ? (
                     <span className="px-2 opacity-100 pointer-events-none cursor-not-allowed">
-                      <Image src="/assets/TrashDisabled.svg" alt="Delete disabled" width={30} height={30} />
+                      <Image
+                        src="/assets/TrashDisabled.svg"
+                        alt="Delete disabled"
+                        width={30}
+                        height={30}
+                      />
                     </span>
                   ) : (
                     <FormDialog
                       title="Delete Slot"
                       buttonText={
-                        <Image src="/assets/TrashEnabled.svg" alt="Delete" width={30} height={30} />
+                        <Image
+                          src="/assets/TrashEnabled.svg"
+                          alt="Delete"
+                          width={30}
+                          height={30}
+                        />
                       }
                       saveButtonText="Yes"
                       onSubmit={() => handleDelete(row.id)}
@@ -240,7 +271,9 @@ function Slots({ areaId }: { areaId: string }) {
                       submitVariant="delete"
                     >
                       Are you sure you want to delete this Slot?
-                      <span className="mt-[8px] block">This action cannot be undone.</span>
+                      <span className="mt-[8px] block">
+                        This action cannot be undone.
+                      </span>
                     </FormDialog>
                   )}
                 </div>
@@ -254,7 +287,7 @@ function Slots({ areaId }: { areaId: string }) {
         />
       </Card>
     </div>
-  )
+  );
 }
 
-export default Slots
+export default Slots;

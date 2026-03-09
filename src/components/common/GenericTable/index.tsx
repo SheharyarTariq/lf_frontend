@@ -1,6 +1,6 @@
-"use client"
-import React, { useState, useMemo } from 'react';
-import { ChevronLeft, ChevronRight, ArrowDown, ArrowUp } from 'lucide-react';
+"use client";
+import React, { useState, useMemo } from "react";
+import { ChevronLeft, ChevronRight, ArrowDown, ArrowUp } from "lucide-react";
 
 export interface Column<T> {
   header: string;
@@ -21,16 +21,23 @@ export interface GenericTableProps<T> {
   isLoading?: boolean;
 }
 
-type SortDirection = 'asc' | 'desc';
+type SortDirection = "asc" | "desc";
 
 interface SortConfig {
   key: string;
   direction: SortDirection;
 }
 
-import Loader from '../Loader';
+import Loader from "../Loader";
 
-function GenericTable<T>({ columns, data, onRowClick, className = "", pageSize = 10, isLoading }: GenericTableProps<T>) {
+function GenericTable<T>({
+  columns,
+  data,
+  onRowClick,
+  className = "",
+  pageSize = 10,
+  isLoading,
+}: GenericTableProps<T>) {
   const [currentPage, setCurrentPage] = useState(0);
   const [sortConfig, setSortConfig] = useState<SortConfig | null>(null);
 
@@ -43,9 +50,9 @@ function GenericTable<T>({ columns, data, onRowClick, className = "", pageSize =
     const key = getSortKey(column);
     setSortConfig((prev) => {
       if (prev && prev.key === key) {
-        return { key, direction: prev.direction === 'asc' ? 'desc' : 'asc' };
+        return { key, direction: prev.direction === "asc" ? "desc" : "asc" };
       }
-      return { key, direction: 'asc' };
+      return { key, direction: "asc" };
     });
     setCurrentPage(0);
   };
@@ -58,13 +65,13 @@ function GenericTable<T>({ columns, data, onRowClick, className = "", pageSize =
       const bVal = b[key as keyof T];
       if (aVal == null) return 1;
       if (bVal == null) return -1;
-      if (typeof aVal === 'string' && typeof bVal === 'string') {
-        return direction === 'asc'
+      if (typeof aVal === "string" && typeof bVal === "string") {
+        return direction === "asc"
           ? aVal.localeCompare(bVal)
           : bVal.localeCompare(aVal);
       }
-      if (aVal < bVal) return direction === 'asc' ? -1 : 1;
-      if (aVal > bVal) return direction === 'asc' ? 1 : -1;
+      if (aVal < bVal) return direction === "asc" ? -1 : 1;
+      if (aVal > bVal) return direction === "asc" ? 1 : -1;
       return 0;
     });
   }, [data, sortConfig]);
@@ -91,7 +98,7 @@ function GenericTable<T>({ columns, data, onRowClick, className = "", pageSize =
     if (column.render) {
       return column.render(row);
     }
-    if (typeof column.accessor === 'function') {
+    if (typeof column.accessor === "function") {
       return column.accessor(row);
     }
     return row[column.accessor as keyof T] as React.ReactNode;
@@ -99,29 +106,33 @@ function GenericTable<T>({ columns, data, onRowClick, className = "", pageSize =
 
   const isSortable = (column: Column<T>) => {
     if (column.sortable === true) return true;
-    return typeof column.accessor !== 'function' && column.sortable !== false;
+    return typeof column.accessor !== "function" && column.sortable !== false;
   };
 
   const hasActionColumn = columns.some((col) => col.isAction);
 
   return (
-    <div className={`overflow-x-auto border border-muted rounded-[14px] ${className}`}>
+    <div
+      className={`overflow-x-auto border border-muted rounded-[14px] ${className}`}
+    >
       <table className="min-w-full text-left border-collapse">
         <thead>
           <tr className="border-b border-muted">
             {columns.map((column, index) => (
               <th
                 key={index}
-                className={`py-[16px] px-[25px] font-[500] text-black ${hasActionColumn && !column.isAction ? 'w-[1%] whitespace-nowrap' : ''} ${isSortable(column) ? 'cursor-pointer select-none' : ''} ${column.className || ''}`}
+                className={`py-[16px] px-[25px] font-[500] text-black ${hasActionColumn && !column.isAction ? "w-[1%] whitespace-nowrap" : ""} ${isSortable(column) ? "cursor-pointer select-none" : ""} ${column.className || ""}`}
                 onClick={() => isSortable(column) && handleSort(column)}
               >
                 {isSortable(column) ? (
                   <div className="flex items-center gap-2">
                     {column.header}
                     {sortConfig?.key === getSortKey(column) ? (
-                      sortConfig.direction === 'asc'
-                        ? <ArrowUp size={16} className="text-silver" />
-                        : <ArrowDown size={16} className="text-silver" />
+                      sortConfig.direction === "asc" ? (
+                        <ArrowUp size={16} className="text-silver" />
+                      ) : (
+                        <ArrowDown size={16} className="text-silver" />
+                      )
                     ) : (
                       <ArrowDown size={16} className="text-silver" />
                     )}
@@ -147,12 +158,12 @@ function GenericTable<T>({ columns, data, onRowClick, className = "", pageSize =
               <tr
                 key={rowIndex}
                 onClick={() => onRowClick && onRowClick(row)}
-                className={`border-b border-muted hover:bg-gray-50 transition-colors ${onRowClick ? 'cursor-pointer' : ''}`}
+                className={`border-b border-muted hover:bg-gray-50 transition-colors ${onRowClick ? "cursor-pointer" : ""}`}
               >
                 {columns.map((column, colIndex) => (
                   <td
                     key={colIndex}
-                    className={`py-[16px] px-[25px] text-black ${hasActionColumn && !column.isAction ? 'w-[1%] whitespace-nowrap text-center' : ''} ${column.className || ''}`}
+                    className={`py-[16px] px-[25px] text-black ${hasActionColumn && !column.isAction ? "w-[1%] whitespace-nowrap text-center" : ""} ${column.className || ""}`}
                   >
                     {renderCell(row, column)}
                   </td>

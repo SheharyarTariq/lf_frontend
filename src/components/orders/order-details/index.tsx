@@ -1,16 +1,16 @@
-"use client"
-import apiCall from '@/utils/api-call'
-import BackArrow from '@/components/common/BackArrow'
-import CustomerInfo from './customer-info'
-import SpecialNotes from './special-notes'
-import OrderInformation from './order-information'
-import OrderItems from './order-items'
-import FormDialog from '@/components/common/form-dailog'
-import toast from 'react-hot-toast'
-import Loader from '@/components/common/Loader'
-import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
-import { routes } from '@/utils/routes'
+"use client";
+import apiCall from "@/utils/api-call";
+import BackArrow from "@/components/common/BackArrow";
+import CustomerInfo from "./customer-info";
+import SpecialNotes from "./special-notes";
+import OrderInformation from "./order-information";
+import OrderItems from "./order-items";
+import FormDialog from "@/components/common/form-dailog";
+import toast from "react-hot-toast";
+import Loader from "@/components/common/Loader";
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import { routes } from "@/utils/routes";
 
 interface OrderSlot {
   "@context"?: string;
@@ -78,89 +78,100 @@ const statusStyles: Record<string, string> = {
   awaiting_review: "bg-[#FEF3C7] text-[#92400E]",
   payment_failed: "bg-[#FDE8E8] text-[#9B1C1C]",
   payment_pending: "bg-[#F3E8FF] text-[#6B21A8]",
-}
+};
 
 function OrderDetails() {
-  const params = useParams()
-  const orderId = params["order-details"] as string
-  const [order, setOrder] = useState<OrderDetail | null>(null)
-  const [cancelLoading, setCancelLoading] = useState(false)
-  const [finaliseLoading, setFinaliseLoading] = useState(false)
+  const params = useParams();
+  const orderId = params["order-details"] as string;
+  const [order, setOrder] = useState<OrderDetail | null>(null);
+  const [cancelLoading, setCancelLoading] = useState(false);
+  const [finaliseLoading, setFinaliseLoading] = useState(false);
 
   const getOrderDetails = async () => {
     const response = await apiCall<OrderDetail>({
       endpoint: routes.api.getOrderDetails(orderId),
       method: "GET",
-      headers: { "Accept": "application/ld+json" },
-    })
+      headers: { Accept: "application/ld+json" },
+    });
     if (response.success && response?.data) {
-      setOrder(response.data)
+      setOrder(response.data);
     }
-  }
+  };
 
   const handleCancelOrder = async (): Promise<boolean> => {
-    setCancelLoading(true)
+    setCancelLoading(true);
     const response = await apiCall({
       endpoint: routes.api.cancelOrder(orderId),
       method: "POST",
       headers: { "Content-Type": "application/ld+json" },
       showSuccessToast: true,
       successMessage: "Order cancelled successfully",
-      data: {}
-    })
-    setCancelLoading(false)
+      data: {},
+    });
+    setCancelLoading(false);
     if (response.success) {
-      await getOrderDetails()
-      return true
+      await getOrderDetails();
+      return true;
     }
-    return false
-  }
+    return false;
+  };
 
   const handleFinaliseOrder = async (): Promise<boolean> => {
-    setFinaliseLoading(true)
+    setFinaliseLoading(true);
     const response = await apiCall({
       endpoint: routes.api.finaliseOrder(orderId),
       method: "POST",
       headers: { "Content-Type": "application/ld+json" },
       showSuccessToast: true,
       successMessage: "Order finalised successfully",
-      data: {}
-    })
-    setFinaliseLoading(false)
+      data: {},
+    });
+    setFinaliseLoading(false);
     if (response.success) {
-      await getOrderDetails()
-      return true
+      await getOrderDetails();
+      return true;
     }
-    return false
-  }
+    return false;
+  };
 
   useEffect(() => {
-    getOrderDetails()
-  }, [])
+    getOrderDetails();
+  }, []);
 
-  const isCancelled = order ? order.status.toLowerCase() === "cancelled" : false
-  const hasOrderItems = order ? order.orderItems && order.orderItems.length > 0 : false
-  const statusLabel = order ? order.status.replace(/-/g, " ") : ""
-  const statusStyle = order ? statusStyles[order.status.toLowerCase()] || "bg-gray-100 text-gray-600" : ""
+  const isCancelled = order
+    ? order.status.toLowerCase() === "cancelled"
+    : false;
+  const hasOrderItems = order
+    ? order.orderItems && order.orderItems.length > 0
+    : false;
+  const statusLabel = order ? order.status.replace(/-/g, " ") : "";
+  const statusStyle = order
+    ? statusStyles[order.status.toLowerCase()] || "bg-gray-100 text-gray-600"
+    : "";
 
   return (
     <div className="px-[30px] pt-3 pb-10">
-      <div className='flex justify-between border-b border-muted mb-7'>
-        <div className='flex items-center gap-[16px] '>
+      <div className="flex justify-between border-b border-muted mb-7">
+        <div className="flex items-center gap-[16px] ">
           <BackArrow />
           <div className="flex items-center gap-[50px]">
             <h1 className="text-black text-[32px] font-[500]">
-              {order ? `Order #${String(order.number).padStart(2, "0")}` : <Loader size={24} className="text-gray-400" />}
+              {order ? (
+                `Order #${String(order.number).padStart(2, "0")}`
+              ) : (
+                <Loader size={24} className="text-gray-400" />
+              )}
             </h1>
             {order && (
-              <span className={`px-[14px] py-[5px] rounded-full text-[14px] font-[500] capitalize ${statusStyle}`}>
+              <span
+                className={`px-[14px] py-[5px] rounded-full text-[14px] font-[500] capitalize ${statusStyle}`}
+              >
                 {statusLabel}
               </span>
             )}
           </div>
         </div>
         <div className="flex items-center justify-between mt-[20px] mx-[30px] mb-[30px]">
-
           <div className="flex items-center gap-[12px]">
             {!isCancelled ? (
               <FormDialog
@@ -175,8 +186,13 @@ function OrderDetails() {
                 Are you sure you want to cancel this order?
               </FormDialog>
             ) : (
-              <button className='bg-muted text-placeholder cursor-not-allowed rounded-md py-4 px-6 text-[20px] font-[500]'
-                onClick={() => toast.error("This order is already cancelled", { id: "cancel-error" })}
+              <button
+                className="bg-muted text-placeholder cursor-not-allowed rounded-md py-4 px-6 text-[20px] font-[500]"
+                onClick={() =>
+                  toast.error("This order is already cancelled", {
+                    id: "cancel-error",
+                  })
+                }
               >
                 ✕ Cancel Order
               </button>
@@ -192,13 +208,17 @@ function OrderDetails() {
                 Are you sure you want to finalize this order?
               </FormDialog>
             ) : (
-              <button className='bg-muted text-placeholder cursor-not-allowed cursor-delete  rounded-md py-4 px-6 text-[20px] font-[500]'
-                onClick={() => toast.error("Add an Item First TO Finalise The Order", { id: "finalise-error" })}
+              <button
+                className="bg-muted text-placeholder cursor-not-allowed cursor-delete  rounded-md py-4 px-6 text-[20px] font-[500]"
+                onClick={() =>
+                  toast.error("Add an Item First TO Finalise The Order", {
+                    id: "finalise-error",
+                  })
+                }
               >
                 ✓ Finalize Order
               </button>
-            )
-            }
+            )}
           </div>
         </div>
       </div>
@@ -216,12 +236,15 @@ function OrderDetails() {
           />
         </div>
         <div className="flex-1">
-          <OrderItems orderId={orderId} revenue={order?.revenue || 0} onItemsChange={getOrderDetails} />
+          <OrderItems
+            orderId={orderId}
+            revenue={order?.revenue || 0}
+            onItemsChange={getOrderDetails}
+          />
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default OrderDetails
-
+export default OrderDetails;

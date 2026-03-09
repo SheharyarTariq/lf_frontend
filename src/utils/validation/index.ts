@@ -1,4 +1,4 @@
-import * as yup from 'yup';
+import * as yup from "yup";
 
 export async function validateForm<T extends object>(
   schema: yup.ObjectSchema<any>,

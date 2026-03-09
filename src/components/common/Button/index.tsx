@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useRef } from "react";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -7,9 +7,18 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 import Loader from "../Loader";
-export default function Button({ children, variant = "primary", className = "", isLoading, onClick, disabled, ...props }: ButtonProps) {
+export default function Button({
+  children,
+  variant = "primary",
+  className = "",
+  isLoading,
+  onClick,
+  disabled,
+  ...props
+}: ButtonProps) {
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const baseStyles = "px-4 py-2 rounded-[8px] transition-colors duration-200 font-[500] cursor-pointer relative overflow-hidden";
+  const baseStyles =
+    "px-4 py-2 rounded-[8px] transition-colors duration-200 font-[500] cursor-pointer relative overflow-hidden";
 
   const variants = {
     primary: "bg-black text-white hover:bg-neutral-700  px-6 py-4",
@@ -57,7 +66,7 @@ export default function Button({ children, variant = "primary", className = "", 
             `}</style>
       <button
         ref={buttonRef}
-        className={`${baseStyles} ${variants[variant]} ${className} ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+        className={`${baseStyles} ${variants[variant]} ${className} ${isLoading ? "opacity-70 cursor-not-allowed" : ""}`}
         onClick={isLoading ? undefined : handleClick}
         disabled={disabled || isLoading}
         {...props}

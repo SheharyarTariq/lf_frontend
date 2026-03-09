@@ -1,11 +1,11 @@
-"use client"
-import React, { useState } from 'react';
-import { X } from 'lucide-react';
-import Image from 'next/image';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
+"use client";
+import React, { useState } from "react";
+import { X } from "lucide-react";
+import Image from "next/image";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
 
 type TriggerVariant = "primary" | "delete" | "logout" | "icon";
 type SubmitVariant = "primary" | "delete";
@@ -85,8 +85,8 @@ export default function FormDialog({
         slotProps={{
           paper: {
             sx: {
-              borderRadius: '6px',
-              fontFamily: 'var(--font-poppins)',
+              borderRadius: "6px",
+              fontFamily: "var(--font-poppins)",
             },
           },
         }}
@@ -104,7 +104,14 @@ export default function FormDialog({
                 {children}
               </div>
             </div>
-            <DialogActions sx={{ justifyContent: 'center', gap: '12px', pb: '30px', px: '30px' }}>
+            <DialogActions
+              sx={{
+                justifyContent: "center",
+                gap: "12px",
+                pb: "30px",
+                px: "30px",
+              }}
+            >
               <button
                 className="px-8 py-2.5 rounded-[8px] font-[500] cursor-pointer transition-colors duration-200 border border-muted text-black hover:bg-gray-50 min-w-[120px]"
                 onClick={handleClose}
@@ -122,8 +129,19 @@ export default function FormDialog({
           </>
         ) : (
           <>
-            <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: '30px', pt: '25px', pb: '10px' }}>
-              <span className="text-[18px] font-[400] text-black [font-family:var(--font-poppins)]">{title}</span>
+            <DialogTitle
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                px: "30px",
+                pt: "25px",
+                pb: "10px",
+              }}
+            >
+              <span className="text-[18px] font-[400] text-black [font-family:var(--font-poppins)]">
+                {title}
+              </span>
               <button
                 onClick={handleClose}
                 className="text-neutral hover:text-black transition-colors cursor-pointer"
@@ -133,12 +151,16 @@ export default function FormDialog({
             </DialogTitle>
 
             {children && (
-              <DialogContent sx={{ p: '30px' }}>
-                {children}
-              </DialogContent>
+              <DialogContent sx={{ p: "30px" }}>{children}</DialogContent>
             )}
 
-            <DialogActions sx={{ px: '30px', py: '15px', borderTop: children ? '1px solid #EAEAEA' : 'none' }}>
+            <DialogActions
+              sx={{
+                px: "30px",
+                py: "15px",
+                borderTop: children ? "1px solid #EAEAEA" : "none",
+              }}
+            >
               <button
                 className={`px-8 py-2 rounded-[8px] font-[500] cursor-pointer transition-colors duration-200 ${submitStyles[submitVariant]} disabled:opacity-50 disabled:cursor-not-allowed`}
                 onClick={handleSubmit}
