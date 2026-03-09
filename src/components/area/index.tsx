@@ -9,104 +9,106 @@ import Input from '../common/Input'
 import SearchInput from '../common/SearchInput'
 
 export interface AreaData {
-    "@id": string;
-    id: string;
-    name: string;
-    code: string;
-    city: string;
-    status: string;
+  "@id": string;
+  id: string;
+  name: string;
+  code: string;
+  city: string;
+  status: string;
 }
 
 interface AreaResponse {
-    member: AreaData[];
+  member: AreaData[];
 }
 
 interface CreateAreaResponse {
-    id: string;
-    name: string;
-    code: string;
-    city: string;
-    status: string;
+  id: string;
+  name: string;
+  code: string;
+  city: string;
+  status: string;
 }
 
 function Area() {
-    const [areaResponse, setAreaResponse] = useState<AreaData[]>([])
-    const [areaName, setAreaName] = useState('')
-    const [loading, setLoading] = useState(false)
+  const [areaResponse, setAreaResponse] = useState<AreaData[]>([])
+  const [areaName, setAreaName] = useState('')
+  const [loading, setLoading] = useState(false)
 
-    const getArea = async () => {
-        const response = await apiCall<AreaResponse>({
-            endpoint: routes.api.getArea,
-            method: "GET",
-        })
-        if (response.success && response.data?.member) {
-            setAreaResponse(response.data.member)
-        }
+  const getArea = async () => {
+    setLoading(true)
+    const response = await apiCall<AreaResponse>({
+      endpoint: routes.api.getArea,
+      method: "GET",
+    })
+    if (response.success && response.data?.member) {
+      setAreaResponse(response.data.member)
     }
+    setLoading(false)
+  }
 
-    useEffect(() => {
-        getArea()
-    }, [])
+  useEffect(() => {
+    getArea()
+  }, [])
 
-    const handleCreateArea = async (): Promise<boolean> => {
-        setLoading(true)
-        const response = await apiCall<CreateAreaResponse>({
-            endpoint: routes.api.getArea,
-            method: "POST",
-            data: { name: areaName },
-            showSuccessToast: true,
-            successMessage: "Area created successfully",
-        })
-        setLoading(false)
-        if (response.success && response.data) {
-            setAreaResponse((prev) => [...prev, response.data as AreaData])
-            setAreaName('')
-            return true
-        }
-        return false
+  const handleCreateArea = async (): Promise<boolean> => {
+    setLoading(true)
+    const response = await apiCall<CreateAreaResponse>({
+      endpoint: routes.api.getArea,
+      method: "POST",
+      data: { name: areaName },
+      showSuccessToast: true,
+      successMessage: "Area created successfully",
+    })
+    setLoading(false)
+    if (response.success && response.data) {
+      setAreaResponse((prev) => [...prev, response.data as AreaData])
+      setAreaName('')
+      return true
     }
+    return false
+  }
 
-    const handleSearchResults = (data: AreaResponse | null) => {
-        if (data && data.member) {
-            setAreaResponse(data.member)
-        } else {
-            getArea()
-        }
+  const handleSearchResults = (data: AreaResponse | null) => {
+    if (data && data.member) {
+      setAreaResponse(data.member)
+    } else {
+      getArea()
     }
+  }
 
-    return (
-        <>
-            <div className='px-[50px] mt-[51px]'>
-                <div className="flex items-center justify-between mb-8">
-                    <h1 className='text-black text-[32px] font-[500]'>Areas</h1>
-                </div>
+  return (
+    <>
+      <div className='px-[50px] mt-[51px]'>
+        <div className="flex items-center justify-between mb-8">
+          <h1 className='text-black text-[32px] font-[500]'>Areas</h1>
+        </div>
 
-                <div className='w-full flex items-center gap-[24px]'>
-                    <SearchInput<AreaResponse>
-                        endpoint={routes.api.getArea}
-                        searchKey="name"
-                        placeholder="Search Area"
-                        onResults={handleSearchResults}
-                    />
-                    <FormDialog
-                        title="Area Name"
-                        buttonText={<span className="flex items-center gap-2"><Plus size={20} />Create</span>}
-                        saveButtonText="Save"
-                        onSubmit={handleCreateArea}
-                        loading={loading}
-                    >
-                        <Input
-                            placeholder="e.g. Arsenal"
-                            value={areaName}
-                            onChange={(e) => setAreaName(e.target.value)}
-                            className=''
-                        />
-                    </FormDialog>
-                </div>
-                <AreaTable areaResponse={areaResponse} />
-            </div>
-        </>
-    )
+        <div className='w-full flex items-center gap-[24px]'>
+          <SearchInput<AreaResponse>
+            endpoint={routes.api.getArea}
+            searchKey="name"
+            placeholder="Search Area"
+            onResults={handleSearchResults}
+          />
+          <FormDialog
+            title="Area Name"
+            buttonText={<span className="flex items-center gap-2"><Plus size={20} />Create</span>}
+            saveButtonText="Save"
+            onSubmit={handleCreateArea}
+            loading={loading}
+          >
+            <Input
+              placeholder="e.g. Arsenal"
+              value={areaName}
+              onChange={(e) => setAreaName(e.target.value)}
+              className=''
+            />
+          </FormDialog>
+        </div>
+        <AreaTable areaResponse={areaResponse} isLoading={loading} />
+      </div>
+    </>
+  )
 }
 
 export default Area

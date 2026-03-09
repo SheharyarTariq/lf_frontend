@@ -26,9 +26,11 @@ interface ItemCategoriesResponse {
 function Category() {
   const router = useRouter()
   const [categories, setCategories] = useState<ItemCategory[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [createData, setCreateData] = useState<{ name: string, position?: number }>({ name: '' })
 
   const getCategories = async () => {
+    setIsLoading(true)
     const response = await apiCall<ItemCategoriesResponse>({
       endpoint: routes.api.getItemCategories,
       method: "GET",
@@ -40,6 +42,7 @@ function Category() {
         position: index + 1,
       })))
     }
+    setIsLoading(false)
   }
 
   useEffect(() => {
@@ -138,9 +141,9 @@ function Category() {
           <GenericTable
             columns={columns}
             data={categories}
+            isLoading={isLoading}
             onRowClick={(row) => router.push(`${routes.ui.categoryDetails(row.id)}?name=${encodeURIComponent(row.name)}`)}
           />
-          <GenericTable columns={columns} data={categories} />
         </div>
       </div>
     </div>

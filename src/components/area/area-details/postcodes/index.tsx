@@ -29,8 +29,10 @@ function Postcodes({ areaId }: { areaId: string }) {
   const [searchQuery, setSearchQuery] = useState("")
   const [newPostcode, setNewPostcode] = useState("")
   const [createLoading, setCreateLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   const getPostcodes = async () => {
+    setLoading(true)
     const response = await apiCall<PostcodesData>({
       endpoint: routes.api.getPostcodes(areaId),
       method: "GET",
@@ -38,6 +40,7 @@ function Postcodes({ areaId }: { areaId: string }) {
     if (response.success && response?.data) {
       setPostcodes(response.data.member)
     }
+    setLoading(false)
   }
 
   const handleToggle = async (postcodeId: string, isActive: boolean) => {
@@ -134,6 +137,7 @@ function Postcodes({ areaId }: { areaId: string }) {
         </div>
         <GenericTable
           data={filteredPostcodes}
+          isLoading={loading}
           columns={[
             { accessor: "postcodeString", header: "Postcode" },
             {
@@ -151,7 +155,7 @@ function Postcodes({ areaId }: { areaId: string }) {
                     />
                   </button>
                   {row.isActive ? (
-                    <span className="p-[6px] opacity-100 pointer-events-none cursor-not-allowed">
+                    <span className="px-2 opacity-100 pointer-events-none cursor-not-allowed">
                       <Image src="/assets/TrashDisabled.svg" alt="Delete disabled" width={30} height={30} />
                     </span>
                   ) : (

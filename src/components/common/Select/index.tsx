@@ -17,7 +17,7 @@ interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>
 }
 
 function Select({ options, placeholder = "Select", startIcon, fullWidth = false, searchable = false, className = "", onChange, value, disabled, ...props }: SelectProps) {
-    const baseStyles = `py-3 px-6 pr-14 appearance-none placeholder:font-[400] placeholder:text-[#C1C1C1] text-black border-muted border border-[1px] focus:outline-none rounded-[4px] bg-white cursor-pointer ${fullWidth ? 'w-full' : 'min-w-[305px]'}`;
+    const baseStyles = `py-4 px-6 pr-14 appearance-none placeholder:font-[400] placeholder:text-[#C1C1C1] text-black border-muted border border-[1px] focus:outline-none rounded-[8px] bg-white cursor-pointer ${fullWidth ? 'w-full' : 'min-w-[305px]'}`;
     const iconStyles = startIcon ? "pl-10" : "";
 
     const [isOpen, setIsOpen] = useState(false)
@@ -112,7 +112,7 @@ function Select({ options, placeholder = "Select", startIcon, fullWidth = false,
                 <ChevronDown size={20} color="black" />
             </div>
             {isOpen && (
-                <div style={dropdownStyle} className="bg-white border border-muted rounded-[4px] shadow-lg max-h-[250px] flex flex-col">
+                <div style={dropdownStyle} className="bg-white border border-muted rounded-[8px] shadow-lg max-h-[250px] flex flex-col">
                     <div className="p-2 border-b border-muted">
                         <div className="relative">
                             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral" />

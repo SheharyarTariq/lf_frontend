@@ -61,10 +61,12 @@ function AreaDetails() {
 
             <Slots areaId={areaId} />
             <Postcodes areaId={areaId}/>
-            <Button 
-            className='text-right mt-6 bg-muted text-placeholder cursor-not-allowed rounded-md py-4 px-6 text-[20px] font-[500]'>
-            ✕ Delete Area
-            </Button>
+            <div className='flex justify-end mt-6 mx-[30px]'>
+                <Button
+                className='bg-muted text-placeholder cursor-not-allowed rounded-md py-4 px-6 text-[20px] font-[500]'>
+                ✕ Delete Area
+                </Button>
+            </div>
         </div>
     )
 }
