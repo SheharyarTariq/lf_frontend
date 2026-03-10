@@ -143,15 +143,15 @@ function OrderItems({
         cleaningMethod: "",
         pricePerUnit: "",
       });
-      await getOrderItems();
+      await getOrderItems(false);
       onItemsChange?.();
       return true;
     }
     return false;
   };
 
-  const getOrderItems = async () => {
-    setLoading(true);
+  const getOrderItems = async (showLoader = true) => {
+    if (showLoader) setLoading(true);
     const response = await apiCall<OrderItemsData>({
       endpoint: routes.api.getOrderItems(orderId),
       method: "GET",
@@ -159,7 +159,7 @@ function OrderItems({
     if (response.success && response?.data) {
       setOrderItems(response.data.member);
     }
-    setLoading(false);
+    if (showLoader) setLoading(false);
   };
 
   const getItemCategories = async () => {
@@ -265,7 +265,7 @@ function OrderItems({
         cleaningMethod: "",
         pricePerUnit: "",
       });
-      await getOrderItems();
+      await getOrderItems(false);
       onItemsChange?.();
       return true;
     }
@@ -282,7 +282,7 @@ function OrderItems({
     });
     setIsDeletingItem(false);
     if (response.success) {
-      await getOrderItems();
+      await getOrderItems(false);
       onItemsChange?.();
       return true;
     }

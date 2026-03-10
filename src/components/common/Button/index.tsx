@@ -6,6 +6,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   isLoading?: boolean;
 }
 
+import { cn } from "@/utils/cn";
 import Loader from "../Loader";
 export default function Button({
   children,
@@ -66,7 +67,7 @@ export default function Button({
             `}</style>
       <button
         ref={buttonRef}
-        className={`${baseStyles} ${variants[variant]} ${className} ${isLoading ? "opacity-70 cursor-not-allowed" : ""}`}
+        className={cn(baseStyles, variants[variant], className, isLoading ? "opacity-70 cursor-not-allowed" : "")}
         onClick={isLoading ? undefined : handleClick}
         disabled={disabled || isLoading}
         {...props}

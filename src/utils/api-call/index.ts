@@ -4,6 +4,8 @@ import { config } from "../../../config";
 
 const BASE_URL = config.apiUrl;
 
+const apiCache = new Map<string, ApiResponse<any>>();
+
 interface ApiCallParams {
   endpoint: string;
   method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
@@ -28,6 +30,25 @@ const getCookie = (name: string) => {
   return null;
 };
 
+const formatBackendMessage = (msg: any): string => {
+  if (!msg || typeof msg !== "string") return "";
+
+  // Typically "fieldName: This value is already used."
+  const colonIndex = msg.indexOf(": ");
+  if (colonIndex > 0 && colonIndex < 30) {
+    const field = msg.substring(0, colonIndex);
+    let errorPart = msg.substring(colonIndex + 2);
+
+    if (errorPart.toLowerCase().startsWith("this value")) {
+      errorPart = `This ${field}` + errorPart.substring(10);
+    }
+
+    return errorPart.charAt(0).toUpperCase() + errorPart.slice(1);
+  }
+
+  return msg;
+};
+
 export default async function apiCall<T = unknown>({
   endpoint,
   method,
@@ -36,6 +57,12 @@ export default async function apiCall<T = unknown>({
   showSuccessToast = false,
   successMessage,
 }: ApiCallParams): Promise<ApiResponse<T>> {
+  const cacheKey = `${method}:${endpoint}:${JSON.stringify(data || {})}`;
+
+  if (method === "GET" && apiCache.has(cacheKey)) {
+    return apiCache.get(cacheKey) as ApiResponse<T>;
+  }
+
   try {
     const token = getCookie("authtoken");
 
@@ -63,39 +90,47 @@ export default async function apiCall<T = unknown>({
       toast.success(successMessage || "Request successful");
     }
 
-    return {
+    const result = {
       success: true,
       data: response.data,
       status: response.status,
       message: successMessage || "Request successful",
     };
+
+    // Cache successful GET requests
+    if (method === "GET") {
+      apiCache.set(cacheKey, result);
+    }
+    // Clear cache on any mutation (create, update, delete) to ensure fresh data
+    else if (["POST", "PUT", "PATCH", "DELETE"].includes(method)) {
+      apiCache.clear();
+    }
+
+    return result;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
       const status = error.response?.status;
-      const backendMessage =
+      const rawBackendMessage =
         error.response?.data?.message ||
         error.response?.data?.error ||
         error.response?.data?.detail;
+
+      const backendMessage = formatBackendMessage(rawBackendMessage);
 
       let errorMessage: string;
 
       switch (status) {
         case 400:
-          errorMessage =
-            backendMessage || "Invalid request. Please check your input.";
+          errorMessage = "Invalid request. Please check your input.";
           break;
         case 401:
-          errorMessage =
-            backendMessage || "Session expired. Please login again.";
+          errorMessage = "Session expired. Please login again.";
           break;
         case 403:
-          errorMessage =
-            backendMessage ||
-            "You don't have permission to perform this action.";
+          errorMessage = "You don't have permission to perform this action.";
           break;
         case 404:
-          errorMessage =
-            backendMessage || "The requested resource was not found.";
+          errorMessage = "The requested resource was not found.";
           break;
         case 409:
           errorMessage = backendMessage || "This resource already exists.";
@@ -108,7 +143,7 @@ export default async function apiCall<T = unknown>({
           errorMessage = "Too many requests. Please try again later.";
           break;
         case 500:
-          errorMessage = "Internal server error. Please try again later.";
+          errorMessage = "Something went wrong. Please try again later.";
           break;
         case 502:
         case 503:
@@ -117,8 +152,7 @@ export default async function apiCall<T = unknown>({
             "Server is currently unavailable. Please try again later.";
           break;
         default:
-          errorMessage =
-            backendMessage || "Something went wrong. Please try again.";
+          errorMessage = "Something went wrong. Please try again.";
       }
 
       toast.error(errorMessage);
@@ -142,12 +176,12 @@ export default async function apiCall<T = unknown>({
         };
       }
 
-      toast.error(error.message || "An unexpected error occurred.");
+      toast.error("An unexpected error occurred. Please try again.");
       return {
         success: false,
         data: null,
         status: null,
-        message: error.message || "An unexpected error occurred.",
+        message: "An unexpected error occurred. Please try again.",
       };
     }
 

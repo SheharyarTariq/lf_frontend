@@ -34,8 +34,8 @@ function Postcodes({ areaId }: { areaId: string }) {
   const [loading, setLoading] = useState(true);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const getPostcodes = async () => {
-    setLoading(true);
+  const getPostcodes = async (showLoader = true) => {
+    if (showLoader) setLoading(true);
     const response = await apiCall<PostcodesData>({
       endpoint: routes.api.getPostcodes(areaId),
       method: "GET",
@@ -43,7 +43,7 @@ function Postcodes({ areaId }: { areaId: string }) {
     if (response.success && response?.data) {
       setPostcodes(response.data.member);
     }
-    setLoading(false);
+    if (showLoader) setLoading(false);
   };
 
   const handleToggle = async (postcodeId: string, isActive: boolean) => {
@@ -59,7 +59,7 @@ function Postcodes({ areaId }: { areaId: string }) {
     });
 
     if (response.success) {
-      await getPostcodes();
+      await getPostcodes(false);
     }
   };
 
@@ -71,7 +71,7 @@ function Postcodes({ areaId }: { areaId: string }) {
       successMessage: "Postcode deleted successfully",
     });
     if (response.success) {
-      await getPostcodes();
+      await getPostcodes(false);
       return true;
     }
     return false;
@@ -102,7 +102,7 @@ function Postcodes({ areaId }: { areaId: string }) {
     if (response.success) {
       setErrors({});
       setNewPostcode("");
-      await getPostcodes();
+      await getPostcodes(false);
       return true;
     }
     return false;
@@ -176,14 +176,15 @@ function Postcodes({ areaId }: { areaId: string }) {
                     />
                   </button>
                   {row.isActive ? (
-                    <span className="px-2 opacity-100 pointer-events-none cursor-not-allowed">
+                    <button className="p-0 bg-transparent opacity-100 pointer-events-none cursor-not-allowed flex items-center justify-center">
                       <Image
                         src="/assets/TrashDisabled.svg"
                         alt="Delete disabled"
                         width={30}
                         height={30}
+                        className="block"
                       />
-                    </span>
+                    </button>
                   ) : (
                     <FormDialog
                       title="Delete Postcode"

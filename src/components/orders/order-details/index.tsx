@@ -9,7 +9,7 @@ import FormDialog from "@/components/common/form-dailog";
 import toast from "react-hot-toast";
 import Loader from "@/components/common/Loader";
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { routes } from "@/utils/routes";
 
 interface OrderSlot {
@@ -82,7 +82,9 @@ const statusStyles: Record<string, string> = {
 
 function OrderDetails() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const orderId = params["order-details"] as string;
+  const orderNumberParam = searchParams.get("number");
   const [order, setOrder] = useState<OrderDetail | null>(null);
   const [cancelLoading, setCancelLoading] = useState(false);
   const [finaliseLoading, setFinaliseLoading] = useState(false);
@@ -156,11 +158,7 @@ function OrderDetails() {
           <BackArrow />
           <div className="flex items-center gap-[50px]">
             <h1 className="text-black text-[32px] font-[500]">
-              {order ? (
-                `Order #${String(order.number).padStart(2, "0")}`
-              ) : (
-                <Loader size={24} className="text-gray-400" />
-              )}
+              Order #{orderNumberParam || order?.number ? String(orderNumberParam || order?.number).padStart(2, "0") : orderId}
             </h1>
             {order && (
               <span

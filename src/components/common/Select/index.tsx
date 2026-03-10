@@ -1,6 +1,7 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import { ChevronDown, Search } from "lucide-react";
+import { cn } from "@/utils/cn";
 
 interface Option {
   label: string;
@@ -33,7 +34,8 @@ function Select({
   disabled,
   ...props
 }: SelectProps) {
-  const baseStyles = `py-4 px-6 pr-14 appearance-none placeholder:font-[400] placeholder:text-[#C1C1C1] text-black border-muted border border-[1px] focus:outline-none rounded-[8px] bg-white cursor-pointer ${fullWidth ? "w-full" : "min-w-[305px]"}`;
+  const baseStyles = "py-4 px-6 pr-14 appearance-none placeholder:font-[400] placeholder:text-[#C1C1C1] text-black border-muted border border-[1px] focus:outline-none rounded-[8px] bg-white cursor-pointer";
+  const widthStyles = fullWidth ? "w-full" : "min-w-[305px]";
   const iconStyles = startIcon ? "pl-10" : "";
 
   const [isOpen, setIsOpen] = useState(false);
@@ -58,7 +60,7 @@ function Select({
 
   if (!searchable) {
     return (
-      <div className={`${fullWidth ? "w-full" : "w-fit"}`}>
+      <div className={cn(fullWidth ? "w-full" : "w-fit")}>
         <div className="relative">
           {startIcon && (
             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral">
@@ -66,7 +68,7 @@ function Select({
             </div>
           )}
           <select
-            className={`${baseStyles} ${iconStyles} ${error ? "border-red-500" : ""} ${className}`}
+            className={cn(baseStyles, widthStyles, iconStyles, error ? "border-red-500" : "", className)}
             onChange={onChange}
             value={value}
             disabled={disabled}
@@ -110,11 +112,17 @@ function Select({
   };
 
   return (
-    <div className={`${fullWidth ? "w-full" : "w-fit"}`}>
+    <div className={cn(fullWidth ? "w-full" : "w-fit")}>
       <div className={`relative w-full`} ref={dropdownRef}>
         <div
           ref={triggerRef}
-          className={`${baseStyles} ${iconStyles} ${className} ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+          className={cn(
+            baseStyles,
+            widthStyles,
+            iconStyles,
+            disabled ? "opacity-50 cursor-not-allowed" : "",
+            className
+          )}
           onClick={() => {
             if (disabled) return;
             if (!isOpen && triggerRef.current) {

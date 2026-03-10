@@ -1,4 +1,5 @@
 import { Search } from "lucide-react";
+import { cn } from "@/utils/cn";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   startIcon?: React.ReactNode;
@@ -27,7 +28,7 @@ function Input({
         </div>
       )}
       <input
-        className={`${baseStyles} ${iconStyles} ${errorStyles} ${className}`}
+        className={cn(baseStyles, iconStyles, errorStyles, className)}
         {...props}
       />
       {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
