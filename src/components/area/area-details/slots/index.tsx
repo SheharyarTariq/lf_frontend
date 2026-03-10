@@ -68,8 +68,8 @@ function Slots({ areaId }: { areaId: string }) {
   const [loading, setLoading] = useState(true);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const getSlots = async () => {
-    setLoading(true);
+  const getSlots = async (showLoader = true) => {
+    if (showLoader) setLoading(true);
     const response = await apiCall<SlotsData>({
       endpoint: routes.api.getAreaSlots(areaId),
       method: "GET",
@@ -78,7 +78,7 @@ function Slots({ areaId }: { areaId: string }) {
       setSlotsResponse(response.data.member);
       console.log(response);
     }
-    setLoading(false);
+    if (showLoader) setLoading(false);
   };
 
   const handleToggle = async (slotId: string, isActive: boolean) => {
@@ -94,7 +94,7 @@ function Slots({ areaId }: { areaId: string }) {
     });
 
     if (response.success) {
-      await getSlots();
+      await getSlots(false);
     }
   };
 
@@ -106,7 +106,7 @@ function Slots({ areaId }: { areaId: string }) {
       successMessage: "Slot deleted successfully",
     });
     if (response.success) {
-      await getSlots();
+      await getSlots(false);
       return true;
     }
     return false;
@@ -145,7 +145,7 @@ function Slots({ areaId }: { areaId: string }) {
       setNewSlotWeekDay("");
       setNewSlotStartTime("");
       setNewSlotEndTime("");
-      await getSlots();
+      await getSlots(false);
       return true;
     }
     return false;
@@ -246,14 +246,15 @@ function Slots({ areaId }: { areaId: string }) {
                     />
                   </button>
                   {row.isActive ? (
-                    <span className="px-2 opacity-100 pointer-events-none cursor-not-allowed">
+                    <button className="p-0 bg-transparent opacity-100 pointer-events-none cursor-not-allowed flex items-center justify-center">
                       <Image
                         src="/assets/TrashDisabled.svg"
                         alt="Delete disabled"
                         width={30}
                         height={30}
+                        className="block"
                       />
-                    </span>
+                    </button>
                   ) : (
                     <FormDialog
                       title="Delete Slot"

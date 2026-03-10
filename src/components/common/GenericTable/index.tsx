@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useMemo } from "react";
 import { ChevronLeft, ChevronRight, ArrowDown, ArrowUp } from "lucide-react";
+import { cn } from "@/utils/cn";
 
 export interface Column<T> {
   header: string;
@@ -113,7 +114,7 @@ function GenericTable<T>({
 
   return (
     <div
-      className={`overflow-x-auto border border-muted rounded-[14px] ${className}`}
+      className={cn("overflow-x-auto border border-muted rounded-[14px]", className)}
     >
       <table className="min-w-full text-left border-collapse">
         <thead>
@@ -121,7 +122,12 @@ function GenericTable<T>({
             {columns.map((column, index) => (
               <th
                 key={index}
-                className={`py-[16px] px-[25px] font-[500] text-black ${hasActionColumn && !column.isAction ? "w-[1%] whitespace-nowrap" : ""} ${isSortable(column) ? "cursor-pointer select-none" : ""} ${column.className || ""}`}
+                className={cn(
+                  "py-[16px] px-[25px] font-[500] text-black",
+                  hasActionColumn && !column.isAction ? "w-[1%] whitespace-nowrap" : "",
+                  isSortable(column) ? "cursor-pointer select-none" : "",
+                  column.className
+                )}
                 onClick={() => isSortable(column) && handleSort(column)}
               >
                 {isSortable(column) ? (
@@ -158,12 +164,19 @@ function GenericTable<T>({
               <tr
                 key={rowIndex}
                 onClick={() => onRowClick && onRowClick(row)}
-                className={`border-b border-muted hover:bg-gray-50 transition-colors ${onRowClick ? "cursor-pointer" : ""}`}
+                className={cn(
+                  "border-b border-muted hover:bg-gray-50 transition-colors",
+                  onRowClick ? "cursor-pointer" : ""
+                )}
               >
                 {columns.map((column, colIndex) => (
                   <td
                     key={colIndex}
-                    className={`py-[16px] px-[25px] text-black ${hasActionColumn && !column.isAction ? "w-[1%] whitespace-nowrap text-center" : ""} ${column.className || ""}`}
+                    className={cn(
+                      "py-[16px] px-[25px] text-black",
+                      hasActionColumn && !column.isAction ? "w-[1%] whitespace-nowrap text-center" : "",
+                      column.className
+                    )}
                   >
                     {renderCell(row, column)}
                   </td>

@@ -3,11 +3,14 @@ import React, { useState, useEffect, useRef } from "react";
 import { Search } from "lucide-react";
 import apiCall from "@/utils/api-call";
 
+import { cn } from "@/utils/cn";
+
 interface SearchInputProps<T> {
   endpoint: string;
   searchKey: string;
   placeholder?: string;
   debounceMs?: number;
+  className?: string;
   onResults: (data: T | null) => void;
 }
 
@@ -16,6 +19,7 @@ function SearchInput<T>({
   searchKey,
   placeholder = "Search",
   debounceMs = 400,
+  className,
   onResults,
 }: SearchInputProps<T>) {
   const [query, setQuery] = useState("");
@@ -50,7 +54,7 @@ function SearchInput<T>({
   }, [query]);
 
   return (
-    <div className="relative w-full">
+    <div className={cn("relative w-full", className)}>
       <div className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral">
         <Search size={24} color="#8F8F8F" />
       </div>

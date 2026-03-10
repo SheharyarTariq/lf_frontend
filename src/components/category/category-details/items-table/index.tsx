@@ -95,7 +95,7 @@ function ItemsTable({ categoryId, onItemsChange }: ItemsTableProps) {
     if (response.success) {
       setErrors({});
       setCreateItemData({ name: "", priceType: "Fixed" });
-      fetchItems();
+      fetchItems(false);
       return true;
     }
     return false;
@@ -111,14 +111,14 @@ function ItemsTable({ categoryId, onItemsChange }: ItemsTableProps) {
     });
     setIsDeletingItem(false);
     if (response.success) {
-      fetchItems();
+      fetchItems(false);
       return true;
     }
     return false;
   };
 
-  const fetchItems = async () => {
-    setLoading(true);
+  const fetchItems = async (showLoader = true) => {
+    if (showLoader) setLoading(true);
     const response = await apiCall<CategoryDetailsResponse>({
       endpoint: routes.api.getItemCategoryDetails(categoryId),
       method: "GET",
@@ -129,7 +129,7 @@ function ItemsTable({ categoryId, onItemsChange }: ItemsTableProps) {
       setItems(response.data.member);
       onItemsChange?.(response.data.member);
     }
-    setLoading(false);
+    if (showLoader) setLoading(false);
   };
 
   useEffect(() => {
@@ -215,7 +215,7 @@ function ItemsTable({ categoryId, onItemsChange }: ItemsTableProps) {
                 setItems(data.member);
                 onItemsChange?.(data.member);
               } else {
-                fetchItems();
+                fetchItems(false);
               }
             }}
           />

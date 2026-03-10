@@ -6,6 +6,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
+import { cn } from "@/utils/cn";
 
 type TriggerVariant = "primary" | "delete" | "logout" | "icon";
 type SubmitVariant = "primary" | "delete";
@@ -24,7 +25,7 @@ interface FormDialogProps {
 const triggerStyles: Record<TriggerVariant, string> = {
   primary: "bg-black text-white hover:bg-neutral-700",
   delete: "bg-delete text-white hover:bg-red-700",
-  logout: "bg-white text-black hover:bg-muted !px-4 !py-2",
+  logout: "bg-white text-black hover:bg-muted px-4 py-2",
   icon: "bg-transparent p-0",
 };
 
@@ -68,10 +69,33 @@ export default function FormDialog({
 
   const isDeleteVariant = submitVariant === "delete";
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+    if (
+      target.tagName === "TEXTAREA" ||
+      target.tagName === "BUTTON" ||
+      target.tagName === "SELECT" ||
+      target.closest("button") ||
+      target.closest("[role='listbox']")
+    ) {
+      return;
+    }
+
+    if (e.key === "Enter" && !isSubmitting && !loading) {
+      e.preventDefault();
+      handleSubmit();
+    }
+  };
+
   return (
     <>
       <button
-        className={`${triggerVariant === "icon" ? "px-2 cursor-pointer" : "px-[25px] py-[14px] rounded-[8px] font-[500] text-[20px] cursor-pointer transition-colors duration-200 [font-family:var(--font-poppins)] whitespace-nowrap"} ${triggerStyles[triggerVariant]}`}
+        className={cn(
+          triggerVariant === "icon"
+            ? "px-2 cursor-pointer"
+            : "px-[25px] py-[14px] rounded-[8px] font-[500] text-[20px] cursor-pointer transition-colors duration-200 [font-family:var(--font-poppins)] whitespace-nowrap",
+          triggerStyles[triggerVariant]
+        )}
         onClick={handleClickOpen}
       >
         {buttonText}
@@ -80,6 +104,7 @@ export default function FormDialog({
       <Dialog
         open={open}
         onClose={handleClose}
+        onKeyDown={handleKeyDown}
         maxWidth="sm"
         fullWidth
         slotProps={{

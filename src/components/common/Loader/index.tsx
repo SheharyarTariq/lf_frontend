@@ -11,13 +11,41 @@ interface LoaderProps {
 export default function Loader({
   size = 24,
   className = "",
-  color = "currentColor",
+  color = "var(--loader-color)",
 }: LoaderProps) {
+  const dotSize = Math.max(4, size / 3.5);
+
   return (
-    <Loader2
-      size={size}
-      color={color}
-      className={`animate-spin ${className}`}
-    />
+    <div
+      className={`flex items-center justify-center gap-[4px] ${className}`}
+      style={{ height: size }}
+    >
+      <span
+        className="animate-dots rounded-full"
+        style={{
+          width: dotSize,
+          height: dotSize,
+          backgroundColor: color,
+          animationDelay: "-0.32s",
+        }}
+      ></span>
+      <span
+        className="animate-dots rounded-full"
+        style={{
+          width: dotSize,
+          height: dotSize,
+          backgroundColor: color,
+          animationDelay: "-0.16s",
+        }}
+      ></span>
+      <span
+        className="animate-dots rounded-full"
+        style={{
+          width: dotSize,
+          height: dotSize,
+          backgroundColor: color,
+        }}
+      ></span>
+    </div>
   );
 }

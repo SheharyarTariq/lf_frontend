@@ -28,23 +28,26 @@ export const categoryItemSchema = yup.object({
   priceWashing: yup
     .number()
     .transform((val, orig) =>
-      orig === "" || orig === undefined ? undefined : val
+      orig === "" || orig === undefined ? undefined : Number(val)
     )
-    .optional()
+    .required("Wash price is required")
+    .typeError("Wash price must be a valid number")
     .min(0, "Wash price must be 0 or greater"),
   priceDryCleaning: yup
     .number()
     .transform((val, orig) =>
-      orig === "" || orig === undefined ? undefined : val
+      orig === "" || orig === undefined ? undefined : Number(val)
     )
-    .optional()
+    .required("Dry clean price is required")
+    .typeError("Dry clean price must be a valid number")
     .min(0, "Dry clean price must be 0 or greater"),
   position: yup
     .number()
     .transform((val, orig) =>
-      orig === "" || orig === undefined ? undefined : val
+      orig === "" || orig === undefined ? undefined : Number(val)
     )
-    .optional()
+    .required("Position is required")
+    .typeError("Position must be a valid number")
     .positive("Position must be a positive number")
     .integer("Position must be a whole number"),
 });

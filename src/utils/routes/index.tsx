@@ -8,7 +8,8 @@ export const routes = {
     users: "/users",
     areaDetails: (id: string | number) => `area/${id}`,
     categoryDetails: (id: string | number) => `category/${id}`,
-    orderDetails: (id: string | number) => `orders/${id}`,
+    orderDetails: (id: string | number, number?: string | number) =>
+      number ? `orders/${id}?number=${number}` : `orders/${id}`,
   },
 
   api: {

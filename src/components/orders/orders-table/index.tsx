@@ -181,7 +181,9 @@ function OrdersTable() {
         data={orders}
         columns={columns}
         isLoading={isLoading}
-        onRowClick={(row) => router.push(routes.ui.orderDetails(row.id))}
+        onRowClick={(row) =>
+          router.push(routes.ui.orderDetails(row.id, row.number))
+        }
       />
     </div>
   );
