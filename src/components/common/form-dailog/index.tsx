@@ -25,7 +25,7 @@ interface FormDialogProps {
 const triggerStyles: Record<TriggerVariant, string> = {
   primary: "bg-black text-white hover:bg-neutral-700",
   delete: "bg-delete text-white hover:bg-red-700",
-  logout: "bg-white text-black hover:bg-muted px-4 py-2",
+  logout: "bg-white text-black hover:bg-muted",
   icon: "bg-transparent p-0",
 };
 
@@ -93,7 +93,7 @@ export default function FormDialog({
         className={cn(
           triggerVariant === "icon"
             ? "px-2 cursor-pointer"
-            : "px-[25px] py-[14px] rounded-[8px] font-[500] text-[20px] cursor-pointer transition-colors duration-200 [font-family:var(--font-poppins)] whitespace-nowrap",
+            : "px-[35px] py-[12px] text-[16px] rounded-[8px] font-[500] cursor-pointer transition-colors duration-200 [font-family:var(--font-poppins)] whitespace-nowrap",
           triggerStyles[triggerVariant]
         )}
         onClick={handleClickOpen}
@@ -138,13 +138,13 @@ export default function FormDialog({
               }}
             >
               <button
-                className="px-8 py-2.5 rounded-[8px] font-[500] cursor-pointer transition-colors duration-200 border border-muted text-black hover:bg-gray-50 min-w-[120px]"
+                className="px-[35px] py-[12px] text-[16px] rounded-[8px] font-[500] cursor-pointer transition-colors duration-200 border border-muted text-black hover:bg-gray-50 min-w-[120px]"
                 onClick={handleClose}
               >
                 No
               </button>
               <button
-                className={`px-8 py-2.5 rounded-[8px] font-[500] cursor-pointer transition-colors duration-200 ${submitStyles[submitVariant]} disabled:opacity-50 disabled:cursor-not-allowed min-w-[120px]`}
+                className={`px-[35px] py-[12px] text-[16px] rounded-[8px] font-[500] cursor-pointer transition-colors duration-200 ${submitStyles[submitVariant]} disabled:opacity-50 disabled:cursor-not-allowed min-w-[120px]`}
                 onClick={handleSubmit}
                 disabled={isSubmitting || loading}
               >
@@ -187,7 +187,7 @@ export default function FormDialog({
               }}
             >
               <button
-                className={`px-8 py-2 rounded-[8px] font-[500] cursor-pointer transition-colors duration-200 ${submitStyles[submitVariant]} disabled:opacity-50 disabled:cursor-not-allowed`}
+                className={`px-[35px] py-[12px] text-[16px] rounded-[8px] font-[500] cursor-pointer transition-colors duration-200 ${submitStyles[submitVariant]} disabled:opacity-50 disabled:cursor-not-allowed`}
                 onClick={handleSubmit}
                 disabled={isSubmitting || loading}
               >
