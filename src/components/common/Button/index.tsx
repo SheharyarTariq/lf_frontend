@@ -19,10 +19,10 @@ export default function Button({
 }: ButtonProps) {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const baseStyles =
-    "px-4 py-2 rounded-[8px] transition-colors duration-200 font-[500] cursor-pointer relative overflow-hidden";
+    "px-[35px] py-[12px] text-[16px] rounded-[8px] transition-colors duration-200 font-[500] cursor-pointer relative overflow-hidden";
 
   const variants = {
-    primary: "bg-black text-white hover:bg-neutral-700  px-6 py-4",
+    primary: "bg-black text-white hover:bg-neutral-700",
     secondary: "bg-secondary text-black hover:bg-limeGreen",
     outline: "text-white hover:bg-secondary/20",
   };
