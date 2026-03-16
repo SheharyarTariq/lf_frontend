@@ -158,7 +158,10 @@ function OrderDetails() {
           <BackArrow />
           <div className="flex items-center gap-[50px]">
             <h1 className="text-black text-[32px] font-[500]">
-              Order #{orderNumberParam || order?.number ? String(orderNumberParam || order?.number).padStart(2, "0") : orderId}
+              Order #
+              {orderNumberParam || order?.number
+                ? String(orderNumberParam || order?.number).padStart(2, "0")
+                : orderId}
             </h1>
             {order && (
               <span

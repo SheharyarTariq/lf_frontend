@@ -114,7 +114,10 @@ function GenericTable<T>({
 
   return (
     <div
-      className={cn("overflow-x-auto border border-muted rounded-[14px]", className)}
+      className={cn(
+        "overflow-x-auto border border-muted rounded-[14px]",
+        className
+      )}
     >
       <table className="min-w-full text-left border-collapse">
         <thead>
@@ -124,7 +127,9 @@ function GenericTable<T>({
                 key={index}
                 className={cn(
                   "py-[16px] px-[25px] font-[500] text-black",
-                  hasActionColumn && !column.isAction ? "w-[1%] whitespace-nowrap" : "",
+                  hasActionColumn && !column.isAction
+                    ? "w-[1%] whitespace-nowrap"
+                    : "",
                   isSortable(column) ? "cursor-pointer select-none" : "",
                   column.className
                 )}
@@ -174,7 +179,9 @@ function GenericTable<T>({
                     key={colIndex}
                     className={cn(
                       "py-[16px] px-[25px] text-black",
-                      hasActionColumn && !column.isAction ? "w-[1%] whitespace-nowrap text-center" : "",
+                      hasActionColumn && !column.isAction
+                        ? "w-[1%] whitespace-nowrap text-center"
+                        : "",
                       column.className
                     )}
                   >

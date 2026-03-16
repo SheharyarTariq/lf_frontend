@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import apiCall from "@/utils/api-call";
 import { routes } from "@/utils/routes";
+import { penceToPounds } from "@/utils/helper";
 import GenericTable from "@/components/common/GenericTable";
 import Image from "next/image";
 
@@ -65,7 +66,24 @@ const formatDate = (dateStr: string) => {
   });
 };
 
-function OrdersTable() {
+interface OrdersFilters {
+  search: string;
+  status: string;
+  type: string;
+}
+
+function buildEndpoint(filters: OrdersFilters): string {
+  const parts: string[] = [];
+  if (filters.search)
+    parts.push(`search=${encodeURIComponent(filters.search)}`);
+  if (filters.status)
+    parts.push(`exact[status][]=${encodeURIComponent(filters.status)}`);
+  if (filters.type)
+    parts.push(`exact[type][]=${encodeURIComponent(filters.type)}`);
+  return routes.api.getOrders + (parts.length ? `?${parts.join("&")}` : "");
+}
+
+function OrdersTable({ filters }: { filters: OrdersFilters }) {
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
@@ -73,7 +91,7 @@ function OrdersTable() {
   const getOrders = async () => {
     setIsLoading(true);
     const response = await apiCall<OrdersData>({
-      endpoint: routes.api.getOrders,
+      endpoint: buildEndpoint(filters),
       method: "GET",
     });
     if (response.success && response?.data) {
@@ -84,7 +102,7 @@ function OrdersTable() {
 
   useEffect(() => {
     getOrders();
-  }, []);
+  }, [filters.search, filters.status, filters.type]);
 
   const columns = [
     {
@@ -113,7 +131,7 @@ function OrdersTable() {
       header: "Type",
     },
     {
-      accessor: (row: Order) => `£${row.revenue}`,
+      accessor: (row: Order) => `£${penceToPounds(row.revenue).toFixed(2)}`,
       header: "Revenue",
       sortable: true,
       sortKey: "revenue" as keyof Order,

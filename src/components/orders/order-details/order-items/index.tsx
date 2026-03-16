@@ -9,6 +9,7 @@ import Input from "@/components/common/Input";
 import Select from "@/components/common/Select";
 import { validateAndSetErrors } from "@/utils/validation";
 import { openItemSchema, regularItemSchema } from "../../schema";
+import { penceToPounds, poundsToPence } from "@/utils/helper";
 
 interface OrderItem {
   "@context"?: string;
@@ -39,6 +40,9 @@ interface RegularItemOption {
   atId: string;
   name: string;
   washingLabel: string;
+  categoryId: string;
+  priceWashing: number | null;
+  priceDryCleaning: number | null;
 }
 
 interface OrderItemsData {
@@ -96,6 +100,11 @@ function OrderItems({
     Record<string, string>
   >({});
   const [createRegularLoading, setCreateRegularLoading] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("");
+
+  const filteredItems = selectedCategory
+    ? allItems.filter((item) => item.categoryId === selectedCategory)
+    : [];
 
   const handleCreateOpenItem = async (): Promise<boolean> => {
     if (
@@ -121,12 +130,12 @@ function OrderItems({
       endpoint: routes.api.createOpenItem,
       method: "POST",
       data: {
-        openItemName: openItemData.openItemName,
+        openItemName: openItemData.openItemName.trim(),
         quantity: openItemData.quantity ? Number(openItemData.quantity) : 1,
         piece: openItemData.piece ? Number(openItemData.piece) : 0,
         cleaningMethod: openItemData.cleaningMethod,
         pricePerUnit: openItemData.pricePerUnit
-          ? Number(openItemData.pricePerUnit)
+          ? poundsToPence(Number(openItemData.pricePerUnit))
           : 0,
         order: `/orders/${orderId}`,
       },
@@ -178,7 +187,13 @@ function OrderItems({
     const itemsList: RegularItemOption[] = [];
     for (const category of categories) {
       const response = await apiCall<{
-        member: { "@id"?: string; id: string; name: string }[];
+        member: {
+          "@id"?: string;
+          id: string;
+          name: string;
+          priceWashing: number | null;
+          priceDryCleaning: number | null;
+        }[];
       }>({
         endpoint: routes.api.getItemCategoryDetails(category.id),
         method: "GET",
@@ -191,6 +206,9 @@ function OrderItems({
             atId: item["@id"] || `/items/${item.id}`,
             name: item.name,
             washingLabel: category.washingLabel,
+            categoryId: category.id,
+            priceWashing: item.priceWashing ?? null,
+            priceDryCleaning: item.priceDryCleaning ?? null,
           });
         });
       }
@@ -227,10 +245,12 @@ function OrderItems({
       !(await validateAndSetErrors(
         regularItemSchema,
         {
+          category: selectedCategory,
           item: regularItemData.item,
           quantity: regularItemData.quantity
             ? Number(regularItemData.quantity)
             : undefined,
+          cleaningMethod: regularItemData.cleaningMethod,
           pricePerUnit: regularItemData.pricePerUnit
             ? Number(regularItemData.pricePerUnit)
             : undefined,
@@ -244,7 +264,7 @@ function OrderItems({
       quantity: regularItemData.quantity ? Number(regularItemData.quantity) : 1,
       cleaningMethod: regularItemData.cleaningMethod,
       pricePerUnit: regularItemData.pricePerUnit
-        ? Number(regularItemData.pricePerUnit)
+        ? poundsToPence(Number(regularItemData.pricePerUnit))
         : 0,
       order: `/orders/${orderId}`,
     };
@@ -259,6 +279,7 @@ function OrderItems({
     setCreateRegularLoading(false);
     if (response.success) {
       setRegularItemErrors({});
+      setSelectedCategory("");
       setRegularItemData({
         item: "",
         quantity: "1",
@@ -294,6 +315,37 @@ function OrderItems({
     getItemCategories();
   }, []);
 
+  useEffect(() => {
+    if (!regularItemData.item) return;
+    const selectedItem = allItems.find((i) => i.atId === regularItemData.item);
+    if (!selectedItem) return;
+    const defaultMethod =
+      selectedItem.priceWashing !== null
+        ? "washing"
+        : selectedItem.priceDryCleaning !== null
+          ? "dry_cleaning"
+          : "";
+    setRegularItemData((prev) => ({ ...prev, cleaningMethod: defaultMethod }));
+  }, [regularItemData.item, allItems]);
+
+  useEffect(() => {
+    if (!regularItemData.item || !regularItemData.cleaningMethod) return;
+    const selectedItem = allItems.find((i) => i.atId === regularItemData.item);
+    if (!selectedItem) return;
+    const price =
+      regularItemData.cleaningMethod === "washing"
+        ? selectedItem.priceWashing
+        : regularItemData.cleaningMethod === "dry_cleaning"
+          ? selectedItem.priceDryCleaning
+          : null;
+    if (price !== null) {
+      setRegularItemData((prev) => ({
+        ...prev,
+        pricePerUnit: String(penceToPounds(price)),
+      }));
+    }
+  }, [regularItemData.item, regularItemData.cleaningMethod, allItems]);
+
   const columns = [
     {
       accessor: (row: OrderItem) => {
@@ -317,12 +369,14 @@ function OrderItems({
       sortable: false,
     },
     {
-      accessor: (row: OrderItem) => `£${row.pricePerUnit}`,
+      accessor: (row: OrderItem) =>
+        `£${penceToPounds(row.pricePerUnit).toFixed(2)}`,
       header: "Unit Price",
       sortable: false,
     },
     {
-      accessor: (row: OrderItem) => `£${row.totalPrice}`,
+      accessor: (row: OrderItem) =>
+        `£${penceToPounds(row.totalPrice).toFixed(2)}`,
       header: "Total",
       sortable: false,
     },
@@ -498,18 +552,45 @@ function OrderItems({
               loading={createRegularLoading}
             >
               <div className="flex flex-col gap-[20px]">
+                <div>
+                  <label className="text-black font-[500] text-[14px] mb-[8px] block">
+                    Category
+                  </label>
+                  <Select
+                    options={itemCategories.map((cat) => ({
+                      label: cat.name,
+                      value: cat.id,
+                    }))}
+                    placeholder="Select"
+                    value={selectedCategory}
+                    onChange={(e) => {
+                      setSelectedCategory(e.target.value);
+                      setRegularItemData((prev) => ({
+                        ...prev,
+                        item: "",
+                        cleaningMethod: "",
+                      }));
+                      if (regularItemErrors.category)
+                        setRegularItemErrors((prev) => ({
+                          ...prev,
+                          category: "",
+                        }));
+                    }}
+                    fullWidth
+                    searchable
+                    error={regularItemErrors.category}
+                  />
+                </div>
                 <div className="flex gap-[20px]">
                   <div className="flex-1">
                     <label className="text-black font-[500] text-[14px] mb-[8px] block">
                       Item
                     </label>
                     <Select
-                      options={[
-                        ...allItems.map((item) => ({
-                          label: item.name,
-                          value: item.atId,
-                        })),
-                      ]}
+                      options={filteredItems.map((item) => ({
+                        label: item.name,
+                        value: item.atId,
+                      }))}
                       placeholder="Select"
                       value={regularItemData.item}
                       onChange={(e) => {
@@ -526,6 +607,7 @@ function OrderItems({
                       }}
                       fullWidth
                       searchable
+                      disabled={!selectedCategory}
                       error={regularItemErrors.item}
                     />
                   </div>
@@ -562,17 +644,19 @@ function OrderItems({
                       placeholder="Select"
                       value={regularItemData.cleaningMethod}
                       onChange={(e) => {
-                        console.log(
-                          "Cleaning method selected:",
-                          e.target.value
-                        );
                         setRegularItemData((prev) => ({
                           ...prev,
                           cleaningMethod: e.target.value,
                         }));
+                        if (regularItemErrors.cleaningMethod)
+                          setRegularItemErrors((prev) => ({
+                            ...prev,
+                            cleaningMethod: "",
+                          }));
                       }}
                       fullWidth
                       disabled={!regularItemData.item}
+                      error={regularItemErrors.cleaningMethod}
                     />
                   </div>
                   <div className="flex-1">
@@ -619,7 +703,11 @@ function OrderItems({
         <p className="text-[16px] font-[700] text-black">
           £
           {orderItems
-            .reduce((acc, item) => acc + (Number(item.totalPrice) || 0), 0)
+            .reduce(
+              (acc, item) =>
+                acc + (penceToPounds(Number(item.totalPrice)) || 0),
+              0
+            )
             .toFixed(2)}
         </p>
       </div>

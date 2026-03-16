@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Input from "../common/Input";
+import SearchInput from "../common/SearchInput";
 import { Plus } from "lucide-react";
 import GenericTable, { Column } from "@/components/common/GenericTable";
 import apiCall from "@/utils/api-call";
@@ -35,6 +36,14 @@ function Category() {
   }>({ name: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const handleSearchResults = (data: ItemCategoriesResponse | null) => {
+    if (data && data.member) {
+      setCategories(data.member);
+    } else {
+      getCategories();
+    }
+  };
+
   const getCategories = async () => {
     setIsLoading(true);
     const response = await apiCall<ItemCategoriesResponse>({
@@ -43,12 +52,7 @@ function Category() {
       headers: { Accept: "application/ld+json" },
     });
     if (response.success && response?.data) {
-      setCategories(
-        response.data.member.map((item, index) => ({
-          ...item,
-          position: index + 1,
-        }))
-      );
+      setCategories(response.data.member);
     }
     setIsLoading(false);
   };
@@ -70,7 +74,7 @@ function Category() {
       const response = await apiCall({
         endpoint: routes.api.createItemCategory,
         method: "POST",
-        data: createData,
+        data: { ...createData, name: createData.name.trim() },
         showSuccessToast: true,
         successMessage: "Category Created Successfully",
       });
@@ -117,7 +121,12 @@ function Category() {
       <div className="px-[50px] mt-[51px] mb-10">
         <h1 className="text-[32px] font-[500] text-black">Category</h1>
         <div className="w-full flex items-center gap-[24px] mt-5">
-          <Input placeholder="Search" search />
+          <SearchInput<ItemCategoriesResponse>
+            endpoint={routes.api.getItemCategories}
+            searchKey="name"
+            placeholder="Search"
+            onResults={handleSearchResults}
+          />
           <div className="flex items-center relative">
             <FormDialog
               title="Create New Category"
@@ -150,7 +159,7 @@ function Category() {
                     error={errors.name}
                   />
                 </div>
-                <div className="flex flex-col gap-2 w-[150px]">
+                <div className="flex flex-col gap-2">
                   <label className="text-[14px] font-medium text-black">
                     Position
                   </label>
@@ -183,7 +192,7 @@ function Category() {
             isLoading={isLoading}
             onRowClick={(row) =>
               router.push(
-                `${routes.ui.categoryDetails(row.id)}?name=${encodeURIComponent(row.name)}`
+                `${routes.ui.categoryDetails(row.id)}?name=${encodeURIComponent(row.name)}&position=${row.position ?? ""}`
               )
             }
           />

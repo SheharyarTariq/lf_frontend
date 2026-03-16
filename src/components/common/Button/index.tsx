@@ -67,7 +67,12 @@ export default function Button({
             `}</style>
       <button
         ref={buttonRef}
-        className={cn(baseStyles, variants[variant], className, isLoading ? "opacity-70 cursor-not-allowed" : "")}
+        className={cn(
+          baseStyles,
+          variants[variant],
+          className,
+          isLoading ? "opacity-70 cursor-not-allowed" : ""
+        )}
         onClick={isLoading ? undefined : handleClick}
         disabled={disabled || isLoading}
         {...props}
