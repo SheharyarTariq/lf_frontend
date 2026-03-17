@@ -686,17 +686,11 @@ function OrderItems({
             </FormDialog>
           </div>
         </div>
-        {orderItems.length > 0 || loading ? (
-          <GenericTable
-            data={orderItems}
-            columns={columns}
-            isLoading={loading}
-          />
-        ) : (
-          <div className="flex items-center justify-center py-[60px] text-neutral text-[14px]">
-            No items added yet!
-          </div>
-        )}
+        <GenericTable
+          data={orderItems}
+          columns={columns}
+          isLoading={loading}
+        />
       </Card>
       <div className="flex items-center justify-end gap-10 mx-8 mt-[20px] mb-[30px]">
         <p className="text-[16px] font-[700] text-black">Total Revenue</p>

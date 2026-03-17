@@ -25,7 +25,7 @@ interface FormDialogProps {
 const triggerStyles: Record<TriggerVariant, string> = {
   primary: "bg-black text-white hover:bg-neutral-700",
   delete: "bg-delete text-white hover:bg-red-700",
-  logout: "bg-white text-black hover:bg-muted",
+  logout: "bg-white text-black py-[12px] hover:bg-muted",
   icon: "bg-transparent p-0",
 };
 
@@ -93,7 +93,7 @@ export default function FormDialog({
         className={cn(
           triggerVariant === "icon"
             ? "px-2 cursor-pointer"
-            : "px-[35px] py-[12px] text-[16px] rounded-[8px] font-[500] cursor-pointer transition-colors duration-200 [font-family:var(--font-poppins)] whitespace-nowrap",
+            : "px-[35px] py-[16px] text-[16px] rounded-[8px] font-[500] cursor-pointer transition-colors duration-200 [font-family:var(--font-poppins)] whitespace-nowrap",
           triggerStyles[triggerVariant]
         )}
         onClick={handleClickOpen}
@@ -161,7 +161,8 @@ export default function FormDialog({
                 justifyContent: "space-between",
                 px: "30px",
                 pt: "25px",
-                pb: "10px",
+                pb: "20px",
+                borderBottom: children ? "1px solid #EAEAEA" : "none",
               }}
             >
               <span className="text-[18px] font-[400] text-black [font-family:var(--font-poppins)]">
@@ -176,14 +177,13 @@ export default function FormDialog({
             </DialogTitle>
 
             {children && (
-              <DialogContent sx={{ p: "30px" }}>{children}</DialogContent>
+              <DialogContent sx={{ p: "30px", mt: "15px" }}>{children}</DialogContent>
             )}
 
             <DialogActions
               sx={{
                 px: "30px",
                 py: "15px",
-                borderTop: children ? "1px solid #EAEAEA" : "none",
               }}
             >
               <button

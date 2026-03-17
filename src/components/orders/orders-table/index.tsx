@@ -116,7 +116,7 @@ function OrdersTable({ filters }: { filters: OrdersFilters }) {
           statusStyles[row.status.toLowerCase()] || "bg-gray-100 text-gray-600";
         return (
           <span
-            className={`px-[12px] py-[4px] rounded-full text-[13px] font-[500] capitalize ${style}`}
+            className={`inline-block w-[140px] py-[4px] rounded-full text-[13px] font-[500] capitalize text-center ${style}`}
           >
             {label}
           </span>
@@ -124,7 +124,7 @@ function OrdersTable({ filters }: { filters: OrdersFilters }) {
       },
       header: "Status",
       sortable: false,
-      className: "text-center",
+      className: "w-[140px] text-center",
     },
     {
       accessor: "type" as keyof Order,

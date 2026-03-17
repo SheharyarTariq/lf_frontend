@@ -1,6 +1,7 @@
 "use client";
 import apiCall from "@/utils/api-call";
 import BackArrow from "@/components/common/BackArrow";
+import Button from "@/components/common/Button";
 import CustomerInfo from "./customer-info";
 import SpecialNotes from "./special-notes";
 import OrderInformation from "./order-information";
@@ -187,8 +188,8 @@ function OrderDetails() {
                 Are you sure you want to cancel this order?
               </FormDialog>
             ) : (
-              <button
-                className="bg-muted text-placeholder cursor-not-allowed rounded-md py-4 px-6 text-[20px] font-[500]"
+              <Button
+                variant="disabled"
                 onClick={() =>
                   toast.error("This order is already cancelled", {
                     id: "cancel-error",
@@ -196,7 +197,7 @@ function OrderDetails() {
                 }
               >
                 ✕ Cancel Order
-              </button>
+              </Button>
             )}
             {hasOrderItems ? (
               <FormDialog
@@ -209,8 +210,8 @@ function OrderDetails() {
                 Are you sure you want to finalize this order?
               </FormDialog>
             ) : (
-              <button
-                className="bg-muted text-placeholder cursor-not-allowed cursor-delete  rounded-md py-4 px-6 text-[20px] font-[500]"
+              <Button
+                variant="disabled"
                 onClick={() =>
                   toast.error("Add an Item First TO Finalise The Order", {
                     id: "finalise-error",
@@ -218,7 +219,7 @@ function OrderDetails() {
                 }
               >
                 ✓ Finalize Order
-              </button>
+              </Button>
             )}
           </div>
         </div>
