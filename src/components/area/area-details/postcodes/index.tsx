@@ -26,7 +26,12 @@ interface PostcodesData {
   member: Postcode[];
 }
 
-function Postcodes({ areaId }: { areaId: string }) {
+interface PostcodesProps {
+  areaId: string;
+  onPostcodesChange?: (count: number) => void;
+}
+
+function Postcodes({ areaId, onPostcodesChange }: Readonly<PostcodesProps>) {
   const [postcodes, setPostcodes] = useState<Postcode[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [newPostcode, setNewPostcode] = useState("");
@@ -112,6 +117,12 @@ function Postcodes({ areaId }: { areaId: string }) {
     getPostcodes();
   }, []);
 
+  useEffect(() => {
+    if (onPostcodesChange) {
+      onPostcodesChange(postcodes.length);
+    }
+  }, [postcodes, onPostcodesChange]);
+
   const filteredPostcodes = postcodes.filter((p) =>
     p.postcodeString.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -130,7 +141,7 @@ function Postcodes({ areaId }: { areaId: string }) {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
           <FormDialog
-            title="Add Postcode"
+            title="Postcode"
             buttonText="+ Add Postcode"
             saveButtonText="Save"
             onSubmit={handleCreatePostcode}

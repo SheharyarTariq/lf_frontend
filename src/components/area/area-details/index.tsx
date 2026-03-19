@@ -1,9 +1,10 @@
 "use client";
 import React, { useState } from "react";
 import Slots from "./slots";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams, useSearchParams, useRouter } from "next/navigation";
 import BackArrow from "@/components/common/BackArrow";
 import FormDialog from "@/components/common/form-dailog";
+import toast from "react-hot-toast";
 import Input from "@/components/common/Input";
 import apiCall from "@/utils/api-call";
 import { routes } from "@/utils/routes";
@@ -20,7 +21,10 @@ function AreaDetails() {
   const [areaName, setAreaName] = useState(getareaName);
   const [displayName, setDisplayName] = useState(getareaName);
   const [loading, setLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [postcodeCount, setPostcodeCount] = useState<number | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const router = useRouter();
 
   const handleUpdateArea = async (): Promise<boolean> => {
     if (
@@ -44,6 +48,22 @@ function AreaDetails() {
     if (response.success) {
       setErrors({});
       setDisplayName(areaName);
+      return true;
+    }
+    return false;
+  };
+
+  const handleDeleteArea = async (): Promise<boolean> => {
+    setDeleteLoading(true);
+    const response = await apiCall({
+      endpoint: routes.api.deleteArea(areaId),
+      method: "DELETE",
+      showSuccessToast: true,
+      successMessage: "Area deleted successfully",
+    });
+    setDeleteLoading(false);
+    if (response.success) {
+      router.push(routes.ui.areas);
       return true;
     }
     return false;
@@ -76,11 +96,32 @@ function AreaDetails() {
       </div>
 
       <Slots areaId={areaId} />
-      <Postcodes areaId={areaId} />
+      <Postcodes areaId={areaId} onPostcodesChange={setPostcodeCount} />
       <div className="flex justify-end mt-6 mx-[30px]">
-        <Button className="bg-muted text-placeholder cursor-not-allowed rounded-md py-4 px-6 text-[20px] font-[500]">
-          ✕ Delete Area
-        </Button>
+        {postcodeCount === 0 ? (
+          <FormDialog
+            title="Delete Area"
+            buttonText="✕ Delete Area"
+            saveButtonText="Yes"
+            onSubmit={handleDeleteArea}
+            triggerVariant="delete"
+            submitVariant="delete"
+            loading={deleteLoading}
+          >
+            Are you sure you want to delete this Area?
+            <span className="mt-[8px] block">
+              This action cannot be undone.
+            </span>
+          </FormDialog>
+        ) : (
+          <Button
+            variant="disabled"
+            className="rounded-md py-4 px-6 text-[20px] font-[500]"
+            onClick={() => toast.error("Please delete all postcodes first to delete this area")}
+          >
+            ✕ Delete Area
+          </Button>
+        )}
       </div>
     </div>
   );
