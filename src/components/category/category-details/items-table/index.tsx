@@ -9,6 +9,7 @@ import { routes } from "@/utils/routes";
 import { Plus } from "lucide-react";
 import { validateAndSetErrors } from "@/utils/validation";
 import { categoryItemSchema } from "../../schema";
+import { penceToPounds, poundsToPence } from "@/utils/helper";
 
 interface CategoryItem {
   "@context"?: string;
@@ -69,12 +70,12 @@ function ItemsTable({ categoryId, onItemsChange }: ItemsTableProps) {
       return false;
     setIsCreatingItem(true);
     const payload = {
-      name: createItemData.name,
+      name: createItemData.name.trim(),
       priceWashing: createItemData.priceWashing
-        ? Number(createItemData.priceWashing)
+        ? poundsToPence(Number(createItemData.priceWashing))
         : null,
       priceDryCleaning: createItemData.priceDryCleaning
-        ? Number(createItemData.priceDryCleaning)
+        ? poundsToPence(Number(createItemData.priceDryCleaning))
         : null,
       priceType: createItemData.priceType.toLowerCase(),
       position: createItemData.position
@@ -140,7 +141,7 @@ function ItemsTable({ categoryId, onItemsChange }: ItemsTableProps) {
 
   const formatPrice = (price?: number | null) => {
     if (price === null || price === undefined) return "-";
-    return `£${price.toFixed(2)}`;
+    return `£${penceToPounds(price).toFixed(2)}`;
   };
 
   const columns: Column<CategoryItem>[] = [

@@ -66,7 +66,7 @@ function Area() {
     const response = await apiCall<CreateAreaResponse>({
       endpoint: routes.api.getArea,
       method: "POST",
-      data: { name: areaName },
+      data: { name: areaName.trim() },
       showSuccessToast: true,
       successMessage: "Area created successfully",
     });

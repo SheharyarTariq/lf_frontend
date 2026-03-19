@@ -16,6 +16,7 @@ export const routes = {
     getArea: "areas",
     searchArea: "areas?name=ashtead",
     editArea: (id: string | number) => `areas/${id}`,
+    deleteArea: (id: string | number) => `areas/${id}`,
     getAreaSlots: (id: string | number) => `areas/${id}/slots`,
     markSlotActive: (id: string) => `slots/${id}/mark-as-active`,
     markSlotInactive: (id: string) => `slots/${id}/mark-as-inactive`,

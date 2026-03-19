@@ -8,16 +8,20 @@ import apiCall from "@/utils/api-call";
 import { routes } from "@/utils/routes";
 import ItemsTable from "./items-table";
 import { validateAndSetErrors } from "@/utils/validation";
-import { categoryNameSchema } from "../schema";
+import { categorySchema } from "../schema";
 
 function CategoryDetails() {
   const params = useParams();
   const searchParams = useSearchParams();
   const categoryId = params["category-details"] as string;
   const categoryName = searchParams.get("name") || "";
+  const positionParam = searchParams.get("position");
   const router = useRouter();
 
   const [editName, setEditName] = useState(categoryName);
+  const [editPosition, setEditPosition] = useState<number | undefined>(
+    positionParam ? Number(positionParam) : undefined
+  );
   const [displayName, setDisplayName] = useState(categoryName);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeletingCategory, setIsDeletingCategory] = useState(false);
@@ -27,8 +31,8 @@ function CategoryDetails() {
   const handleUpdateCategory = async (): Promise<boolean> => {
     if (
       !(await validateAndSetErrors(
-        categoryNameSchema,
-        { name: editName },
+        categorySchema,
+        { name: editName, position: editPosition },
         setErrors
       ))
     )
@@ -38,7 +42,7 @@ function CategoryDetails() {
       endpoint: routes.api.updateItemCategory(categoryId),
       method: "PATCH",
       headers: { "Content-Type": "application/merge-patch+json" },
-      data: { name: editName },
+      data: { name: editName.trim(), position: editPosition },
       showSuccessToast: true,
       successMessage: "Category updated successfully",
     });
@@ -80,19 +84,40 @@ function CategoryDetails() {
           onSubmit={handleUpdateCategory}
           loading={isUpdating}
         >
-          <div className="flex flex-col gap-2 mt-2">
-            <label className="text-[14px] font-[500] text-black">
-              Category Name
-            </label>
-            <Input
-              placeholder="e.g. Shirts"
-              value={editName}
-              onChange={(e) => {
-                setEditName(e.target.value);
-                if (errors.name) setErrors((prev) => ({ ...prev, name: "" }));
-              }}
-              error={errors.name}
-            />
+          <div className="flex flex-col gap-6 mt-2">
+            <div className="flex flex-col gap-2">
+              <label className="text-[14px] font-[500] text-black">
+                Category Name
+              </label>
+              <Input
+                placeholder="e.g. Shirts"
+                value={editName}
+                onChange={(e) => {
+                  setEditName(e.target.value);
+                  if (errors.name) setErrors((prev) => ({ ...prev, name: "" }));
+                }}
+                error={errors.name}
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-[14px] font-[500] text-black">
+                Position
+              </label>
+              <Input
+                type="number"
+                placeholder="1"
+                min={1}
+                value={editPosition ?? ""}
+                onChange={(e) => {
+                  setEditPosition(
+                    e.target.value ? Number(e.target.value) : undefined
+                  );
+                  if (errors.position)
+                    setErrors((prev) => ({ ...prev, position: "" }));
+                }}
+                error={errors.position}
+              />
+            </div>
           </div>
         </FormDialog>
       </div>
