@@ -8,7 +8,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import { cn } from "@/utils/cn";
 
-type TriggerVariant = "primary" | "delete" | "logout" | "icon";
+type TriggerVariant = "primary" | "delete" | "delete-outline" | "logout" | "icon";
 type SubmitVariant = "primary" | "delete";
 
 interface FormDialogProps {
@@ -26,6 +26,7 @@ interface FormDialogProps {
 const triggerStyles: Record<TriggerVariant, string> = {
   primary: "bg-black text-white hover:bg-neutral-700",
   delete: "bg-delete text-white hover:bg-red-700",
+  "delete-outline": "bg-white text-delete border border-delete hover:bg-red-50",
   logout: "bg-white text-black py-[12px] hover:bg-muted",
   icon: "bg-transparent p-0",
 };

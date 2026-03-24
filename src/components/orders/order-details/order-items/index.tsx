@@ -424,7 +424,7 @@ function OrderItems({
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 md:gap-[10px] w-full md:w-auto [&>button]:w-full md:[&>button]:w-auto">
             <FormDialog
               title="Add Open Item"
-              buttonText="+ Open Item"
+              buttonText="Open Item"
               saveButtonText="Save"
               onSubmit={handleCreateOpenItem}
               loading={createLoading}
@@ -550,7 +550,7 @@ function OrderItems({
             </FormDialog>
             <FormDialog
               title="Add Regular Item"
-              buttonText="+ Regular Item"
+              buttonText="Regular Item"
               saveButtonText="Save"
               onSubmit={handleCreateRegularItem}
               loading={createRegularLoading}

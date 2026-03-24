@@ -11,7 +11,8 @@
   --placeholder: #c1c1c1;
   --limeGreen: #d6ff4b;
   --loader-color: #4b5563;
-  /* Darker gray for loader */
+  --slot-active: #22c55e;
+  --slot-inactive: #ef4444;
 }
 
 @theme inline {
@@ -25,6 +26,8 @@
   --color-placeholder: var(--placeholder);
   --color-limeGreen: var(--limeGreen);
   --color-silver: var(--silver);
+  --color-slot-active: var(--slot-active);
+  --color-slot-inactive: var(--slot-inactive);
 }
 
 @media (prefers-color-scheme: dark) {
