@@ -35,7 +35,7 @@ function Select({
   ...props
 }: SelectProps) {
   const baseStyles =
-    "py-4 px-6 pr-14 appearance-none placeholder:font-[400] placeholder:text-[#C1C1C1] text-black border-muted border border-[1px] focus:outline-none rounded-[8px] bg-white cursor-pointer";
+    "py-3 md:py-4 px-4 md:px-6 pr-12 md:pr-14 appearance-none placeholder:font-[400] placeholder:text-[#C1C1C1] text-black border-muted border border-[1px] focus:outline-none rounded-[8px] bg-white cursor-pointer";
   const widthStyles = fullWidth ? "w-full" : "min-w-[305px]";
   const iconStyles = startIcon ? "pl-10" : "";
 

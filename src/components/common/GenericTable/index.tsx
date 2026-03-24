@@ -126,7 +126,7 @@ function GenericTable<T>({
               <th
                 key={index}
                 className={cn(
-                  "py-[16px] px-[25px] font-[500] text-black",
+                  "py-3 md:py-[16px] px-4 md:px-[25px] font-[500] text-black text-[14px] md:text-[16px]",
                   hasActionColumn && !column.isAction
                     ? "w-[1%] whitespace-nowrap"
                     : "",
@@ -184,7 +184,7 @@ function GenericTable<T>({
                   <td
                     key={colIndex}
                     className={cn(
-                      "py-[16px] px-[25px] text-black",
+                      "py-3 md:py-[16px] px-4 md:px-[25px] text-black text-[14px] md:text-[16px]",
                       hasActionColumn && !column.isAction
                         ? "w-[1%] whitespace-nowrap text-center"
                         : "",

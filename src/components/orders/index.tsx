@@ -33,10 +33,10 @@ function Orders() {
 
   return (
     <div>
-      <div className="px-[50px] mt-[51px]">
-        <h1 className="text-[32px] font-[500] text-black">Orders</h1>
-        <div className="w-full flex items-center gap-[16px] mt-5">
-          <div className="flex-1">
+      <div className="px-4 md:px-[50px] mt-6 md:mt-[51px]">
+        <h1 className="text-[24px] md:text-[32px] font-[500] text-black">Orders</h1>
+        <div className="w-full flex items-start md:items-center flex-col lg:flex-row gap-[16px] mt-5">
+          <div className="flex-1 w-full relative">
             <Input
               placeholder="Search Orders"
               search
@@ -44,16 +44,20 @@ function Orders() {
               onChange={(e) => setSearchInput(e.target.value)}
             />
           </div>
-          <Select
-            options={STATUS_OPTIONS}
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-          />
-          <Select
-            options={TYPE_OPTIONS}
-            value={type}
-            onChange={(e) => setType(e.target.value)}
-          />
+          <div className="flex flex-col sm:flex-row gap-[16px] w-full lg:w-auto [&>div]:flex-1">
+            <Select
+              options={STATUS_OPTIONS}
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              fullWidth
+            />
+            <Select
+              options={TYPE_OPTIONS}
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+              fullWidth
+            />
+          </div>
         </div>
       </div>
       <OrdersTable filters={{ search, status, type }} />

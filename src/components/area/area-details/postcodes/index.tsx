@@ -130,10 +130,10 @@ function Postcodes({ areaId, onPostcodesChange }: Readonly<PostcodesProps>) {
   return (
     <div className="mt-[30px]">
       <Card>
-        <h2 className="text-black font-[500] text-[24px] mb-[25px]">
+        <h2 className="text-black font-[500] text-[20px] md:text-[24px] mb-4 md:mb-[25px]">
           Postcodes
         </h2>
-        <div className="flex items-center justify-between mb-[30px] gap-[20px]">
+        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between mb-[30px] gap-[16px] md:gap-[20px]">
           <Input
             search
             placeholder="Search Postcode"

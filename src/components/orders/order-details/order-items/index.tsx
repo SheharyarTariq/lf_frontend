@@ -417,11 +417,11 @@ function OrderItems({
   return (
     <div>
       <Card className="mx-0 h-full !p-0">
-        <div className="flex items-center justify-between mb-[20px] border-b border-muted py-6 px-6">
-          <h3 className="text-[18px] font-[600] text-black uppercase ">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-[20px] border-b border-muted py-4 md:py-6 px-4 md:px-6 gap-4 md:gap-0">
+          <h3 className="text-[16px] md:text-[18px] font-[600] text-black uppercase ">
             Order Items
           </h3>
-          <div className="flex items-center gap-[10px]">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 md:gap-[10px] w-full md:w-auto [&>button]:w-full md:[&>button]:w-auto">
             <FormDialog
               title="Add Open Item"
               buttonText="+ Open Item"
@@ -452,8 +452,8 @@ function OrderItems({
                     error={openItemErrors.openItemName}
                   />
                 </div>
-                <div className="flex gap-[20px]">
-                  <div className="flex-1">
+                <div className="flex flex-col md:flex-row gap-4 md:gap-[20px]">
+                  <div className="flex-1 w-full md:w-auto">
                     <label className="text-black font-[500] text-[14px] mb-[8px] block">
                       Quantity
                     </label>
@@ -495,8 +495,8 @@ function OrderItems({
                     />
                   </div>
                 </div>
-                <div className="flex gap-[20px]">
-                  <div className="flex-1">
+                <div className="flex flex-col md:flex-row gap-4 md:gap-[20px]">
+                  <div className="flex-1 w-full md:w-auto">
                     <label className="text-black font-[500] text-[14px] mb-[8px] block">
                       Cleaning Method
                     </label>
@@ -581,8 +581,8 @@ function OrderItems({
                     error={regularItemErrors.category}
                   />
                 </div>
-                <div className="flex gap-[20px]">
-                  <div className="flex-1">
+                <div className="flex flex-col md:flex-row gap-4 md:gap-[20px]">
+                  <div className="flex-1 w-full md:w-auto">
                     <label className="text-black font-[500] text-[14px] mb-[8px] block">
                       Item
                     </label>
@@ -634,8 +634,8 @@ function OrderItems({
                     />
                   </div>
                 </div>
-                <div className="flex gap-[20px]">
-                  <div className="flex-1">
+                <div className="flex flex-col md:flex-row gap-4 md:gap-[20px]">
+                  <div className="flex-1 w-full md:w-auto">
                     <label className="text-black font-[500] text-[14px] mb-[8px] block">
                       Cleaning Method
                     </label>
@@ -692,8 +692,8 @@ function OrderItems({
           isLoading={loading}
         />
       </Card>
-      <div className="flex items-center justify-end gap-10 mx-8 mt-[20px] mb-[30px]">
-        <p className="text-[16px] font-[700] text-black">Total Revenue</p>
+      <div className="flex items-center justify-between md:justify-end gap-4 md:gap-10 mx-4 md:mx-8 mt-[20px] mb-[30px]">
+        <p className="text-[14px] md:text-[16px] font-[700] text-black">Total Revenue</p>
         <p className="text-[16px] font-[700] text-black">
           £
           {orderItems
