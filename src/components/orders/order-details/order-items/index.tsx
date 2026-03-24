@@ -461,9 +461,11 @@ function OrderItems({
                       placeholder="1"
                       value={openItemData.quantity}
                       onChange={(e) => {
+                        const val = e.target.value;
+                        if (val && !/^\d+$/.test(val)) return;
                         setOpenItemData((prev) => ({
                           ...prev,
-                          quantity: e.target.value,
+                          quantity: val,
                         }));
                         if (openItemErrors.quantity)
                           setOpenItemErrors((prev) => ({
@@ -483,9 +485,11 @@ function OrderItems({
                       placeholder="e.g. 2"
                       value={openItemData.piece}
                       onChange={(e) => {
+                        const val = e.target.value;
+                        if (val && !/^\d+$/.test(val)) return;
                         setOpenItemData((prev) => ({
                           ...prev,
-                          piece: e.target.value,
+                          piece: val,
                         }));
                         if (openItemErrors.piece)
                           setOpenItemErrors((prev) => ({ ...prev, piece: "" }));
@@ -619,9 +623,11 @@ function OrderItems({
                       placeholder="1"
                       value={regularItemData.quantity}
                       onChange={(e) => {
+                        const val = e.target.value;
+                        if (val && !/^\d+$/.test(val)) return;
                         setRegularItemData((prev) => ({
                           ...prev,
-                          quantity: e.target.value,
+                          quantity: val,
                         }));
                         if (regularItemErrors.quantity)
                           setRegularItemErrors((prev) => ({
