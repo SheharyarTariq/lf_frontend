@@ -178,47 +178,51 @@ function OrderDetails() {
             {!isCancelled ? (
               <FormDialog
                 title="Cancel Order"
-                buttonText="✕ Cancel Order"
+                buttonText="Delete"
                 saveButtonText="Yes"
                 onSubmit={handleCancelOrder}
                 loading={cancelLoading}
-                triggerVariant="delete"
+                triggerVariant="delete-outline"
                 submitVariant="delete"
+                triggerClassName="min-w-[140px] md:min-w-[160px] text-center"
               >
                 Are you sure you want to cancel this order?
               </FormDialog>
             ) : (
               <Button
                 variant="disabled"
+                className="min-w-[140px] md:min-w-[160px] md:py-[16px] text-center"
                 onClick={() =>
                   toast.error("This order is already cancelled", {
                     id: "cancel-error",
                   })
                 }
               >
-                ✕ Cancel Order
+                Delete
               </Button>
             )}
             {hasOrderItems ? (
               <FormDialog
                 title="Finalize Order"
-                buttonText="✓ Finalize Order"
+                buttonText="Finalize"
                 saveButtonText="Confirm"
                 onSubmit={handleFinaliseOrder}
                 loading={finaliseLoading}
+                triggerClassName="min-w-[140px] md:min-w-[160px] text-center"
               >
                 Are you sure you want to finalize this order?
               </FormDialog>
             ) : (
               <Button
                 variant="disabled"
+                className="min-w-[140px] md:min-w-[160px] md:py-[16px] text-center"
                 onClick={() =>
                   toast.error("Add an Item First TO Finalise The Order", {
                     id: "finalise-error",
                   })
                 }
               >
-                ✓ Finalize Order
+                Finalize
               </Button>
             )}
           </div>

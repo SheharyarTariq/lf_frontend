@@ -3,12 +3,11 @@ import apiCall from "@/utils/api-call";
 import { routes } from "@/utils/routes";
 import Card from "@/components/common/Card";
 import Select from "@/components/common/Select";
-import GenericTable from "@/components/common/GenericTable";
-import Image from "next/image";
 import FormDialog from "@/components/common/form-dailog";
 import Input from "@/components/common/Input";
 import { validateAndSetErrors } from "@/utils/validation";
 import { slotSchema } from "../../schema";
+import { X } from "lucide-react";
 
 interface Slot {
   "@context"?: string;
@@ -26,6 +25,8 @@ interface SlotsData {
   member: Slot[];
 }
 
+const weekDayOrder = [1, 2, 3, 4, 5, 6, 0];
+
 const weekDayMap: Record<number, string> = {
   0: "Sunday",
   1: "Monday",
@@ -35,17 +36,6 @@ const weekDayMap: Record<number, string> = {
   5: "Friday",
   6: "Saturday",
 };
-
-const weekDays = [
-  { label: "All Days", value: 7 },
-  { label: "Monday", value: 1 },
-  { label: "Tuesday", value: 2 },
-  { label: "Wednesday", value: 3 },
-  { label: "Thursday", value: 4 },
-  { label: "Friday", value: 5 },
-  { label: "Saturday", value: 6 },
-  { label: "Sunday", value: 0 },
-];
 
 const slotWeekDays = [
   { label: "Select", value: "" },
@@ -58,9 +48,13 @@ const slotWeekDays = [
   { label: "Sunday", value: 0 },
 ];
 
+function formatTime(time: string): string {
+  const parts = time.split(":");
+  return `${parts[0]}:${parts[1]}`;
+}
+
 function Slots({ areaId }: { areaId: string }) {
   const [slotsResponse, setSlotsResponse] = useState<Slot[]>([]);
-  const [selectedDay, setSelectedDay] = useState<string>("");
   const [newSlotWeekDay, setNewSlotWeekDay] = useState<string>("");
   const [newSlotStartTime, setNewSlotStartTime] = useState<string>("");
   const [newSlotEndTime, setNewSlotEndTime] = useState<string>("");
@@ -76,7 +70,6 @@ function Slots({ areaId }: { areaId: string }) {
     });
     if (response.success && response?.data) {
       setSlotsResponse(response.data.member);
-      console.log(response);
     }
     if (showLoader) setLoading(false);
   };
@@ -91,6 +84,7 @@ function Slots({ areaId }: { areaId: string }) {
       method: "POST",
       data: {},
       showSuccessToast: true,
+      successMessage: isActive ? "Slot marked as inactive" : "Slot marked as active",
     });
 
     if (response.success) {
@@ -155,30 +149,23 @@ function Slots({ areaId }: { areaId: string }) {
     getSlots();
   }, []);
 
-  const filteredSlots = slotsResponse.filter((slot) => {
-    if (!selectedDay || String(selectedDay) === "7") return true;
-    return slot.weekDay === Number(selectedDay);
-  });
+  const slotsByDay: Record<number, Slot[]> = {};
+  for (const day of weekDayOrder) {
+    slotsByDay[day] = slotsResponse.filter((s) => s.weekDay === day);
+  }
+
+  const maxCells = Math.max(6, ...weekDayOrder.map((d) => slotsByDay[d].length));
 
   return (
     <div>
       <Card>
-        <h2 className="text-black font-[500] text-[20px] md:text-[24px] mb-4 md:mb-[25px]">
-          Slots
-        </h2>
         <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between mb-[30px] gap-[16px]">
-          <div className="w-full md:w-auto">
-            <Select
-              options={weekDays}
-              placeholder="All Days"
-              value={selectedDay}
-              onChange={(e) => setSelectedDay(e.target.value)}
-              fullWidth
-            />
-          </div>
+          <h2 className="text-black font-[500] text-[20px] md:text-[24px]">
+            Slots
+          </h2>
           <FormDialog
             title="Slots"
-            buttonText="Add Slot"
+            buttonText="+ Add Slot"
             saveButtonText="Save"
             onSubmit={handleCreateSlot}
             loading={createLoading}
@@ -234,74 +221,91 @@ function Slots({ areaId }: { areaId: string }) {
             </div>
           </FormDialog>
         </div>
-        <GenericTable
-          data={filteredSlots}
-          isLoading={loading}
-          columns={[
-            {
-              accessor: (row) => weekDayMap[row.weekDay] || row.weekDay,
-              header: "Weekday",
-            },
-            { accessor: "startTime", header: "Start Time" },
-            { accessor: "endTime", header: "End Time" },
-            {
-              accessor: (row) => (
-                <div className="flex items-center gap-[16px] justify-end">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleToggle(row.id, row.isActive);
-                    }}
-                    className={`relative w-[44px] h-[24px] rounded-full transition-colors duration-200 cursor-pointer ${row.isActive ? "bg-[#34C759]" : "bg-[#D1D5DB]"}`}
-                  >
-                    <span
-                      className={`absolute top-[2px] left-[2px] w-[20px] h-[20px] bg-white rounded-full shadow transition-transform duration-200 ${row.isActive ? "translate-x-[20px]" : "translate-x-0"}`}
-                    />
-                  </button>
-                  {row.isActive ? (
-                    <button className="p-0 bg-transparent opacity-100 pointer-events-none cursor-not-allowed flex items-center justify-center">
-                      <Image
-                        src="/assets/TrashDisabled.svg"
-                        alt="Delete disabled"
-                        width={30}
-                        height={30}
-                        className="block"
-                      />
-                    </button>
-                  ) : (
-                    <FormDialog
-                      title="Delete Slot"
-                      buttonText={
-                        <Image
-                          src="/assets/TrashEnabled.svg"
-                          alt="Delete"
-                          width={30}
-                          height={30}
-                        />
+
+        {loading ? (
+          <div className="flex justify-center py-[40px]">
+            <div className="flex gap-[6px]">
+              {[0, 1, 2].map((i) => (
+                <span
+                  key={i}
+                  className="w-[10px] h-[10px] rounded-full bg-[var(--loader-color)] animate-dots"
+                  style={{ animationDelay: `${i * 0.16}s` }}
+                />
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-[12px]">
+            {weekDayOrder.map((day, dayIndex) => {
+              const daySlots = slotsByDay[day];
+              return (
+                <div
+                  key={day}
+                  className="flex items-center gap-[16px] md:gap-[24px] rounded-lg px-[20px] py-[14px] border border-[#e5e7eb]"
+                >
+                  <span className="text-[#1f2937] font-[600] text-[14px] md:text-[15px] min-w-[90px] md:min-w-[110px] tracking-[0.2px]">
+                    {weekDayMap[day]}
+                  </span>
+                  <div className="flex flex-wrap gap-[10px]">
+                    {Array.from({ length: maxCells }).map((_, i) => {
+                      const slot = daySlots[i];
+                      if (slot) {
+                        return (
+                          <div
+                            key={slot.id}
+                            onClick={() => handleToggle(slot.id, slot.isActive)}
+                            className={`group relative w-[110px] h-[38px] flex items-center justify-center rounded-lg text-[13px] font-[500] select-none cursor-pointer transition-all duration-200 hover:scale-105 border-dotted ${
+                              slot.isActive
+                                ? "border-slot-active bg-[#f0fdf4] text-[#166534]"
+                                : "border-slot-inactive bg-[#fef2f2] text-[#991b1b]"
+                            }`}
+                            style={{ borderWidth: "1.5px" }}
+                          >
+                            {formatTime(slot.startTime)}-{formatTime(slot.endTime)}
+                            {!slot.isActive && (
+                              <div onClick={(e) => e.stopPropagation()}>
+                                <FormDialog
+                                  title="Delete Slot"
+                                  buttonText={
+                                    <span className="absolute -top-[8px] -right-[8px] w-[20px] h-[20px] rounded-full bg-slot-inactive flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 shadow-sm">
+                                      <X size={11} className="text-white" />
+                                    </span>
+                                  }
+                                  saveButtonText="Yes"
+                                  onSubmit={() => handleDelete(slot.id)}
+                                  triggerVariant="icon"
+                                  submitVariant="delete"
+                                >
+                                  Are you sure you want to delete this Slot?
+                                  <span className="mt-[8px] block">
+                                    This action cannot be undone.
+                                  </span>
+                                </FormDialog>
+                              </div>
+                            )}
+                          </div>
+                        );
                       }
-                      saveButtonText="Yes"
-                      onSubmit={() => handleDelete(row.id)}
-                      triggerVariant="icon"
-                      submitVariant="delete"
-                    >
-                      Are you sure you want to delete this Slot?
-                      <span className="mt-[8px] block">
-                        This action cannot be undone.
-                      </span>
-                    </FormDialog>
-                  )}
+                      return (
+                        <div
+                          key={`empty-${i}`}
+                          className="relative w-[110px] h-[38px] flex items-center justify-center rounded-lg border-dotted border-[#c5c9d0] text-[#9ca3af] text-[13px] font-[500] select-none"
+                          style={{ borderWidth: "1.5px" }}
+                        >
+                          -
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-              ),
-              header: "Action",
-              className: "text-right",
-              sortable: false,
-              isAction: true,
-            },
-          ]}
-        />
+              );
+            })}
+          </div>
+        )}
       </Card>
     </div>
   );
 }
 
 export default Slots;
+
