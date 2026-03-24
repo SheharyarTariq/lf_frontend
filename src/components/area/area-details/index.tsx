@@ -100,26 +100,30 @@ function AreaDetails() {
       <div className="flex w-full justify-end mt-6 mx-0 md:mx-[30px] mb-10 md:mb-0">
         {postcodeCount === 0 ? (
           <div className="md:mr-15 mr-8">
-          <FormDialog
-            title="Delete Area"
-            buttonText="✕ Delete Area"
-            saveButtonText="Yes"
-            onSubmit={handleDeleteArea}
-            triggerVariant="delete"
-            submitVariant="delete"
-            loading={deleteLoading}
-          >
-            Are you sure you want to delete this Area?
-            <span className="mt-[8px] block">
-              This action cannot be undone.
-            </span>
-          </FormDialog>
+            <FormDialog
+              title="Delete Area"
+              buttonText="✕ Delete Area"
+              saveButtonText="Yes"
+              onSubmit={handleDeleteArea}
+              triggerVariant="delete"
+              submitVariant="delete"
+              loading={deleteLoading}
+            >
+              Are you sure you want to delete this Area?
+              <span className="mt-[8px] block">
+                This action cannot be undone.
+              </span>
+            </FormDialog>
           </div>
         ) : (
           <Button
             variant="disabled"
-            className="rounded-md py-4 px-6 text-[20px] font-[500]"
-            onClick={() => toast.error("Please delete all postcodes first to delete this area")}
+            className="rounded-md mr-14 py-4 px-6 text-[20px] font-[500]"
+            onClick={() =>
+              toast.error(
+                "Please delete all postcodes first to delete this area"
+              )
+            }
           >
             ✕ Delete Area
           </Button>

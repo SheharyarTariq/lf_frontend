@@ -76,7 +76,9 @@ function CategoryDetails() {
       <BackArrow />
 
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between mt-[20px] mx-0 md:mx-[20px] mb-[30px] gap-4">
-        <p className="text-black text-[24px] md:text-[32px] font-[500]">{displayName}</p>
+        <p className="text-black text-[24px] md:text-[32px] font-[500]">
+          {displayName}
+        </p>
         <FormDialog
           title="Edit Category Name"
           buttonText="Edit Category"

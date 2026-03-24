@@ -67,7 +67,9 @@ function Header() {
               triggerVariant="logout"
               submitVariant="delete"
             >
-              <p className="mt-3 text-[18px]">Are you sure you want to logout?</p>
+              <p className="mt-3 text-[18px]">
+                Are you sure you want to logout?
+              </p>
             </FormDialog>
           </div>
 
@@ -110,7 +112,9 @@ function Header() {
                 submitVariant="delete"
                 triggerClassName="w-full"
               >
-                <p className="mt-3 text-[18px]">Are you sure you want to logout?</p>
+                <p className="mt-3 text-[18px]">
+                  Are you sure you want to logout?
+                </p>
               </FormDialog>
             </div>
           </div>

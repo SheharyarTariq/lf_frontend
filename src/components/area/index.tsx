@@ -92,7 +92,9 @@ function Area() {
     <>
       <div className="px-4 md:px-[50px] mt-6 md:mt-[51px] mb-10">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-black text-[24px] md:text-[32px] font-[500]">Areas</h1>
+          <h1 className="text-black text-[24px] md:text-[32px] font-[500]">
+            Areas
+          </h1>
         </div>
 
         <div className="w-full flex flex-col md:flex-row items-stretch md:items-center gap-[16px] md:gap-[24px]">

@@ -180,7 +180,15 @@ export default function FormDialog({
             </DialogTitle>
 
             {children && (
-              <DialogContent sx={{ px: { xs: "16px", sm: "30px" }, py: "30px", mt: { xs: "5px", sm: "15px" } }}>{children}</DialogContent>
+              <DialogContent
+                sx={{
+                  px: { xs: "16px", sm: "30px" },
+                  py: "30px",
+                  mt: { xs: "5px", sm: "15px" },
+                }}
+              >
+                {children}
+              </DialogContent>
             )}
 
             <DialogActions

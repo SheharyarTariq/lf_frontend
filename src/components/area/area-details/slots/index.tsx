@@ -163,7 +163,9 @@ function Slots({ areaId }: { areaId: string }) {
   return (
     <div>
       <Card>
-        <h2 className="text-black font-[500] text-[20px] md:text-[24px] mb-4 md:mb-[25px]">Slots</h2>
+        <h2 className="text-black font-[500] text-[20px] md:text-[24px] mb-4 md:mb-[25px]">
+          Slots
+        </h2>
         <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between mb-[30px] gap-[16px]">
           <div className="w-full md:w-auto">
             <Select

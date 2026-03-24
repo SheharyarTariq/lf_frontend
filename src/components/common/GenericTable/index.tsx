@@ -166,7 +166,10 @@ function GenericTable<T>({
             </tr>
           ) : data.length === 0 ? (
             <tr>
-              <td colSpan={columns.length} className="py-[60px] text-center text-neutral text-[15px]">
+              <td
+                colSpan={columns.length}
+                className="py-[60px] text-center text-neutral text-[15px]"
+              >
                 No data found
               </td>
             </tr>

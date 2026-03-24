@@ -686,14 +686,12 @@ function OrderItems({
             </FormDialog>
           </div>
         </div>
-        <GenericTable
-          data={orderItems}
-          columns={columns}
-          isLoading={loading}
-        />
+        <GenericTable data={orderItems} columns={columns} isLoading={loading} />
       </Card>
       <div className="flex items-center justify-between md:justify-end gap-4 md:gap-10 mx-4 md:mx-8 mt-[20px] mb-[30px]">
-        <p className="text-[14px] md:text-[16px] font-[700] text-black">Total Revenue</p>
+        <p className="text-[14px] md:text-[16px] font-[700] text-black">
+          Total Revenue
+        </p>
         <p className="text-[16px] font-[700] text-black">
           £
           {orderItems

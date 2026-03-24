@@ -34,7 +34,9 @@ function Orders() {
   return (
     <div>
       <div className="px-4 md:px-[50px] mt-6 md:mt-[51px]">
-        <h1 className="text-[24px] md:text-[32px] font-[500] text-black">Orders</h1>
+        <h1 className="text-[24px] md:text-[32px] font-[500] text-black">
+          Orders
+        </h1>
         <div className="w-full flex items-start md:items-center flex-col lg:flex-row gap-[16px] mt-5">
           <div className="flex-1 w-full relative">
             <Input
