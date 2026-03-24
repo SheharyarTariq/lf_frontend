@@ -66,7 +66,7 @@ function Area() {
     const response = await apiCall<CreateAreaResponse>({
       endpoint: routes.api.getArea,
       method: "POST",
-      data: { name: areaName },
+      data: { name: areaName.trim() },
       showSuccessToast: true,
       successMessage: "Area created successfully",
     });
@@ -90,12 +90,12 @@ function Area() {
 
   return (
     <>
-      <div className="px-[50px] mt-[51px]">
+      <div className="px-4 md:px-[50px] mt-6 md:mt-[51px] mb-10">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-black text-[32px] font-[500]">Areas</h1>
+          <h1 className="text-black text-[24px] md:text-[32px] font-[500]">Areas</h1>
         </div>
 
-        <div className="w-full flex items-center gap-[24px]">
+        <div className="w-full flex flex-col md:flex-row items-stretch md:items-center gap-[16px] md:gap-[24px]">
           <SearchInput<AreaResponse>
             endpoint={routes.api.getArea}
             searchKey="name"
@@ -105,7 +105,7 @@ function Area() {
           <FormDialog
             title="Area Name"
             buttonText={
-              <span className="flex items-center gap-2">
+              <span className="flex items-center justify-center w-full gap-2">
                 <Plus size={20} />
                 Create
               </span>

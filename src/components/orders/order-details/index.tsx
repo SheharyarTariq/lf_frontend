@@ -1,6 +1,7 @@
 "use client";
 import apiCall from "@/utils/api-call";
 import BackArrow from "@/components/common/BackArrow";
+import Button from "@/components/common/Button";
 import CustomerInfo from "./customer-info";
 import SpecialNotes from "./special-notes";
 import OrderInformation from "./order-information";
@@ -152,13 +153,16 @@ function OrderDetails() {
     : "";
 
   return (
-    <div className="px-[30px] pt-3 pb-10">
-      <div className="flex justify-between border-b border-muted mb-7">
-        <div className="flex items-center gap-[16px] ">
+    <div className="px-4 md:px-[30px] pt-6 md:pt-3 pb-10">
+      <div className="flex flex-col md:flex-row justify-between border-b border-muted mb-7 gap-4 md:gap-0 pb-4 md:pb-0">
+        <div className="flex items-start md:items-center justify-between w-full md:w-auto gap-[16px] ">
           <BackArrow />
-          <div className="flex items-center gap-[50px]">
-            <h1 className="text-black text-[32px] font-[500]">
-              Order #{orderNumberParam || order?.number ? String(orderNumberParam || order?.number).padStart(2, "0") : orderId}
+          <div className="flex flex-col sm:flex-row items-end md:items-center gap-2 sm:gap-[20px] lg:gap-[50px] flex-1">
+            <h1 className="text-black text-[24px] lg:text-[32px] font-[500]">
+              Order #
+              {orderNumberParam || order?.number
+                ? String(orderNumberParam || order?.number).padStart(2, "0")
+                : orderId}
             </h1>
             {order && (
               <span
@@ -169,8 +173,8 @@ function OrderDetails() {
             )}
           </div>
         </div>
-        <div className="flex items-center justify-between mt-[20px] mx-[30px] mb-[30px]">
-          <div className="flex items-center gap-[12px]">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-2 md:mt-[20px] mx-0 md:mx-[30px] mb-2 md:mb-[30px] gap-2">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
             {!isCancelled ? (
               <FormDialog
                 title="Cancel Order"
@@ -184,8 +188,8 @@ function OrderDetails() {
                 Are you sure you want to cancel this order?
               </FormDialog>
             ) : (
-              <button
-                className="bg-muted text-placeholder cursor-not-allowed rounded-md py-4 px-6 text-[20px] font-[500]"
+              <Button
+                variant="disabled"
                 onClick={() =>
                   toast.error("This order is already cancelled", {
                     id: "cancel-error",
@@ -193,7 +197,7 @@ function OrderDetails() {
                 }
               >
                 ✕ Cancel Order
-              </button>
+              </Button>
             )}
             {hasOrderItems ? (
               <FormDialog
@@ -206,8 +210,8 @@ function OrderDetails() {
                 Are you sure you want to finalize this order?
               </FormDialog>
             ) : (
-              <button
-                className="bg-muted text-placeholder cursor-not-allowed cursor-delete  rounded-md py-4 px-6 text-[20px] font-[500]"
+              <Button
+                variant="disabled"
                 onClick={() =>
                   toast.error("Add an Item First TO Finalise The Order", {
                     id: "finalise-error",
@@ -215,13 +219,13 @@ function OrderDetails() {
                 }
               >
                 ✓ Finalize Order
-              </button>
+              </Button>
             )}
           </div>
         </div>
       </div>
-      <div className="flex gap-[24px] mx-[30px]">
-        <div className="w-[280px] flex-shrink-0 flex flex-col gap-[20px]">
+      <div className="flex flex-col lg:flex-row gap-[24px] mx-0 md:mx-[30px]">
+        <div className="w-full lg:w-[280px] flex-shrink-0 flex flex-col gap-[20px]">
           <CustomerInfo user={order?.user} isLoading={!order} />
           <SpecialNotes note={order?.note} isLoading={!order} />
           <OrderInformation

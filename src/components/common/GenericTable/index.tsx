@@ -114,7 +114,10 @@ function GenericTable<T>({
 
   return (
     <div
-      className={cn("overflow-x-auto border border-muted rounded-[14px]", className)}
+      className={cn(
+        "overflow-x-auto border border-muted rounded-[14px]",
+        className
+      )}
     >
       <table className="min-w-full text-left border-collapse">
         <thead>
@@ -123,8 +126,10 @@ function GenericTable<T>({
               <th
                 key={index}
                 className={cn(
-                  "py-[16px] px-[25px] font-[500] text-black",
-                  hasActionColumn && !column.isAction ? "w-[1%] whitespace-nowrap" : "",
+                  "py-3 md:py-[16px] px-4 md:px-[25px] font-[500] text-black text-[14px] md:text-[16px]",
+                  hasActionColumn && !column.isAction
+                    ? "w-[1%] whitespace-nowrap"
+                    : "",
                   isSortable(column) ? "cursor-pointer select-none" : "",
                   column.className
                 )}
@@ -159,6 +164,12 @@ function GenericTable<T>({
                 </div>
               </td>
             </tr>
+          ) : data.length === 0 ? (
+            <tr>
+              <td colSpan={columns.length} className="py-[60px] text-center text-neutral text-[15px]">
+                No data found
+              </td>
+            </tr>
           ) : (
             paginatedData.map((row, rowIndex) => (
               <tr
@@ -173,8 +184,10 @@ function GenericTable<T>({
                   <td
                     key={colIndex}
                     className={cn(
-                      "py-[16px] px-[25px] text-black",
-                      hasActionColumn && !column.isAction ? "w-[1%] whitespace-nowrap text-center" : "",
+                      "py-3 md:py-[16px] px-4 md:px-[25px] text-black text-[14px] md:text-[16px]",
+                      hasActionColumn && !column.isAction
+                        ? "w-[1%] whitespace-nowrap text-center"
+                        : "",
                       column.className
                     )}
                   >

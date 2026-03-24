@@ -16,8 +16,8 @@ function Input({
 }: InputProps) {
   const icon = search ? <Search size={24} color="#8F8F8F" /> : startIcon;
   const baseStyles =
-    "py-4 px-6 placeholder:font-[400] placeholder:text-[#C1C1C1] text-black border-muted border border-[1px] focus:outline-neutral  rounded-[8px] w-full ";
-  const iconStyles = icon ? "pl-12" : "";
+    "py-3 md:py-4 px-4 md:px-6 placeholder:font-[400] placeholder:text-[#C1C1C1] text-black border-muted border border-[1px] focus:outline-neutral  rounded-[8px] w-full ";
+  const iconStyles = icon ? "!pl-10 md:!pl-12" : "";
   const errorStyles = error ? "border-red-500" : "";
 
   return (

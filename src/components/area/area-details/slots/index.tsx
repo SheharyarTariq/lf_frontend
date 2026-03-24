@@ -155,25 +155,36 @@ function Slots({ areaId }: { areaId: string }) {
     getSlots();
   }, []);
 
+  const filteredSlots = slotsResponse.filter((slot) => {
+    if (!selectedDay || String(selectedDay) === "7") return true;
+    return slot.weekDay === Number(selectedDay);
+  });
+
   return (
     <div>
       <Card>
-        <h2 className="text-black font-[500] text-[24px] mb-[25px]">Slots</h2>
-        <div className="flex items-center justify-between mb-[30px]">
-          <Select
-            options={weekDays}
-            placeholder="All Days"
-            value={selectedDay}
-            onChange={(e) => setSelectedDay(e.target.value)}
-          />
+        <h2 className="text-black font-[500] text-[20px] md:text-[24px] mb-4 md:mb-[25px]">Slots</h2>
+        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between mb-[30px] gap-[16px]">
+          <div className="w-full md:w-auto">
+            <Select
+              options={weekDays}
+              placeholder="All Days"
+              value={selectedDay}
+              onChange={(e) => setSelectedDay(e.target.value)}
+              fullWidth
+            />
+          </div>
           <FormDialog
-            title="Weekday"
+            title="Slots"
             buttonText="Add Slot"
             saveButtonText="Save"
             onSubmit={handleCreateSlot}
             loading={createLoading}
           >
             <div className="flex flex-col gap-[20px]">
+              <label className="text-black font-[500] text-[14px] block">
+                Weekday
+              </label>
               <Select
                 options={slotWeekDays}
                 placeholder="Select"
@@ -222,7 +233,7 @@ function Slots({ areaId }: { areaId: string }) {
           </FormDialog>
         </div>
         <GenericTable
-          data={slotsResponse}
+          data={filteredSlots}
           isLoading={loading}
           columns={[
             {

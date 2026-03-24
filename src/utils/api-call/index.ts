@@ -111,6 +111,7 @@ export default async function apiCall<T = unknown>({
     if (axios.isAxiosError(error)) {
       const status = error.response?.status;
       const rawBackendMessage =
+        error.response?.data?.violations?.[0]?.message ||
         error.response?.data?.message ||
         error.response?.data?.error ||
         error.response?.data?.detail;

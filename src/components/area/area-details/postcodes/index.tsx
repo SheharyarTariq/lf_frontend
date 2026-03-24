@@ -26,7 +26,12 @@ interface PostcodesData {
   member: Postcode[];
 }
 
-function Postcodes({ areaId }: { areaId: string }) {
+interface PostcodesProps {
+  areaId: string;
+  onPostcodesChange?: (count: number) => void;
+}
+
+function Postcodes({ areaId, onPostcodesChange }: Readonly<PostcodesProps>) {
   const [postcodes, setPostcodes] = useState<Postcode[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [newPostcode, setNewPostcode] = useState("");
@@ -112,6 +117,12 @@ function Postcodes({ areaId }: { areaId: string }) {
     getPostcodes();
   }, []);
 
+  useEffect(() => {
+    if (onPostcodesChange) {
+      onPostcodesChange(postcodes.length);
+    }
+  }, [postcodes, onPostcodesChange]);
+
   const filteredPostcodes = postcodes.filter((p) =>
     p.postcodeString.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -119,10 +130,10 @@ function Postcodes({ areaId }: { areaId: string }) {
   return (
     <div className="mt-[30px]">
       <Card>
-        <h2 className="text-black font-[500] text-[24px] mb-[25px]">
+        <h2 className="text-black font-[500] text-[20px] md:text-[24px] mb-4 md:mb-[25px]">
           Postcodes
         </h2>
-        <div className="flex items-center justify-between mb-[30px] gap-[20px]">
+        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between mb-[30px] gap-[16px] md:gap-[20px]">
           <Input
             search
             placeholder="Search Postcode"
@@ -130,7 +141,7 @@ function Postcodes({ areaId }: { areaId: string }) {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
           <FormDialog
-            title="Add Postcode"
+            title="Postcode"
             buttonText="+ Add Postcode"
             saveButtonText="Save"
             onSubmit={handleCreatePostcode}

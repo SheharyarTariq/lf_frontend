@@ -2,7 +2,7 @@
 import React, { useRef } from "react";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "outline";
+  variant?: "primary" | "secondary" | "outline" | "disabled";
   isLoading?: boolean;
 }
 
@@ -19,12 +19,13 @@ export default function Button({
 }: ButtonProps) {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const baseStyles =
-    "px-[35px] py-[12px] text-[16px] rounded-[8px] transition-colors duration-200 font-[500] cursor-pointer relative overflow-hidden";
+    "px-5 py-[10px] md:px-[35px] md:py-[12px] text-[14px] md:text-[16px] rounded-[8px] transition-colors duration-200 font-[500] relative overflow-hidden [font-family:var(--font-poppins)] whitespace-nowrap";
 
   const variants = {
-    primary: "bg-black text-white hover:bg-neutral-700",
-    secondary: "bg-secondary text-black hover:bg-limeGreen",
-    outline: "text-white hover:bg-secondary/20",
+    primary: "bg-black text-white hover:bg-neutral-700 cursor-pointer",
+    secondary: "bg-secondary text-black hover:bg-limeGreen cursor-pointer",
+    outline: "text-white hover:bg-secondary/20 cursor-pointer",
+    disabled: "bg-muted text-placeholder cursor-not-allowed",
   };
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -67,7 +68,12 @@ export default function Button({
             `}</style>
       <button
         ref={buttonRef}
-        className={cn(baseStyles, variants[variant], className, isLoading ? "opacity-70 cursor-not-allowed" : "")}
+        className={cn(
+          baseStyles,
+          variants[variant],
+          className,
+          isLoading ? "opacity-70 cursor-not-allowed" : ""
+        )}
         onClick={isLoading ? undefined : handleClick}
         disabled={disabled || isLoading}
         {...props}

@@ -1,7 +1,7 @@
 import * as yup from "yup";
 
 export const openItemSchema = yup.object({
-  openItemName: yup.string().required("Item name is required"),
+  openItemName: yup.string().trim().required("Item name is required"),
   quantity: yup
     .number()
     .transform((val, orig) => (orig === "" ? undefined : val))
@@ -24,6 +24,10 @@ export const openItemSchema = yup.object({
 });
 
 export const regularItemSchema = yup.object({
+  category: yup
+    .string()
+    .required("Category is required")
+    .notOneOf([""], "Category is required"),
   item: yup
     .string()
     .required("Item is required")
@@ -33,6 +37,10 @@ export const regularItemSchema = yup.object({
     .transform((val, orig) => (orig === "" ? undefined : val))
     .required("Quantity is required")
     .min(1, "Quantity must be at least 1"),
+  cleaningMethod: yup
+    .string()
+    .required("Cleaning method is required")
+    .notOneOf([""], "Please select a cleaning method"),
   pricePerUnit: yup
     .number()
     .transform((val, orig) => (orig === "" ? undefined : val))
