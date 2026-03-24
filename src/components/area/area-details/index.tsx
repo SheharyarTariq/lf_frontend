@@ -70,10 +70,10 @@ function AreaDetails() {
   };
 
   return (
-    <div className="px-[30px] py-[60px]">
+    <div className="px-4 md:px-[30px] py-10 md:py-[60px]">
       <BackArrow />
-      <div className="flex items-center justify-between mt-[20px] mx-[30px] mb-[30px]">
-        <p className="text-black text-[20px] font-[500] text-[32px] ">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mt-[20px] mx-0 md:mx-[30px] mb-[30px] gap-4">
+        <p className="text-black font-[500] text-[24px] md:text-[32px] ">
           {displayName}
         </p>
         <FormDialog
@@ -97,8 +97,9 @@ function AreaDetails() {
 
       <Slots areaId={areaId} />
       <Postcodes areaId={areaId} onPostcodesChange={setPostcodeCount} />
-      <div className="flex justify-end mt-6 mx-[30px]">
+      <div className="flex w-full justify-end mt-6 mx-0 md:mx-[30px] mb-10 md:mb-0">
         {postcodeCount === 0 ? (
+          <div className="md:mr-15 mr-8">
           <FormDialog
             title="Delete Area"
             buttonText="✕ Delete Area"
@@ -113,6 +114,7 @@ function AreaDetails() {
               This action cannot be undone.
             </span>
           </FormDialog>
+          </div>
         ) : (
           <Button
             variant="disabled"

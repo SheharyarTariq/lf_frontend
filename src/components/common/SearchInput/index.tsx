@@ -59,7 +59,7 @@ function SearchInput<T>({
         <Search size={24} color="#8F8F8F" />
       </div>
       <input
-        className="py-4 px-6 pl-12 placeholder:font-[400] placeholder:text-[#C1C1C1] text-black border-muted border border-[1px] focus:outline-neutral rounded-[8px] w-full"
+        className="py-3 md:py-4 px-4 md:px-6 !pl-10 md:!pl-12 placeholder:font-[400] placeholder:text-[#C1C1C1] text-black border-muted border border-[1px] focus:outline-neutral rounded-[8px] w-full"
         placeholder={placeholder}
         value={query}
         onChange={(e) => setQuery(e.target.value)}

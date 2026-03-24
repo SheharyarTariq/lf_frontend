@@ -70,7 +70,7 @@ function SignIn() {
     <div className="flex items-center justify-center min-h-screen bg-white text-black">
       <div className="w-full max-w-[480px] px-4">
         <div className="text-left mb-8">
-          <h1 className="text-[32px] font-[600] text-black mb-[15px]">
+          <h1 className="text-[24px] md:text-[32px] font-[600] text-black mb-[10px] md:mb-[15px]">
             Admin Login
           </h1>
           <p className="text-[16px]">Sign in to your admin account</p>

@@ -118,20 +118,20 @@ function Category() {
 
   return (
     <div>
-      <div className="px-[50px] mt-[51px] mb-10">
-        <h1 className="text-[32px] font-[500] text-black">Category</h1>
-        <div className="w-full flex items-center gap-[24px] mt-5">
+      <div className="px-4 md:px-[50px] mt-6 md:mt-[51px] mb-10">
+        <h1 className="text-[24px] md:text-[32px] font-[500] text-black">Category</h1>
+        <div className="w-full flex flex-col md:flex-row items-stretch md:items-center gap-[16px] md:gap-[24px] mt-5">
           <SearchInput<ItemCategoriesResponse>
             endpoint={routes.api.getItemCategories}
             searchKey="name"
             placeholder="Search"
             onResults={handleSearchResults}
           />
-          <div className="flex items-center relative">
+          <div className="flex items-center w-full md:w-auto relative [&>button]:w-full md:[&>button]:w-auto">
             <FormDialog
               title="Create New Category"
               buttonText={
-                <div className="flex gap-[10px] items-center text-[16px]">
+                <div className="flex gap-[10px] items-center justify-center md:justify-start text-[16px]">
                   <Plus size={20} />
                   Create
                 </div>

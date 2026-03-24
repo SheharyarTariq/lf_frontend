@@ -72,11 +72,11 @@ function CategoryDetails() {
   };
 
   return (
-    <div className="px-[30px] py-[60px] pb-[100px]">
+    <div className="px-4 md:px-[30px] py-10 md:py-[60px] pb-[100px]">
       <BackArrow />
 
-      <div className="flex items-center justify-between mt-[20px] mx-[20px] mb-[30px]">
-        <p className="text-black text-[32px] font-[500]">{displayName}</p>
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mt-[20px] mx-0 md:mx-[20px] mb-[30px] gap-4">
+        <p className="text-black text-[24px] md:text-[32px] font-[500]">{displayName}</p>
         <FormDialog
           title="Edit Category Name"
           buttonText="Edit Category"
@@ -127,7 +127,7 @@ function CategoryDetails() {
         onItemsChange={(items) => setHasItems(items.length > 0)}
       />
 
-      <div className="flex justify-end mt-[40px] px-6">
+      <div className="flex flex-col md:flex-row justify-center md:justify-end mt-[40px] px-0 md:px-6 w-full">
         {!hasItems ? (
           <FormDialog
             title="Delete Category"
@@ -137,6 +137,7 @@ function CategoryDetails() {
             loading={isDeletingCategory}
             triggerVariant="delete"
             submitVariant="delete"
+            triggerClassName="w-full md:w-auto"
           >
             Are you sure you want to delete this category ?
             <span className="mt-[8px] block">
@@ -144,7 +145,7 @@ function CategoryDetails() {
             </span>
           </FormDialog>
         ) : (
-          <button className="bg-muted text-neutral px-[25px] py-[14px] rounded-[8px] font-[500] text-[20px] cursor-not-allowed [font-family:var(--font-poppins)]">
+          <button className="bg-muted text-neutral px-5 md:px-[25px] py-3 md:py-[14px] rounded-[8px] font-[500] text-[16px] md:text-[20px] cursor-not-allowed [font-family:var(--font-poppins)] w-full md:w-auto">
             Delete Category
           </button>
         )}

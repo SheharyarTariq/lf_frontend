@@ -19,7 +19,7 @@ export default function Button({
 }: ButtonProps) {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const baseStyles =
-    "px-[35px] py-[12px] text-[16px] rounded-[8px] transition-colors duration-200 font-[500] relative overflow-hidden [font-family:var(--font-poppins)] whitespace-nowrap";
+    "px-5 py-[10px] md:px-[35px] md:py-[12px] text-[14px] md:text-[16px] rounded-[8px] transition-colors duration-200 font-[500] relative overflow-hidden [font-family:var(--font-poppins)] whitespace-nowrap";
 
   const variants = {
     primary: "bg-black text-white hover:bg-neutral-700 cursor-pointer",

@@ -20,6 +20,7 @@ interface FormDialogProps {
   loading?: boolean;
   triggerVariant?: TriggerVariant;
   submitVariant?: SubmitVariant;
+  triggerClassName?: string;
 }
 
 const triggerStyles: Record<TriggerVariant, string> = {
@@ -43,6 +44,7 @@ export default function FormDialog({
   children,
   triggerVariant = "primary",
   submitVariant = "primary",
+  triggerClassName,
 }: Readonly<FormDialogProps>) {
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -93,8 +95,9 @@ export default function FormDialog({
         className={cn(
           triggerVariant === "icon"
             ? "px-2 cursor-pointer"
-            : "px-[35px] py-[16px] text-[16px] rounded-[8px] font-[500] cursor-pointer transition-colors duration-200 [font-family:var(--font-poppins)] whitespace-nowrap",
-          triggerStyles[triggerVariant]
+            : "px-5 py-[10px] md:px-[35px] md:py-[16px] text-[14px] md:text-[16px] rounded-[8px] font-[500] cursor-pointer transition-colors duration-200 [font-family:var(--font-poppins)] whitespace-nowrap",
+          triggerStyles[triggerVariant],
+          triggerClassName
         )}
         onClick={handleClickOpen}
       >
@@ -118,7 +121,7 @@ export default function FormDialog({
       >
         {isDeleteVariant ? (
           <>
-            <div className="flex flex-col items-center pt-8 pb-4 px-[30px]">
+            <div className="flex flex-col items-center pt-8 pb-4 px-4 sm:px-[30px]">
               <Image
                 src="/assets/Dialog_Cross.svg"
                 alt="Delete"
@@ -134,17 +137,17 @@ export default function FormDialog({
                 justifyContent: "center",
                 gap: "12px",
                 pb: "30px",
-                px: "30px",
+                px: { xs: "16px", sm: "30px" },
               }}
             >
               <button
-                className="px-[35px] py-[12px] text-[16px] rounded-[8px] font-[500] cursor-pointer transition-colors duration-200 border border-muted text-black hover:bg-gray-50 min-w-[120px]"
+                className="px-5 py-[10px] md:px-[35px] md:py-[12px] text-[14px] md:text-[16px] rounded-[8px] font-[500] cursor-pointer transition-colors duration-200 border border-muted text-black hover:bg-gray-50 min-w-full sm:min-w-[120px]"
                 onClick={handleClose}
               >
                 No
               </button>
               <button
-                className={`px-[35px] py-[12px] text-[16px] rounded-[8px] font-[500] cursor-pointer transition-colors duration-200 ${submitStyles[submitVariant]} disabled:opacity-50 disabled:cursor-not-allowed min-w-[120px]`}
+                className={`px-5 py-[10px] md:px-[35px] md:py-[12px] text-[14px] md:text-[16px] rounded-[8px] font-[500] cursor-pointer transition-colors duration-200 ${submitStyles[submitVariant]} disabled:opacity-50 disabled:cursor-not-allowed min-w-full sm:min-w-[120px]`}
                 onClick={handleSubmit}
                 disabled={isSubmitting || loading}
               >
@@ -159,7 +162,7 @@ export default function FormDialog({
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                px: "30px",
+                px: { xs: "16px", sm: "30px" },
                 pt: "25px",
                 pb: "20px",
                 borderBottom: children ? "1px solid #EAEAEA" : "none",
@@ -177,17 +180,17 @@ export default function FormDialog({
             </DialogTitle>
 
             {children && (
-              <DialogContent sx={{ p: "30px", mt: "15px" }}>{children}</DialogContent>
+              <DialogContent sx={{ px: { xs: "16px", sm: "30px" }, py: "30px", mt: { xs: "5px", sm: "15px" } }}>{children}</DialogContent>
             )}
 
             <DialogActions
               sx={{
-                px: "30px",
+                px: { xs: "16px", sm: "30px" },
                 py: "15px",
               }}
             >
               <button
-                className={`px-[35px] py-[12px] text-[16px] rounded-[8px] font-[500] cursor-pointer transition-colors duration-200 ${submitStyles[submitVariant]} disabled:opacity-50 disabled:cursor-not-allowed`}
+                className={`px-5 py-[10px] md:px-[35px] md:py-[12px] text-[14px] md:text-[16px] rounded-[8px] font-[500] cursor-pointer transition-colors duration-200 ${submitStyles[submitVariant]} disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto`}
                 onClick={handleSubmit}
                 disabled={isSubmitting || loading}
               >
