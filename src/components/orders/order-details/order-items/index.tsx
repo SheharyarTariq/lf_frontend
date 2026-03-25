@@ -175,7 +175,6 @@ function OrderItems({
     const response = await apiCall<{ member: ItemCategory[] }>({
       endpoint: routes.api.getItemCategories,
       method: "GET",
-      headers: { Accept: "application/ld+json" },
     });
     if (response.success && response?.data) {
       setItemCategories(response.data.member);
@@ -197,7 +196,6 @@ function OrderItems({
       }>({
         endpoint: routes.api.getItemCategoryDetails(category.id),
         method: "GET",
-        headers: { Accept: "application/ld+json" },
       });
       if (response.success && response.data) {
         response.data.member.forEach((item) => {

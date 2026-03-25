@@ -2,8 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Input from "../common/Input";
-import SearchInput from "../common/SearchInput";
-import { Plus } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import GenericTable, { Column } from "@/components/common/GenericTable";
 import apiCall from "@/utils/api-call";
 import { routes } from "@/utils/routes";
@@ -36,20 +35,17 @@ function Category() {
   }>({ name: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const handleSearchResults = (data: ItemCategoriesResponse | null) => {
-    if (data && data.member) {
-      setCategories(data.member);
-    } else {
-      getCategories();
-    }
-  };
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredCategories = categories.filter((cat) =>
+    cat.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const getCategories = async () => {
     setIsLoading(true);
     const response = await apiCall<ItemCategoriesResponse>({
       endpoint: routes.api.getItemCategories,
       method: "GET",
-      headers: { Accept: "application/ld+json" },
     });
     if (response.success && response?.data) {
       setCategories(response.data.member);
@@ -123,12 +119,17 @@ function Category() {
           Category
         </h1>
         <div className="w-full flex flex-col md:flex-row items-stretch md:items-center gap-[16px] md:gap-[24px] mt-5">
-          <SearchInput<ItemCategoriesResponse>
-            endpoint={routes.api.getItemCategories}
-            searchKey="name"
-            placeholder="Search"
-            onResults={handleSearchResults}
-          />
+          <div className="relative w-full">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral">
+              <Search size={24} color="#8F8F8F" />
+            </div>
+            <input
+              className="py-3 md:py-4 px-4 md:px-6 !pl-10 md:!pl-12 placeholder:font-[400] placeholder:text-[#C1C1C1] text-black border-muted border border-[1px] focus:outline-neutral rounded-[8px] w-full"
+              placeholder="Search by name"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
           <div className="flex items-center w-full md:w-auto relative [&>button]:w-full md:[&>button]:w-auto">
             <FormDialog
               title="Create New Category"
@@ -189,8 +190,9 @@ function Category() {
         </div>
         <div className="mt-[30px]">
           <GenericTable
+            pageSize={1000}
             columns={columns}
-            data={categories}
+            data={filteredCategories}
             isLoading={isLoading}
             onRowClick={(row) =>
               router.push(

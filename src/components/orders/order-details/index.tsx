@@ -94,7 +94,6 @@ function OrderDetails() {
     const response = await apiCall<OrderDetail>({
       endpoint: routes.api.getOrderDetails(orderId),
       method: "GET",
-      headers: { Accept: "application/ld+json" },
     });
     if (response.success && response?.data) {
       setOrder(response.data);
@@ -106,7 +105,6 @@ function OrderDetails() {
     const response = await apiCall({
       endpoint: routes.api.cancelOrder(orderId),
       method: "POST",
-      headers: { "Content-Type": "application/ld+json" },
       showSuccessToast: true,
       successMessage: "Order cancelled successfully",
       data: {},
@@ -124,7 +122,6 @@ function OrderDetails() {
     const response = await apiCall({
       endpoint: routes.api.finaliseOrder(orderId),
       method: "POST",
-      headers: { "Content-Type": "application/ld+json" },
       showSuccessToast: true,
       successMessage: "Order finalised successfully",
       data: {},
@@ -141,8 +138,9 @@ function OrderDetails() {
     getOrderDetails();
   }, []);
 
-  const isCancelled = order
-    ? order.status.toLowerCase() === "cancelled"
+  const cancellableStatuses = ["created", "awaiting_review", "payment_failed"];
+  const canCancel = order
+    ? cancellableStatuses.includes(order.status.toLowerCase())
     : false;
   const hasOrderItems = order
     ? order.orderItems && order.orderItems.length > 0
@@ -175,7 +173,7 @@ function OrderDetails() {
         </div>
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-2 md:mt-[20px] mx-0 md:mx-[30px] mb-2 md:mb-[30px] gap-2">
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
-            {!isCancelled ? (
+            {canCancel ? (
               <FormDialog
                 title="Cancel Order"
                 buttonText="Delete"
@@ -192,16 +190,11 @@ function OrderDetails() {
               <Button
                 variant="disabled"
                 className="min-w-[140px] md:min-w-[160px] md:py-[16px] text-center"
-                onClick={() =>
-                  toast.error("This order is already cancelled", {
-                    id: "cancel-error",
-                  })
-                }
               >
                 Delete
               </Button>
             )}
-            {hasOrderItems ? (
+            {order?.status.toLowerCase() === "created" && hasOrderItems ? (
               <FormDialog
                 title="Finalize Order"
                 buttonText="Finalize"
@@ -216,11 +209,6 @@ function OrderDetails() {
               <Button
                 variant="disabled"
                 className="min-w-[140px] md:min-w-[160px] md:py-[16px] text-center"
-                onClick={() =>
-                  toast.error("Add an Item First TO Finalise The Order", {
-                    id: "finalise-error",
-                  })
-                }
               >
                 Finalize
               </Button>

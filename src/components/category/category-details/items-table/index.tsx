@@ -123,7 +123,6 @@ function ItemsTable({ categoryId, onItemsChange }: ItemsTableProps) {
     const response = await apiCall<CategoryDetailsResponse>({
       endpoint: routes.api.getItemCategoryDetails(categoryId),
       method: "GET",
-      headers: { Accept: "application/ld+json" },
     });
 
     if (response.success && response.data) {
