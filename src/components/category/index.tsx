@@ -2,7 +2,8 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Input from "../common/Input";
-import { Plus, Search } from "lucide-react";
+import SearchInput from "@/components/common/SearchInput";
+import { Plus } from "lucide-react";
 import GenericTable, { Column } from "@/components/common/GenericTable";
 import apiCall from "@/utils/api-call";
 import { routes } from "@/utils/routes";
@@ -119,15 +120,10 @@ function Category() {
           Category
         </h1>
         <div className="w-full flex flex-col md:flex-row items-stretch md:items-center gap-[16px] md:gap-[24px] mt-5">
-          <div className="relative w-full">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral">
-              <Search size={24} color="#8F8F8F" />
-            </div>
-            <input
-              className="py-3 md:py-4 px-4 md:px-6 !pl-10 md:!pl-12 placeholder:font-[400] placeholder:text-[#C1C1C1] text-black border-muted border border-[1px] focus:outline-neutral rounded-[8px] w-full"
+          <div className="w-full">
+            <SearchInput
               placeholder="Search by name"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onSearchChange={(query) => setSearchQuery(query)}
             />
           </div>
           <div className="flex items-center w-full md:w-auto relative [&>button]:w-full md:[&>button]:w-auto">

@@ -6,12 +6,13 @@ import apiCall from "@/utils/api-call";
 import { cn } from "@/utils/cn";
 
 interface SearchInputProps<T> {
-  endpoint: string;
-  searchKey: string;
+  endpoint?: string;
+  searchKey?: string;
   placeholder?: string;
   debounceMs?: number;
   className?: string;
-  onResults: (data: T | null) => void;
+  onResults?: (data: T | null) => void;
+  onSearchChange?: (query: string) => void;
 }
 
 function SearchInput<T>({
@@ -21,6 +22,7 @@ function SearchInput<T>({
   debounceMs = 400,
   className,
   onResults,
+  onSearchChange,
 }: SearchInputProps<T>) {
   const [query, setQuery] = useState("");
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -31,18 +33,25 @@ function SearchInput<T>({
     }
 
     if (!query.trim()) {
-      onResults(null);
+      if (onResults) onResults(null);
+      if (onSearchChange) onSearchChange("");
       return;
     }
 
     timerRef.current = setTimeout(async () => {
-      const response = await apiCall<T>({
-        endpoint,
-        method: "GET",
-        data: { [searchKey]: query.trim() },
-      });
-      if (response.success) {
-        onResults(response.data);
+      if (onSearchChange) {
+        onSearchChange(query.trim());
+      }
+
+      if (endpoint && searchKey && onResults) {
+        const response = await apiCall<T>({
+          endpoint,
+          method: "GET",
+          data: { [searchKey]: query.trim() },
+        });
+        if (response.success) {
+          onResults(response.data);
+        }
       }
     }, debounceMs);
 
