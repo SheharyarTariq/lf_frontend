@@ -44,6 +44,12 @@ interface Order {
 interface OrdersData {
   totalItems: number;
   member: Order[];
+  view?: {
+    first?: string;
+    last?: string;
+    next?: string;
+    previous?: string;
+  };
 }
 
 const statusStyles: Record<string, string> = {
@@ -72,37 +78,45 @@ interface OrdersFilters {
   type: string;
 }
 
-function buildEndpoint(filters: OrdersFilters): string {
-  const parts: string[] = [];
+function buildEndpoint(filters: OrdersFilters, page: number): string {
+  const parts: string[] = [`page=${page}`];
   if (filters.search)
     parts.push(`search=${encodeURIComponent(filters.search)}`);
   if (filters.status)
     parts.push(`exact[status][]=${encodeURIComponent(filters.status)}`);
   if (filters.type)
     parts.push(`exact[type][]=${encodeURIComponent(filters.type)}`);
-  return routes.api.getOrders + (parts.length ? `?${parts.join("&")}` : "");
+  return routes.api.getOrders + `?${parts.join("&")}`;
 }
 
 function OrdersTable({ filters }: { filters: OrdersFilters }) {
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const PAGE_SIZE = 30;
   const router = useRouter();
 
-  const getOrders = async () => {
+  const getOrders = async (page: number) => {
     setIsLoading(true);
     const response = await apiCall<OrdersData>({
-      endpoint: buildEndpoint(filters),
+      endpoint: buildEndpoint(filters, page),
       method: "GET",
     });
     if (response.success && response?.data) {
       setOrders(response.data.member);
+      setTotalItems(response.data.totalItems);
     }
     setIsLoading(false);
   };
 
   useEffect(() => {
-    getOrders();
+    setCurrentPage(1);
   }, [filters.search, filters.status, filters.type]);
+
+  useEffect(() => {
+    getOrders(currentPage);
+  }, [currentPage, filters.search, filters.status, filters.type]);
 
   const columns = [
     {
@@ -199,6 +213,12 @@ function OrdersTable({ filters }: { filters: OrdersFilters }) {
         data={orders}
         columns={columns}
         isLoading={isLoading}
+        backendPagination={{
+          currentPage,
+          totalItems,
+          pageSize: PAGE_SIZE,
+          onPageChange: setCurrentPage,
+        }}
         onRowClick={(row) =>
           router.push(routes.ui.orderDetails(row.id, row.number))
         }
