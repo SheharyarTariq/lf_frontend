@@ -13,6 +13,13 @@ export interface Column<T> {
   isAction?: boolean;
 }
 
+export interface BackendPaginationConfig {
+  currentPage: number;
+  totalItems: number;
+  pageSize: number;
+  onPageChange: (page: number) => void;
+}
+
 export interface GenericTableProps<T> {
   columns: Column<T>[];
   data: T[];
@@ -20,6 +27,7 @@ export interface GenericTableProps<T> {
   className?: string;
   pageSize?: number;
   isLoading?: boolean;
+  backendPagination?: BackendPaginationConfig;
 }
 
 type SortDirection = "asc" | "desc";
@@ -38,6 +46,7 @@ function GenericTable<T>({
   className = "",
   pageSize = 10,
   isLoading,
+  backendPagination,
 }: GenericTableProps<T>) {
   const [currentPage, setCurrentPage] = useState(0);
   const [sortConfig, setSortConfig] = useState<SortConfig | null>(null);
@@ -77,20 +86,40 @@ function GenericTable<T>({
     });
   }, [data, sortConfig]);
 
-  const totalItems = sortedData.length;
-  const totalPages = Math.ceil(totalItems / pageSize);
-  const startIndex = currentPage * pageSize;
-  const endIndex = Math.min(startIndex + pageSize, totalItems);
-  const paginatedData = sortedData.slice(startIndex, endIndex);
+  const isBackendPaginated = !!backendPagination;
+
+  const totalItems = isBackendPaginated
+    ? backendPagination.totalItems
+    : sortedData.length;
+  const effectivePageSize = isBackendPaginated
+    ? backendPagination.pageSize
+    : pageSize;
+  const effectivePage = isBackendPaginated
+    ? backendPagination.currentPage - 1
+    : currentPage;
+  const totalPages = Math.ceil(totalItems / effectivePageSize);
+  const startIndex = effectivePage * effectivePageSize;
+  const endIndex = Math.min(startIndex + effectivePageSize, totalItems);
+  const paginatedData = isBackendPaginated
+    ? sortedData
+    : sortedData.slice(startIndex, endIndex);
 
   const handlePrev = () => {
-    if (currentPage > 0) {
+    if (isBackendPaginated) {
+      if (backendPagination.currentPage > 1) {
+        backendPagination.onPageChange(backendPagination.currentPage - 1);
+      }
+    } else if (currentPage > 0) {
       setCurrentPage(currentPage - 1);
     }
   };
 
   const handleNext = () => {
-    if (currentPage < totalPages - 1) {
+    if (isBackendPaginated) {
+      if (backendPagination.currentPage < totalPages) {
+        backendPagination.onPageChange(backendPagination.currentPage + 1);
+      }
+    } else if (currentPage < totalPages - 1) {
       setCurrentPage(currentPage + 1);
     }
   };
@@ -202,21 +231,21 @@ function GenericTable<T>({
           )}
         </tbody>
       </table>
-      {totalItems > pageSize && (
+      {totalItems > effectivePageSize && (
         <div className="flex items-center justify-end gap-4 py-[14px] px-[25px]">
           <span className="text-[14px] text-black">
             {startIndex + 1}-{endIndex} of {totalItems}
           </span>
           <button
             onClick={handlePrev}
-            disabled={currentPage === 0}
+            disabled={effectivePage === 0}
             className="cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed text-black hover:bg-muted rounded-lg px-2 py-1 transition-colors"
           >
             <ChevronLeft size={20} />
           </button>
           <button
             onClick={handleNext}
-            disabled={currentPage >= totalPages - 1}
+            disabled={effectivePage >= totalPages - 1}
             className="cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed text-black hover:bg-muted rounded-lg px-2 py-1 transition-colors"
           >
             <ChevronRight size={20} />
