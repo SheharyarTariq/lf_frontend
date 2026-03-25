@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Input from "../common/Input";
-import SearchInput from "../common/SearchInput";
+import SearchInput from "@/components/common/SearchInput";
 import { Plus } from "lucide-react";
 import GenericTable, { Column } from "@/components/common/GenericTable";
 import apiCall from "@/utils/api-call";
@@ -36,20 +36,17 @@ function Category() {
   }>({ name: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const handleSearchResults = (data: ItemCategoriesResponse | null) => {
-    if (data && data.member) {
-      setCategories(data.member);
-    } else {
-      getCategories();
-    }
-  };
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredCategories = categories.filter((cat) =>
+    cat.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const getCategories = async () => {
     setIsLoading(true);
     const response = await apiCall<ItemCategoriesResponse>({
       endpoint: routes.api.getItemCategories,
       method: "GET",
-      headers: { Accept: "application/ld+json" },
     });
     if (response.success && response?.data) {
       setCategories(response.data.member);
@@ -123,12 +120,12 @@ function Category() {
           Category
         </h1>
         <div className="w-full flex flex-col md:flex-row items-stretch md:items-center gap-[16px] md:gap-[24px] mt-5">
-          <SearchInput<ItemCategoriesResponse>
-            endpoint={routes.api.getItemCategories}
-            searchKey="name"
-            placeholder="Search"
-            onResults={handleSearchResults}
-          />
+          <div className="w-full">
+            <SearchInput
+              placeholder="Search by name"
+              onSearchChange={(query) => setSearchQuery(query)}
+            />
+          </div>
           <div className="flex items-center w-full md:w-auto relative [&>button]:w-full md:[&>button]:w-auto">
             <FormDialog
               title="Create New Category"
@@ -189,8 +186,9 @@ function Category() {
         </div>
         <div className="mt-[30px]">
           <GenericTable
+            pageSize={1000}
             columns={columns}
-            data={categories}
+            data={filteredCategories}
             isLoading={isLoading}
             onRowClick={(row) =>
               router.push(

@@ -70,7 +70,8 @@ export default async function apiCall<T = unknown>({
       url: `${BASE_URL}${endpoint}`,
       method,
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/ld+json",
+        Accept: "application/ld+json",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...headers,
       },
