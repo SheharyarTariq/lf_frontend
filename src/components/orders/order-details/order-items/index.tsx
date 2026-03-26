@@ -10,20 +10,21 @@ import Select from "@/components/common/Select";
 import { validateAndSetErrors } from "@/utils/validation";
 import { openItemSchema, regularItemSchema } from "../../schema";
 import { penceToPounds, poundsToPence } from "@/utils/helper";
+import { Trash2 } from "lucide-react";
 
 interface OrderItem {
   "@context"?: string;
   "@id"?: string;
   "@type"?: string;
   id: string;
-  item: string;
+  item: any;
   quantity: number;
   cleaningMethod: string;
   pricePerUnit: number;
   totalPrice: number;
-  openItemName: string;
-  piece: number;
-  isApproved: boolean;
+  openItemName: string | null;
+  piece: number | null;
+  isApproved: boolean | null;
 }
 
 interface ItemCategory {
@@ -220,22 +221,15 @@ function OrderItems({
 
   const getRegularCleaningOptions = () => {
     if (!selectedItemData) return cleaningMethodOptions;
-    const label = selectedItemData.washingLabel?.toLowerCase();
-    if (label === "washing") {
-      return [
-        { label: "Select", value: "" },
-        { label: "Wash", value: "washing" },
-        { label: "Dry Clean", value: "dry_cleaning", disabled: true },
-      ];
+
+    const options = [{ label: "Select", value: "" }];
+    if (selectedItemData.priceWashing !== null) {
+      options.push({ label: "Wash", value: "washing" });
     }
-    if (label === "dry_cleaning") {
-      return [
-        { label: "Select", value: "" },
-        { label: "Wash", value: "washing", disabled: true },
-        { label: "Dry Clean", value: "dry_cleaning" },
-      ];
+    if (selectedItemData.priceDryCleaning !== null) {
+      options.push({ label: "Dry Clean", value: "dry_cleaning" });
     }
-    return cleaningMethodOptions;
+    return options.length > 1 ? options : cleaningMethodOptions;
   };
 
   const handleCreateRegularItem = async (): Promise<boolean> => {
@@ -318,9 +312,11 @@ function OrderItems({
     const selectedItem = allItems.find((i) => i.atId === regularItemData.item);
     if (!selectedItem) return;
     const defaultMethod =
-      selectedItem.priceWashing !== null
+      selectedItem.priceWashing !== null &&
+      selectedItem.priceDryCleaning === null
         ? "washing"
-        : selectedItem.priceDryCleaning !== null
+        : selectedItem.priceDryCleaning !== null &&
+            selectedItem.priceWashing === null
           ? "dry_cleaning"
           : "";
     setRegularItemData((prev) => ({ ...prev, cleaningMethod: defaultMethod }));
@@ -346,12 +342,20 @@ function OrderItems({
 
   const columns = [
     {
-      accessor: (row: OrderItem) => {
+      accessor: (row: any) => {
+        if (row.item && typeof row.item === "object" && row.item.name)
+          return row.item.name;
         if (row.openItemName) return row.openItemName;
-        const matched = allItems.find(
-          (i) => i.atId === row.item || `/items/${i.id}` === row.item
-        );
-        return matched?.name || "-";
+        if (row.name) return row.name;
+
+        if (typeof row.item === "string") {
+          const matched = allItems.find(
+            (i) => i.atId === row.item || `/items/${i.id}` === row.item
+          );
+          return matched?.name || row.item;
+        }
+
+        return "-";
       },
       header: "Item Name",
       sortable: false,
@@ -380,17 +384,18 @@ function OrderItems({
     },
     {
       accessor: (row: OrderItem) => (
-        <div className="flex items-center justify-end">
+        <div
+          className="flex items-center justify-end"
+          onClick={() => setDeleteItemId(row.id)}
+        >
           <FormDialog
             title="Delete Item"
             buttonText={
-              <div onClick={() => setDeleteItemId(row.id)}>
-                <img
-                  src="/assets/trashEnabled.svg"
-                  alt="Delete"
-                  className="cursor-pointer h-[38px] w-[38px]"
-                />
-              </div>
+              <img
+                src="/assets/trashEnabled.svg"
+                alt="Delete"
+                className="cursor-pointer h-[38px] w-[38px]"
+              />
             }
             saveButtonText="Yes"
             onSubmit={handleDeleteOrderItem}
