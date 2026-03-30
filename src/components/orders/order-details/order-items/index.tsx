@@ -392,7 +392,7 @@ function OrderItems({
             title="Delete Item"
             buttonText={
               <img
-                src="/assets/trashEnabled.svg"
+                src="/assets/TrashEnabled.svg"
                 alt="Delete"
                 className="cursor-pointer h-[38px] w-[38px]"
               />
