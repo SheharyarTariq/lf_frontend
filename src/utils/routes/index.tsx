@@ -40,6 +40,7 @@ export const routes = {
     getOrderItems: (id: string) => `orders/${id}/order-items`,
     cancelOrder: (id: string) => `orders/${id}/mark-as-cancelled`,
     finaliseOrder: (id: string) => `orders/${id}/finalise`,
+    markDelivered: (id: string) => `orders/${id}/mark-as-delivered`,
     createRegularItem: "order-items",
     createOpenItem: "order-items/open-item",
     deleteOrderItem: (id: string) => `order-items/${id}`,

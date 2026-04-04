@@ -9,8 +9,9 @@ import Input from "@/components/common/Input";
 import Select from "@/components/common/Select";
 import { validateAndSetErrors } from "@/utils/validation";
 import { openItemSchema, regularItemSchema } from "../../schema";
-import { penceToPounds, poundsToPence } from "@/utils/helper";
+import { poundsToPence, penceToPounds } from "@/utils/helper";
 import { Trash2 } from "lucide-react";
+import Button from "@/components/common/Button";
 
 interface OrderItem {
   "@context"?: string;
@@ -68,10 +69,12 @@ function OrderItems({
   orderId,
   revenue,
   onItemsChange,
+  status,
 }: {
   orderId: string;
   revenue: number;
   onItemsChange?: () => void;
+  status?: string;
 }) {
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [openItemData, setOpenItemData] = useState({
@@ -85,6 +88,7 @@ function OrderItems({
     {}
   );
   const [createLoading, setCreateLoading] = useState(false);
+  const [updateLoading, setUpdateLoading] = useState<string>("");
   const [isDeletingItem, setIsDeletingItem] = useState(false);
   const [deleteItemId, setDeleteItemId] = useState<string>("");
   const [loading, setLoading] = useState(true);
@@ -101,6 +105,7 @@ function OrderItems({
     Record<string, string>
   >({});
   const [createRegularLoading, setCreateRegularLoading] = useState(false);
+  const [updateRegularLoading, setUpdateRegularLoading] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState("");
 
   const filteredItems = selectedCategory
@@ -285,6 +290,114 @@ function OrderItems({
     return false;
   };
 
+  const handleUpdateOpenItem = async (id: string): Promise<boolean> => {
+    if (
+      !(await validateAndSetErrors(
+        openItemSchema,
+        {
+          openItemName: openItemData.openItemName,
+          quantity: openItemData.quantity
+            ? Number(openItemData.quantity)
+            : undefined,
+          piece: openItemData.piece ? Number(openItemData.piece) : undefined,
+          cleaningMethod: openItemData.cleaningMethod,
+          pricePerUnit: openItemData.pricePerUnit
+            ? Number(openItemData.pricePerUnit)
+            : undefined,
+        },
+        setOpenItemErrors
+      ))
+    )
+      return false;
+    setUpdateLoading(id);
+    const response = await apiCall({
+      endpoint: routes.api.updateOrderItem(id),
+      method: "PATCH",
+      headers: { "Content-Type": "application/merge-patch+json" },
+      data: {
+        openItemName: openItemData.openItemName.trim(),
+        quantity: openItemData.quantity ? Number(openItemData.quantity) : 1,
+        piece: openItemData.piece ? Number(openItemData.piece) : 0,
+        cleaningMethod: openItemData.cleaningMethod,
+        pricePerUnit: openItemData.pricePerUnit
+          ? poundsToPence(Number(openItemData.pricePerUnit))
+          : 0,
+      },
+      showSuccessToast: true,
+      successMessage: "Open item updated successfully",
+    });
+    setUpdateLoading("");
+    if (response.success) {
+      setOpenItemErrors({});
+      setOpenItemData({
+        openItemName: "",
+        quantity: "",
+        piece: "",
+        cleaningMethod: "",
+        pricePerUnit: "",
+      });
+      await getOrderItems(false);
+      onItemsChange?.();
+      return true;
+    }
+    return false;
+  };
+
+  const handleUpdateRegularItem = async (id: string): Promise<boolean> => {
+    if (
+      !(await validateAndSetErrors(
+        regularItemSchema,
+        {
+          category: selectedCategory,
+          item: regularItemData.item,
+          quantity: regularItemData.quantity
+            ? Number(regularItemData.quantity)
+            : undefined,
+          cleaningMethod: regularItemData.cleaningMethod,
+          pricePerUnit: regularItemData.pricePerUnit
+            ? Number(regularItemData.pricePerUnit)
+            : undefined,
+        },
+        setRegularItemErrors
+      ))
+    )
+      return false;
+
+    const payload = {
+      item: regularItemData.item,
+      quantity: regularItemData.quantity ? Number(regularItemData.quantity) : 1,
+      cleaningMethod: regularItemData.cleaningMethod,
+      pricePerUnit: regularItemData.pricePerUnit
+        ? poundsToPence(Number(regularItemData.pricePerUnit))
+        : 0,
+    };
+
+    setUpdateRegularLoading(id);
+    const response = await apiCall({
+      endpoint: routes.api.updateOrderItem(id),
+      method: "PATCH",
+      headers: { "Content-Type": "application/merge-patch+json" },
+      data: payload,
+      showSuccessToast: true,
+      successMessage: "Regular item updated successfully",
+    });
+    setUpdateRegularLoading("");
+    if (response.success) {
+      setRegularItemErrors({});
+      setSelectedCategory("");
+      setRegularItemData({
+        item: "",
+        quantity: "1",
+        cleaningMethod: "",
+        pricePerUnit: "",
+      });
+      await getOrderItems(false);
+      onItemsChange?.();
+      return true;
+    }
+    return false;
+  };
+
   const handleDeleteOrderItem = async (): Promise<boolean> => {
     setIsDeletingItem(true);
     const response = await apiCall({
@@ -340,6 +453,264 @@ function OrderItems({
     }
   }, [regularItemData.item, regularItemData.cleaningMethod, allItems]);
 
+  const renderOpenItemFormFields = () => (
+    <div className="flex flex-col gap-[20px]">
+      <div>
+        <label className="text-black font-[500] text-[14px] mb-[8px] block">
+          Item Name
+        </label>
+        <Input
+          placeholder="e.g. Formal Shirt"
+          value={openItemData.openItemName}
+          onChange={(e) => {
+            setOpenItemData((prev) => ({
+              ...prev,
+              openItemName: e.target.value,
+            }));
+            if (openItemErrors.openItemName)
+              setOpenItemErrors((prev) => ({
+                ...prev,
+                openItemName: "",
+              }));
+          }}
+          type="text"
+          error={openItemErrors.openItemName}
+        />
+      </div>
+      <div className="flex flex-col md:flex-row gap-4 md:gap-[20px]">
+        <div className="flex-1 w-full md:w-auto">
+          <label className="text-black font-[500] text-[14px] mb-[8px] block">
+            Quantity
+          </label>
+          <Input
+            placeholder="1"
+            value={openItemData.quantity}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (val && !/^\d+$/.test(val)) return;
+              setOpenItemData((prev) => ({
+                ...prev,
+                quantity: val,
+              }));
+              if (openItemErrors.quantity)
+                setOpenItemErrors((prev) => ({
+                  ...prev,
+                  quantity: "",
+                }));
+            }}
+            type="number"
+            error={openItemErrors.quantity}
+          />
+        </div>
+        <div className="flex-1">
+          <label className="text-black font-[500] text-[14px] mb-[8px] block">
+            Pieces
+          </label>
+          <Input
+            placeholder="e.g. 2"
+            value={openItemData.piece}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (val && !/^\d+$/.test(val)) return;
+              setOpenItemData((prev) => ({
+                ...prev,
+                piece: val,
+              }));
+              if (openItemErrors.piece)
+                setOpenItemErrors((prev) => ({ ...prev, piece: "" }));
+            }}
+            type="number"
+            error={openItemErrors.piece}
+          />
+        </div>
+      </div>
+      <div className="flex flex-col md:flex-row gap-4 md:gap-[20px]">
+        <div className="flex-1 w-full md:w-auto">
+          <label className="text-black font-[500] text-[14px] mb-[8px] block">
+            Cleaning Method
+          </label>
+          <Select
+            options={cleaningMethodOptions}
+            placeholder="Select"
+            value={openItemData.cleaningMethod}
+            onChange={(e) => {
+              setOpenItemData((prev) => ({
+                ...prev,
+                cleaningMethod: e.target.value,
+              }));
+              if (openItemErrors.cleaningMethod)
+                setOpenItemErrors((prev) => ({
+                  ...prev,
+                  cleaningMethod: "",
+                }));
+            }}
+            fullWidth
+            error={openItemErrors.cleaningMethod}
+          />
+        </div>
+        <div className="flex-1">
+          <label className="text-black font-[500] text-[14px] mb-[8px] block">
+            Price Per Unit
+          </label>
+          <Input
+            placeholder="e.g. 5000"
+            value={openItemData.pricePerUnit}
+            onChange={(e) => {
+              setOpenItemData((prev) => ({
+                ...prev,
+                pricePerUnit: e.target.value,
+              }));
+              if (openItemErrors.pricePerUnit)
+                setOpenItemErrors((prev) => ({
+                  ...prev,
+                  pricePerUnit: "",
+                }));
+            }}
+            type="number"
+            error={openItemErrors.pricePerUnit}
+          />
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderRegularItemFormFields = () => (
+    <div className="flex flex-col gap-[20px]">
+      <div>
+        <label className="text-black font-[500] text-[14px] mb-[8px] block">
+          Category
+        </label>
+        <Select
+          options={itemCategories.map((cat) => ({
+            label: cat.name,
+            value: cat.id,
+          }))}
+          placeholder="Select"
+          value={selectedCategory}
+          onChange={(e) => {
+            setSelectedCategory(e.target.value);
+            setRegularItemData((prev) => ({
+              ...prev,
+              item: "",
+              cleaningMethod: "",
+            }));
+            if (regularItemErrors.category)
+              setRegularItemErrors((prev) => ({
+                ...prev,
+                category: "",
+              }));
+          }}
+          fullWidth
+          searchable
+          error={regularItemErrors.category}
+        />
+      </div>
+      <div className="flex flex-col md:flex-row gap-4 md:gap-[20px]">
+        <div className="flex-1 w-full md:w-auto">
+          <label className="text-black font-[500] text-[14px] mb-[8px] block">
+            Item
+          </label>
+          <Select
+            options={filteredItems.map((item) => ({
+              label: item.name,
+              value: item.atId,
+            }))}
+            placeholder="Select"
+            value={regularItemData.item}
+            onChange={(e) => {
+              setRegularItemData((prev) => ({
+                ...prev,
+                item: e.target.value,
+                cleaningMethod: "",
+              }));
+              if (regularItemErrors.item)
+                setRegularItemErrors((prev) => ({
+                  ...prev,
+                  item: "",
+                }));
+            }}
+            fullWidth
+            searchable
+            disabled={!selectedCategory}
+            error={regularItemErrors.item}
+          />
+        </div>
+        <div className="flex-1">
+          <label className="text-black font-[500] text-[14px] mb-[8px] block">
+            Quantity
+          </label>
+          <Input
+            placeholder="1"
+            value={regularItemData.quantity}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (val && !/^\d+$/.test(val)) return;
+              setRegularItemData((prev) => ({
+                ...prev,
+                quantity: val,
+              }));
+              if (regularItemErrors.quantity)
+                setRegularItemErrors((prev) => ({
+                  ...prev,
+                  quantity: "",
+                }));
+            }}
+            type="number"
+            error={regularItemErrors.quantity}
+          />
+        </div>
+      </div>
+      <div className="flex flex-col md:flex-row gap-4 md:gap-[20px]">
+        <div className="flex-1 w-full md:w-auto">
+          <label className="text-black font-[500] text-[14px] mb-[8px] block">
+            Cleaning Method
+          </label>
+          <Select
+            options={getRegularCleaningOptions()}
+            placeholder="Select"
+            value={regularItemData.cleaningMethod}
+            onChange={(e) => {
+              setRegularItemData((prev) => ({
+                ...prev,
+                cleaningMethod: e.target.value,
+              }));
+              if (regularItemErrors.cleaningMethod)
+                setRegularItemErrors((prev) => ({
+                  ...prev,
+                  cleaningMethod: "",
+                }));
+            }}
+            fullWidth
+            disabled={!regularItemData.item}
+            error={regularItemErrors.cleaningMethod}
+          />
+        </div>
+        <div className="flex-1">
+          <label className="text-black font-[500] text-[14px] mb-[8px] block">
+            Price Per Unit
+          </label>
+          <Input
+            placeholder="e.g. 5000"
+            value={regularItemData.pricePerUnit}
+            onChange={(e) => {
+              setRegularItemData((prev) => ({
+                ...prev,
+                pricePerUnit: e.target.value,
+              }));
+              if (regularItemErrors.pricePerUnit)
+                setRegularItemErrors((prev) => ({
+                  ...prev,
+                  pricePerUnit: "",
+                }));
+            }}
+            type="number"
+            error={regularItemErrors.pricePerUnit}
+          />
+        </div>
+      </div>
+    </div>
+  );
+
   const columns = [
     {
       accessor: (row: any) => {
@@ -383,33 +754,126 @@ function OrderItems({
       sortable: false,
     },
     {
-      accessor: (row: OrderItem) => (
-        <div
-          className="flex items-center justify-end"
-          onClick={() => setDeleteItemId(row.id)}
-        >
-          <FormDialog
-            title="Delete Item"
-            buttonText={
+      accessor: (row: OrderItem) => (row.isApproved ? "Yes" : "No"),
+      header: "Approved?",
+      sortable: false,
+    },
+    {
+      accessor: (row: OrderItem) => {
+        const isOpenItem = !!row.openItemName;
+        const canManage = !status || status.toLowerCase() === "created";
+
+        return (
+          <div className="flex items-center justify-end gap-[10px]">
+            {!canManage ? (
               <img
-                src="/assets/TrashEnabled.svg"
-                alt="Delete"
-                className="cursor-pointer h-[38px] w-[38px]"
+                src="/assets/Edit.svg"
+                alt="Edit"
+                className="cursor-not-allowed h-[26px] w-[26px] opacity-50 grayscale"
               />
-            }
-            saveButtonText="Yes"
-            onSubmit={handleDeleteOrderItem}
-            loading={isDeletingItem}
-            triggerVariant="icon"
-            submitVariant="delete"
-          >
-            Are you sure you want to delete this item?
-            <span className="mt-[8px] block">
-              This action cannot be undone.
-            </span>
-          </FormDialog>
-        </div>
-      ),
+            ) : isOpenItem ? (
+              <FormDialog
+                title="Edit Open Item"
+                buttonText={
+                  <img
+                    src="/assets/Edit.svg"
+                    alt="Edit"
+                    className="cursor-pointer h-[26px] w-[26px]"
+                  />
+                }
+                saveButtonText="Save"
+                onSubmit={() => handleUpdateOpenItem(row.id)}
+                loading={updateLoading === row.id}
+                triggerVariant="icon"
+                onOpen={() => {
+                  setOpenItemErrors({});
+                  setOpenItemData({
+                    openItemName: row.openItemName || "",
+                    quantity: String(row.quantity),
+                    piece: String(row.piece || 0),
+                    cleaningMethod: row.cleaningMethod,
+                    pricePerUnit: String(penceToPounds(row.pricePerUnit)),
+                  });
+                }}
+              >
+                {renderOpenItemFormFields()}
+              </FormDialog>
+            ) : (
+              <FormDialog
+                title="Edit Regular Item"
+                buttonText={
+                  <img
+                    src="/assets/Edit.svg"
+                    alt="Edit"
+                    className="cursor-pointer h-[26px] w-[26px]"
+                  />
+                }
+                saveButtonText="Save"
+                onSubmit={() => handleUpdateRegularItem(row.id)}
+                loading={updateRegularLoading === row.id}
+                triggerVariant="icon"
+                onOpen={() => {
+                  setRegularItemErrors({});
+                  let matchedItem = null;
+                  if (typeof row.item === "object" && row.item !== null) {
+                    matchedItem = allItems.find(
+                      (i) =>
+                        i.atId === row.item?.["@id"] || i.id === row.item?.id
+                    );
+                  } else if (typeof row.item === "string") {
+                    matchedItem = allItems.find(
+                      (i) =>
+                        i.atId === row.item || `/items/${i.id}` === row.item
+                    );
+                  }
+
+                  if (matchedItem) {
+                    setSelectedCategory(matchedItem.categoryId);
+                    setRegularItemData({
+                      item: matchedItem.atId,
+                      quantity: String(row.quantity),
+                      cleaningMethod: row.cleaningMethod,
+                      pricePerUnit: String(penceToPounds(row.pricePerUnit)),
+                    });
+                  }
+                }}
+              >
+                {renderRegularItemFormFields()}
+              </FormDialog>
+            )}
+
+            {!canManage ? (
+              <img
+                src="/assets/TrashDisabled.svg"
+                alt="Delete"
+                className="cursor-not-allowed h-[38px] w-[36px]"
+              />
+            ) : (
+              <FormDialog
+                title="Delete Item"
+                buttonText={
+                  <img
+                    src="/assets/TrashEnabled.svg"
+                    alt="Delete"
+                    className="cursor-pointer h-[38px] w-[36px]"
+                  />
+                }
+                saveButtonText="Yes"
+                onSubmit={handleDeleteOrderItem}
+                loading={isDeletingItem}
+                triggerVariant="icon"
+                submitVariant="delete"
+                onOpen={() => setDeleteItemId(row.id)}
+              >
+                Are you sure you want to delete this item?
+                <span className="mt-[8px] block">
+                  This action cannot be undone.
+                </span>
+              </FormDialog>
+            )}
+          </div>
+        );
+      },
       header: "Action",
       sortable: false,
       className: "text-right",
@@ -418,286 +882,77 @@ function OrderItems({
   ];
 
   return (
-    <div>
-      <Card className="mx-0 h-full !p-0">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-[20px] border-b border-muted py-4 md:py-6 px-4 md:px-6 gap-4 md:gap-0">
-          <h3 className="text-[16px] md:text-[18px] font-[600] text-black uppercase ">
-            Order Items
-          </h3>
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 md:gap-[10px] w-full md:w-auto [&>button]:w-full md:[&>button]:w-auto">
-            <FormDialog
-              title="Add Open Item"
-              buttonText="Open Item"
-              saveButtonText="Save"
-              onSubmit={handleCreateOpenItem}
-              loading={createLoading}
-            >
-              <div className="flex flex-col gap-[20px]">
-                <div>
-                  <label className="text-black font-[500] text-[14px] mb-[8px] block">
-                    Item Name
-                  </label>
-                  <Input
-                    placeholder="e.g. Formal Shirt"
-                    value={openItemData.openItemName}
-                    onChange={(e) => {
-                      setOpenItemData((prev) => ({
-                        ...prev,
-                        openItemName: e.target.value,
-                      }));
-                      if (openItemErrors.openItemName)
-                        setOpenItemErrors((prev) => ({
-                          ...prev,
-                          openItemName: "",
-                        }));
-                    }}
-                    type="text"
-                    error={openItemErrors.openItemName}
-                  />
-                </div>
-                <div className="flex flex-col md:flex-row gap-4 md:gap-[20px]">
-                  <div className="flex-1 w-full md:w-auto">
-                    <label className="text-black font-[500] text-[14px] mb-[8px] block">
-                      Quantity
-                    </label>
-                    <Input
-                      placeholder="1"
-                      value={openItemData.quantity}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        if (val && !/^\d+$/.test(val)) return;
-                        setOpenItemData((prev) => ({
-                          ...prev,
-                          quantity: val,
-                        }));
-                        if (openItemErrors.quantity)
-                          setOpenItemErrors((prev) => ({
-                            ...prev,
-                            quantity: "",
-                          }));
-                      }}
-                      type="number"
-                      error={openItemErrors.quantity}
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <label className="text-black font-[500] text-[14px] mb-[8px] block">
-                      Pieces
-                    </label>
-                    <Input
-                      placeholder="e.g. 2"
-                      value={openItemData.piece}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        if (val && !/^\d+$/.test(val)) return;
-                        setOpenItemData((prev) => ({
-                          ...prev,
-                          piece: val,
-                        }));
-                        if (openItemErrors.piece)
-                          setOpenItemErrors((prev) => ({ ...prev, piece: "" }));
-                      }}
-                      type="number"
-                      error={openItemErrors.piece}
-                    />
-                  </div>
-                </div>
-                <div className="flex flex-col md:flex-row gap-4 md:gap-[20px]">
-                  <div className="flex-1 w-full md:w-auto">
-                    <label className="text-black font-[500] text-[14px] mb-[8px] block">
-                      Cleaning Method
-                    </label>
-                    <Select
-                      options={cleaningMethodOptions}
-                      placeholder="Select"
-                      value={openItemData.cleaningMethod}
-                      onChange={(e) => {
-                        setOpenItemData((prev) => ({
-                          ...prev,
-                          cleaningMethod: e.target.value,
-                        }));
-                        if (openItemErrors.cleaningMethod)
-                          setOpenItemErrors((prev) => ({
-                            ...prev,
-                            cleaningMethod: "",
-                          }));
-                      }}
-                      fullWidth
-                      error={openItemErrors.cleaningMethod}
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <label className="text-black font-[500] text-[14px] mb-[8px] block">
-                      Price Per Unit
-                    </label>
-                    <Input
-                      placeholder="e.g. 5000"
-                      value={openItemData.pricePerUnit}
-                      onChange={(e) => {
-                        setOpenItemData((prev) => ({
-                          ...prev,
-                          pricePerUnit: e.target.value,
-                        }));
-                        if (openItemErrors.pricePerUnit)
-                          setOpenItemErrors((prev) => ({
-                            ...prev,
-                            pricePerUnit: "",
-                          }));
-                      }}
-                      type="number"
-                      error={openItemErrors.pricePerUnit}
-                    />
-                  </div>
-                </div>
-              </div>
-            </FormDialog>
-            <FormDialog
-              title="Add Regular Item"
-              buttonText="Regular Item"
-              saveButtonText="Save"
-              onSubmit={handleCreateRegularItem}
-              loading={createRegularLoading}
-            >
-              <div className="flex flex-col gap-[20px]">
-                <div>
-                  <label className="text-black font-[500] text-[14px] mb-[8px] block">
-                    Category
-                  </label>
-                  <Select
-                    options={itemCategories.map((cat) => ({
-                      label: cat.name,
-                      value: cat.id,
-                    }))}
-                    placeholder="Select"
-                    value={selectedCategory}
-                    onChange={(e) => {
-                      setSelectedCategory(e.target.value);
-                      setRegularItemData((prev) => ({
-                        ...prev,
-                        item: "",
-                        cleaningMethod: "",
-                      }));
-                      if (regularItemErrors.category)
-                        setRegularItemErrors((prev) => ({
-                          ...prev,
-                          category: "",
-                        }));
-                    }}
-                    fullWidth
-                    searchable
-                    error={regularItemErrors.category}
-                  />
-                </div>
-                <div className="flex flex-col md:flex-row gap-4 md:gap-[20px]">
-                  <div className="flex-1 w-full md:w-auto">
-                    <label className="text-black font-[500] text-[14px] mb-[8px] block">
-                      Item
-                    </label>
-                    <Select
-                      options={filteredItems.map((item) => ({
-                        label: item.name,
-                        value: item.atId,
-                      }))}
-                      placeholder="Select"
-                      value={regularItemData.item}
-                      onChange={(e) => {
-                        setRegularItemData((prev) => ({
-                          ...prev,
-                          item: e.target.value,
-                          cleaningMethod: "",
-                        }));
-                        if (regularItemErrors.item)
-                          setRegularItemErrors((prev) => ({
-                            ...prev,
-                            item: "",
-                          }));
-                      }}
-                      fullWidth
-                      searchable
-                      disabled={!selectedCategory}
-                      error={regularItemErrors.item}
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <label className="text-black font-[500] text-[14px] mb-[8px] block">
-                      Quantity
-                    </label>
-                    <Input
-                      placeholder="1"
-                      value={regularItemData.quantity}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        if (val && !/^\d+$/.test(val)) return;
-                        setRegularItemData((prev) => ({
-                          ...prev,
-                          quantity: val,
-                        }));
-                        if (regularItemErrors.quantity)
-                          setRegularItemErrors((prev) => ({
-                            ...prev,
-                            quantity: "",
-                          }));
-                      }}
-                      type="number"
-                      error={regularItemErrors.quantity}
-                    />
-                  </div>
-                </div>
-                <div className="flex flex-col md:flex-row gap-4 md:gap-[20px]">
-                  <div className="flex-1 w-full md:w-auto">
-                    <label className="text-black font-[500] text-[14px] mb-[8px] block">
-                      Cleaning Method
-                    </label>
-                    <Select
-                      options={getRegularCleaningOptions()}
-                      placeholder="Select"
-                      value={regularItemData.cleaningMethod}
-                      onChange={(e) => {
-                        setRegularItemData((prev) => ({
-                          ...prev,
-                          cleaningMethod: e.target.value,
-                        }));
-                        if (regularItemErrors.cleaningMethod)
-                          setRegularItemErrors((prev) => ({
-                            ...prev,
-                            cleaningMethod: "",
-                          }));
-                      }}
-                      fullWidth
-                      disabled={!regularItemData.item}
-                      error={regularItemErrors.cleaningMethod}
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <label className="text-black font-[500] text-[14px] mb-[8px] block">
-                      Price Per Unit
-                    </label>
-                    <Input
-                      placeholder="e.g. 5000"
-                      value={regularItemData.pricePerUnit}
-                      onChange={(e) => {
-                        setRegularItemData((prev) => ({
-                          ...prev,
-                          pricePerUnit: e.target.value,
-                        }));
-                        if (regularItemErrors.pricePerUnit)
-                          setRegularItemErrors((prev) => ({
-                            ...prev,
-                            pricePerUnit: "",
-                          }));
-                      }}
-                      type="number"
-                      error={regularItemErrors.pricePerUnit}
-                    />
-                  </div>
-                </div>
-              </div>
-            </FormDialog>
-          </div>
+    <Card className="mx-0 h-full p-0 flex flex-col">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between border-b border-muted py-4 md:py-6 px-4 md:px-6 gap-4 md:gap-0">
+        <h3 className="text-[16px] md:text-[18px] font-[600] text-black uppercase ">
+          Order Items
+        </h3>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 md:gap-[10px] w-full md:w-auto [&>button]:w-full md:[&>button]:w-auto">
+          {!status || status.toLowerCase() === "created" ? (
+            <>
+              <FormDialog
+                title="Add Open Item"
+                buttonText="Open Item"
+                saveButtonText="Save"
+                onSubmit={handleCreateOpenItem}
+                loading={createLoading}
+                onOpen={() => {
+                  setOpenItemErrors({});
+                  setOpenItemData({
+                    openItemName: "",
+                    quantity: "1",
+                    piece: "",
+                    cleaningMethod: "",
+                    pricePerUnit: "",
+                  });
+                }}
+              >
+                {renderOpenItemFormFields()}
+              </FormDialog>
+              <FormDialog
+                title="Add Regular Item"
+                buttonText="Regular Item"
+                saveButtonText="Save"
+                onSubmit={handleCreateRegularItem}
+                loading={createRegularLoading}
+                onOpen={() => {
+                  setRegularItemErrors({});
+                  setSelectedCategory("");
+                  setRegularItemData({
+                    item: "",
+                    quantity: "1",
+                    cleaningMethod: "",
+                    pricePerUnit: "",
+                  });
+                }}
+              >
+                {renderRegularItemFormFields()}
+              </FormDialog>
+            </>
+          ) : (
+            <>
+              <Button
+                variant="disabled"
+                className="px-5 py-[10px] md:px-[35px] md:py-[16px] text-[14px] md:text-[16px]"
+              >
+                Open Item
+              </Button>
+              <Button
+                variant="disabled"
+                className="px-5 py-[10px] md:px-[35px] md:py-[16px] text-[14px] md:text-[16px]"
+              >
+                Regular Item
+              </Button>
+            </>
+          )}
         </div>
+      </div>
+
+      <div className="flex-1">
         <GenericTable data={orderItems} columns={columns} isLoading={loading} />
-      </Card>
-      <div className="flex items-center justify-between md:justify-end gap-4 md:gap-10 mx-4 md:mx-8 mt-[20px] mb-[30px]">
+      </div>
+
+      <div className="flex items-center justify-between md:justify-end gap-4 md:gap-10 px-4 md:px-6 py-4 md:py-6 mt-auto">
         <p className="text-[14px] md:text-[16px] font-[700] text-black">
           Total Revenue
         </p>
@@ -712,7 +967,7 @@ function OrderItems({
             .toFixed(2)}
         </p>
       </div>
-    </div>
+    </Card>
   );
 }
 
