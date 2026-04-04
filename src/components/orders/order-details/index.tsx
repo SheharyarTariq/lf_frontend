@@ -6,6 +6,7 @@ import CustomerInfo from "./customer-info";
 import SpecialNotes from "./special-notes";
 import OrderInformation from "./order-information";
 import OrderItems from "./order-items";
+import OrderPreferences from "./order-preferences";
 import FormDialog from "@/components/common/form-dailog";
 import toast from "react-hot-toast";
 import Loader from "@/components/common/Loader";
@@ -30,6 +31,9 @@ interface OrderUser {
   name: string;
   phone?: string;
   address?: string;
+  shirtHandling?: string;
+  priceReviewRequired?: boolean;
+  stainTreatmentEnabled?: boolean;
 }
 
 interface OrderItemData {
@@ -89,6 +93,7 @@ function OrderDetails() {
   const [order, setOrder] = useState<OrderDetail | null>(null);
   const [cancelLoading, setCancelLoading] = useState(false);
   const [finaliseLoading, setFinaliseLoading] = useState(false);
+  const [deliverLoading, setDeliverLoading] = useState(false);
 
   const getOrderDetails = async () => {
     const response = await apiCall<OrderDetail>({
@@ -127,6 +132,23 @@ function OrderDetails() {
       data: {},
     });
     setFinaliseLoading(false);
+    if (response.success) {
+      await getOrderDetails();
+      return true;
+    }
+    return false;
+  };
+
+  const handleMarkDelivered = async (): Promise<boolean> => {
+    setDeliverLoading(true);
+    const response = await apiCall({
+      endpoint: routes.api.markDelivered(orderId),
+      method: "POST",
+      showSuccessToast: true,
+      successMessage: "Order marked as delivered",
+      data: {},
+    });
+    setDeliverLoading(false);
     if (response.success) {
       await getOrderDetails();
       return true;
@@ -176,7 +198,7 @@ function OrderDetails() {
             {canCancel ? (
               <FormDialog
                 title="Cancel Order"
-                buttonText="Delete"
+                buttonText="Cancel"
                 saveButtonText="Yes"
                 onSubmit={handleCancelOrder}
                 loading={cancelLoading}
@@ -191,7 +213,7 @@ function OrderDetails() {
                 variant="disabled"
                 className="min-w-[140px] md:min-w-[160px] md:py-[16px] text-center"
               >
-                Delete
+                Cancel
               </Button>
             )}
             {order?.status.toLowerCase() === "created" && hasOrderItems ? (
@@ -213,13 +235,33 @@ function OrderDetails() {
                 Finalize
               </Button>
             )}
+            {order?.status.toLowerCase() === "processing" && (
+              <FormDialog
+                title="Mark as Delivered"
+                buttonText="Mark Delivered"
+                saveButtonText="Confirm"
+                onSubmit={handleMarkDelivered}
+                loading={deliverLoading}
+                triggerClassName="min-w-[140px] md:min-w-[160px] text-center"
+              >
+                Are you sure you want to mark this order as delivered?
+              </FormDialog>
+            )}
           </div>
         </div>
       </div>
-      <div className="flex flex-col lg:flex-row gap-[24px] mx-0 md:mx-[30px]">
+      <div className="flex flex-col lg:flex-row gap-[50px] mx-0 md:mx-[30px]">
         <div className="w-full lg:w-[280px] flex-shrink-0 flex flex-col gap-[20px]">
           <CustomerInfo user={order?.user} isLoading={!order} />
           <SpecialNotes note={order?.note} isLoading={!order} />
+          <OrderPreferences
+            shirtHandling={order?.user?.shirtHandling}
+            allowDeepStainTreatment={order?.user?.stainTreatmentEnabled}
+            priceReview={order?.user?.priceReviewRequired}
+            isLoading={!order}
+          />
+        </div>
+        <div className="flex-1 flex flex-col gap-[20px]">
           <OrderInformation
             createdAt={order?.createdAt || ""}
             pickupDate={order?.pickupDate || ""}
@@ -228,12 +270,11 @@ function OrderDetails() {
             dropoffSlot={order?.dropoffSlot ?? null}
             isLoading={!order}
           />
-        </div>
-        <div className="flex-1">
           <OrderItems
             orderId={orderId}
             revenue={order?.revenue || 0}
             onItemsChange={getOrderDetails}
+            status={order?.status || ""}
           />
         </div>
       </div>

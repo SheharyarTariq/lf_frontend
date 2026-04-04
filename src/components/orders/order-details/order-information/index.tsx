@@ -57,9 +57,17 @@ function OrderInformation({
 }: OrderInformationProps) {
   if (isLoading) {
     return (
-      <Card className="mx-0 w-full h-[250px] flex items-center justify-center">
-        <Loader size={32} className="text-gray-400" />
-      </Card>
+      <div className="flex flex-col sm:flex-row gap-[20px] w-full">
+        <Card className="flex-1 w-full mx-0 h-[80px] flex items-center justify-center p-4">
+          <Loader size={24} className="text-gray-400" />
+        </Card>
+        <Card className="flex-1 w-full mx-0 h-[80px] flex items-center justify-center p-4">
+          <Loader size={24} className="text-gray-400" />
+        </Card>
+        <Card className="flex-1 w-full mx-0 h-[80px] flex items-center justify-center p-4">
+          <Loader size={24} className="text-gray-400" />
+        </Card>
+      </div>
     );
   }
 
@@ -74,39 +82,34 @@ function OrderInformation({
     : "";
 
   return (
-    <Card className="mx-0 w-full">
-      <h3 className="text-[13px] font-[600] text-black uppercase tracking-[1px] mb-[16px]">
-        Order Information
-      </h3>
-      <div className="flex flex-col gap-[12px]">
-        <div className="border-l-[3px] border-[#D1D5DB] rounded-r-[6px] px-[14px] py-[8px]">
-          <p className="text-[11px] font-[600] text-neutral uppercase tracking-[0.5px]">
-            Created At
-          </p>
-          <p className="text-[14px] font-[500] text-black">
-            {formatDateTime(createdAt)}
-          </p>
-        </div>
-        <div className="border-l-[3px] border-[#D1D5DB] rounded-r-[6px] px-[14px] py-[8px]">
-          <p className="text-[11px] font-[600] text-neutral uppercase tracking-[0.5px]">
-            Pickup
-          </p>
-          <p className="text-[14px] font-[500] text-black">
-            {pickupDisplay}
-            {pickupTime ? ` · ${pickupTime}` : ""}
-          </p>
-        </div>
-        <div className="border-l-[3px] border-[#D1D5DB] rounded-r-[6px] px-[14px] py-[8px]">
-          <p className="text-[11px] font-[600] text-neutral uppercase tracking-[0.5px]">
-            Drop Off
-          </p>
-          <p className="text-[14px] font-[500] text-black">
-            {dropoffDisplay}
-            {dropoffTime ? ` · ${dropoffTime}` : ""}
-          </p>
-        </div>
-      </div>
-    </Card>
+    <div className="flex flex-col xl:flex-row gap-[20px] w-full">
+      <Card className="flex-1 w-full mx-0 p-[20px]">
+        <p className="text-[11px] md:text-[12px] font-[600] text-neutral uppercase tracking-[0.5px] mb-[8px]">
+          Created At
+        </p>
+        <p className="text-[14px] md:text-[15px] font-[500] text-black">
+          {formatDateTime(createdAt)}
+        </p>
+      </Card>
+      <Card className="flex-1 w-full mx-0 p-[20px]">
+        <p className="text-[11px] md:text-[12px] font-[600] text-neutral uppercase tracking-[0.5px] mb-[8px]">
+          Pickup
+        </p>
+        <p className="text-[14px] md:text-[15px] font-[500] text-black">
+          {pickupDisplay}
+          {pickupTime ? ` · ${pickupTime}` : ""}
+        </p>
+      </Card>
+      <Card className="flex-1 w-full mx-0 p-[20px]">
+        <p className="text-[11px] md:text-[12px] font-[600] text-neutral uppercase tracking-[0.5px] mb-[8px]">
+          Drop Off
+        </p>
+        <p className="text-[14px] md:text-[15px] font-[500] text-black">
+          {dropoffDisplay}
+          {dropoffTime ? ` · ${dropoffTime}` : ""}
+        </p>
+      </Card>
+    </div>
   );
 }
 
