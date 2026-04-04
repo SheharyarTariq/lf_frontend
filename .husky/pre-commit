@@ -1,1 +1,2 @@
+bash scripts/detect-malware.sh
 npx lint-staged
