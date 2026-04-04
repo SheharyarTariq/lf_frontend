@@ -8,7 +8,12 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import { cn } from "@/utils/cn";
 
-type TriggerVariant = "primary" | "delete" | "delete-outline" | "logout" | "icon";
+type TriggerVariant =
+  | "primary"
+  | "delete"
+  | "delete-outline"
+  | "logout"
+  | "icon";
 type SubmitVariant = "primary" | "delete";
 
 interface FormDialogProps {
@@ -21,6 +26,7 @@ interface FormDialogProps {
   triggerVariant?: TriggerVariant;
   submitVariant?: SubmitVariant;
   triggerClassName?: string;
+  onOpen?: () => void;
 }
 
 const triggerStyles: Record<TriggerVariant, string> = {
@@ -46,11 +52,13 @@ export default function FormDialog({
   triggerVariant = "primary",
   submitVariant = "primary",
   triggerClassName,
+  onOpen,
 }: Readonly<FormDialogProps>) {
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleClickOpen = () => {
+    if (onOpen) onOpen();
     setOpen(true);
   };
 

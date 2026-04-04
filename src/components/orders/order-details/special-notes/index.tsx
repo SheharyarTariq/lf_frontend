@@ -19,12 +19,16 @@ function SpecialNotes({
   }
 
   return (
-    <Card className="mx-0 w-full">
-      <h3 className="text-[13px] font-[600] text-black uppercase tracking-[1px] mb-[16px]">
+    <Card className="mx-0 w-full p-0 overflow-hidden">
+      <h3 className="text-[16px] px-6 py-3 font-[600] text-black uppercase border-b border-muted m-0">
         Special Notes
       </h3>
-      <div className="border-l-[3px] border-[#F59E0B] bg-[#FFFBEB] rounded-r-[6px] px-[14px] py-[10px]">
-        <p className="text-[13px] text-black">{note || "No special notes."}</p>
+      <div className="p-6">
+        <div className="border-l-[3px] border-[#F59E0B] bg-[#FFFBEB] px-4 py-4 rounded-r-[6px]">
+          <p className="text-[14px] text-black leading-relaxed">
+            {note || "No special notes."}
+          </p>
+        </div>
       </div>
     </Card>
   );
