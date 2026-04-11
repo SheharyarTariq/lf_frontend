@@ -62,3 +62,13 @@ body {
 .animate-dots {
   animation: bounceDots 1.4s infinite ease-in-out both;
 }
+
+/* Hide scrollbar globally */
+::-webkit-scrollbar {
+  display: none;
+}
+
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}

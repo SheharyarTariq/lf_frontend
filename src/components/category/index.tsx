@@ -17,7 +17,8 @@ interface ItemCategory {
   "@type"?: string;
   id: string;
   name: string;
-  washingLabel: string;
+  washingLabel?: string | null;
+  dryCleaningLabel?: string | null;
   position?: number;
 }
 
@@ -33,6 +34,8 @@ function Category() {
   const [createData, setCreateData] = useState<{
     name: string;
     position?: number;
+    washingLabel?: string;
+    dryCleaningLabel?: string;
   }>({ name: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -62,7 +65,12 @@ function Category() {
     if (
       !(await validateAndSetErrors(
         categorySchema,
-        { name: createData.name, position: createData.position },
+        {
+          name: createData.name,
+          position: createData.position,
+          washingLabel: createData.washingLabel,
+          dryCleaningLabel: createData.dryCleaningLabel,
+        },
         setErrors
       ))
     )
@@ -92,15 +100,39 @@ function Category() {
     {
       header: "Name",
       accessor: "name",
+      sortable: false,
     },
     {
       header: "Position",
       accessor: "position" as keyof ItemCategory,
+      className: "text-center [&>div]:justify-center",
       render: (item) => (
-        <div className="w-[30px] h-[30px] flex items-center justify-center bg-muted rounded-md text-[18px]">
+        <div className="w-[30px] h-[30px] flex items-center justify-center bg-muted rounded-md text-[18px] mx-auto">
           {item.position}
         </div>
       ),
+    },
+    {
+      header: "Washing Label",
+      accessor: "washingLabel",
+      sortable: false,
+      render: (item) =>
+        item.washingLabel ? (
+          <>{item.washingLabel}</>
+        ) : (
+          <span className="text-info-text">No Label</span>
+        ),
+    },
+    {
+      header: "Dry Clean Label",
+      accessor: "dryCleaningLabel" as keyof ItemCategory,
+      sortable: false,
+      render: (item) =>
+        item.dryCleaningLabel ? (
+          <>{item.dryCleaningLabel}</>
+        ) : (
+          <span className="text-info-text">No Label</span>
+        ),
     },
     {
       header: "Action",
@@ -180,6 +212,47 @@ function Category() {
                     error={errors.position}
                   />
                 </div>
+                <div className="flex flex-col md:flex-row gap-6">
+                  <div className="flex flex-col gap-2 w-full">
+                    <label className="text-[14px] font-medium text-black">
+                      Washing Label
+                    </label>
+                    <Input
+                      placeholder="Hand Wash"
+                      value={createData.washingLabel || ""}
+                      onChange={(e) => {
+                        setCreateData((prev) => ({
+                          ...prev,
+                          washingLabel: e.target.value,
+                        }));
+                        if (errors.washingLabel)
+                          setErrors((prev) => ({ ...prev, washingLabel: "" }));
+                      }}
+                      error={errors.washingLabel}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2 w-full">
+                    <label className="text-[14px] font-medium text-black">
+                      Dry Clean Label
+                    </label>
+                    <Input
+                      placeholder="Dry Clean Only"
+                      value={createData.dryCleaningLabel || ""}
+                      onChange={(e) => {
+                        setCreateData((prev) => ({
+                          ...prev,
+                          dryCleaningLabel: e.target.value,
+                        }));
+                        if (errors.dryCleaningLabel)
+                          setErrors((prev) => ({
+                            ...prev,
+                            dryCleaningLabel: "",
+                          }));
+                      }}
+                      error={errors.dryCleaningLabel}
+                    />
+                  </div>
+                </div>
               </div>
             </FormDialog>
           </div>
@@ -192,7 +265,7 @@ function Category() {
             isLoading={isLoading}
             onRowClick={(row) =>
               router.push(
-                `${routes.ui.categoryDetails(row.id)}?name=${encodeURIComponent(row.name)}&position=${row.position ?? ""}`
+                `${routes.ui.categoryDetails(row.id)}?name=${encodeURIComponent(row.name)}&position=${row.position ?? ""}&washingLabel=${encodeURIComponent(row.washingLabel || "")}&dryCleaningLabel=${encodeURIComponent(row.dryCleaningLabel || "")}`
               )
             }
           />

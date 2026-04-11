@@ -8,6 +8,7 @@ export interface Column<T> {
   accessor: keyof T | ((row: T) => React.ReactNode);
   render?: (row: T) => React.ReactNode;
   className?: string;
+  headerClassName?: string;
   sortable?: boolean;
   sortKey?: keyof T;
   isAction?: boolean;
@@ -139,7 +140,9 @@ function GenericTable<T>({
     return typeof column.accessor !== "function" && column.sortable !== false;
   };
 
-  const hasActionColumn = columns.some((col) => col.isAction);
+  const isColAction = (col: Column<T>) =>
+    col.isAction || col.header.toLowerCase() === "action";
+  const hasActionColumn = columns.some(isColAction);
 
   return (
     <div
@@ -156,11 +159,13 @@ function GenericTable<T>({
                 key={index}
                 className={cn(
                   "py-3 md:py-[16px] px-4 md:px-[25px] font-[500] text-black text-[14px] md:text-[16px]",
-                  hasActionColumn && !column.isAction
+                  isColAction(column) ? "text-right" : "text-left",
+                  hasActionColumn && !isColAction(column)
                     ? "w-[1%] whitespace-nowrap"
                     : "",
                   isSortable(column) ? "cursor-pointer select-none" : "",
-                  column.className
+                  column.className,
+                  column.headerClassName
                 )}
                 onClick={() => isSortable(column) && handleSort(column)}
               >
@@ -217,8 +222,9 @@ function GenericTable<T>({
                     key={colIndex}
                     className={cn(
                       "py-3 md:py-[16px] px-4 md:px-[25px] text-black text-[14px] md:text-[16px]",
-                      hasActionColumn && !column.isAction
-                        ? "w-[1%] whitespace-nowrap text-center"
+                      isColAction(column) ? "text-right" : "text-left",
+                      hasActionColumn && !isColAction(column)
+                        ? "w-[1%] whitespace-nowrap"
                         : "",
                       column.className
                     )}

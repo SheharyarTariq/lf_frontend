@@ -14,9 +14,11 @@ export interface AreaData {
   "@id": string;
   id: string;
   name: string;
-  code: string;
-  city: string;
-  status: string;
+  code?: string;
+  city?: string;
+  status?: string;
+  totalPostcodes?: number;
+  totalActivePostcodes?: number;
 }
 
 interface AreaResponse {

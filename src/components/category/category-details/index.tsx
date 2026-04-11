@@ -16,11 +16,19 @@ function CategoryDetails() {
   const categoryId = params["category-details"] as string;
   const categoryName = searchParams.get("name") || "";
   const positionParam = searchParams.get("position");
+  const washingLabelParam = searchParams.get("washingLabel");
+  const dryCleaningLabelParam = searchParams.get("dryCleaningLabel");
   const router = useRouter();
 
   const [editName, setEditName] = useState(categoryName);
   const [editPosition, setEditPosition] = useState<number | undefined>(
     positionParam ? Number(positionParam) : undefined
+  );
+  const [editWashingLabel, setEditWashingLabel] = useState(
+    washingLabelParam || ""
+  );
+  const [editDryCleaningLabel, setEditDryCleaningLabel] = useState(
+    dryCleaningLabelParam || ""
   );
   const [displayName, setDisplayName] = useState(categoryName);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -32,7 +40,12 @@ function CategoryDetails() {
     if (
       !(await validateAndSetErrors(
         categorySchema,
-        { name: editName, position: editPosition },
+        {
+          name: editName,
+          position: editPosition,
+          washingLabel: editWashingLabel,
+          dryCleaningLabel: editDryCleaningLabel,
+        },
         setErrors
       ))
     )
@@ -42,7 +55,12 @@ function CategoryDetails() {
       endpoint: routes.api.updateItemCategory(categoryId),
       method: "PATCH",
       headers: { "Content-Type": "application/merge-patch+json" },
-      data: { name: editName.trim(), position: editPosition },
+      data: {
+        name: editName.trim(),
+        position: editPosition,
+        washingLabel: editWashingLabel,
+        dryCleaningLabel: editDryCleaningLabel,
+      },
       showSuccessToast: true,
       successMessage: "Category updated successfully",
     });
@@ -119,6 +137,38 @@ function CategoryDetails() {
                 }}
                 error={errors.position}
               />
+            </div>
+            <div className="flex flex-col md:flex-row gap-6">
+              <div className="flex flex-col gap-2 w-full">
+                <label className="text-[14px] font-[500] text-black">
+                  Washing Label
+                </label>
+                <Input
+                  placeholder="Hand Wash"
+                  value={editWashingLabel}
+                  onChange={(e) => {
+                    setEditWashingLabel(e.target.value);
+                    if (errors.washingLabel)
+                      setErrors((prev) => ({ ...prev, washingLabel: "" }));
+                  }}
+                  error={errors.washingLabel}
+                />
+              </div>
+              <div className="flex flex-col gap-2 w-full">
+                <label className="text-[14px] font-[500] text-black">
+                  Dry Clean Label
+                </label>
+                <Input
+                  placeholder="Dry Clean Only"
+                  value={editDryCleaningLabel}
+                  onChange={(e) => {
+                    setEditDryCleaningLabel(e.target.value);
+                    if (errors.dryCleaningLabel)
+                      setErrors((prev) => ({ ...prev, dryCleaningLabel: "" }));
+                  }}
+                  error={errors.dryCleaningLabel}
+                />
+              </div>
             </div>
           </div>
         </FormDialog>

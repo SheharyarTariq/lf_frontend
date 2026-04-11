@@ -102,7 +102,7 @@ function AreaDetails() {
           <div className="md:mr-15 mr-8">
             <FormDialog
               title="Delete Area"
-              buttonText="✕ Delete Area"
+              buttonText="Delete Area"
               saveButtonText="Yes"
               onSubmit={handleDeleteArea}
               triggerVariant="delete"
@@ -125,7 +125,7 @@ function AreaDetails() {
               )
             }
           >
-            ✕ Delete Area
+            Delete Area
           </Button>
         )}
       </div>
