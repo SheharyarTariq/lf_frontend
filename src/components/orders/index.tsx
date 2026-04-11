@@ -18,6 +18,7 @@ const STATUS_OPTIONS = [
 const TYPE_OPTIONS = [
   { label: "All Types", value: "" },
   { label: "Manual", value: "manual" },
+  { label: "Recurring", value: "recurring" },
 ];
 
 function Orders() {

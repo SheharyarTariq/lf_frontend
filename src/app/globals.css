@@ -13,6 +13,7 @@
   --loader-color: #4b5563;
   --slot-active: #22c55e;
   --slot-inactive: #ef4444;
+  --info-text: #6b635a;
 }
 
 @theme inline {
@@ -28,6 +29,7 @@
   --color-silver: var(--silver);
   --color-slot-active: var(--slot-active);
   --color-slot-inactive: var(--slot-inactive);
+  --color-info-text: var(--info-text);
 }
 
 @media (prefers-color-scheme: dark) {

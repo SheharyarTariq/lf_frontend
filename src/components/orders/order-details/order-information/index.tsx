@@ -84,7 +84,7 @@ function OrderInformation({
   return (
     <div className="flex flex-col xl:flex-row gap-[20px] w-full">
       <Card className="flex-1 w-full mx-0 p-[20px]">
-        <p className="text-[11px] md:text-[12px] font-[600] text-neutral uppercase tracking-[0.5px] mb-[8px]">
+        <p className="text-[11px] md:text-[12px] font-[600] text-info-text uppercase tracking-[0.5px] mb-[8px]">
           Created At
         </p>
         <p className="text-[14px] md:text-[15px] font-[500] text-black">
@@ -92,7 +92,7 @@ function OrderInformation({
         </p>
       </Card>
       <Card className="flex-1 w-full mx-0 p-[20px]">
-        <p className="text-[11px] md:text-[12px] font-[600] text-neutral uppercase tracking-[0.5px] mb-[8px]">
+        <p className="text-[11px] md:text-[12px] font-[600] text-info-text uppercase tracking-[0.5px] mb-[8px]">
           Pickup
         </p>
         <p className="text-[14px] md:text-[15px] font-[500] text-black">
@@ -101,7 +101,7 @@ function OrderInformation({
         </p>
       </Card>
       <Card className="flex-1 w-full mx-0 p-[20px]">
-        <p className="text-[11px] md:text-[12px] font-[600] text-neutral uppercase tracking-[0.5px] mb-[8px]">
+        <p className="text-[11px] md:text-[12px] font-[600] text-info-text uppercase tracking-[0.5px] mb-[8px]">
           Drop Off
         </p>
         <p className="text-[14px] md:text-[15px] font-[500] text-black">
