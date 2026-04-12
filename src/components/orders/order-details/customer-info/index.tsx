@@ -1,5 +1,5 @@
 import React from "react";
-import { Phone, MapPin } from "lucide-react";
+import Image from "next/image";
 import Card from "@/components/common/Card";
 import Loader from "@/components/common/Loader";
 
@@ -10,6 +10,13 @@ interface OrderUser {
   name: string;
   phone?: string;
   address?: string;
+  addressLine1?: string | null;
+  addressLine2?: string | null;
+  addressTown?: string | null;
+  addressCounty?: string | null;
+  postcode?: {
+    postcodeString?: string;
+  } | null;
 }
 
 function CustomerInfo({
@@ -29,6 +36,19 @@ function CustomerInfo({
 
   if (!user) return null;
 
+  const fullAddress =
+    [
+      user.addressLine1,
+      user.addressLine2,
+      user.addressTown,
+      user.addressCounty,
+      user.postcode?.postcodeString,
+    ]
+      .filter(Boolean)
+      .join(", ") ||
+    user.address ||
+    "—";
+
   return (
     <Card className="p-0 w-full mx-0">
       <h3 className="text-[16px] font-[600] text-black uppercase px-6 py-3 mb-0 border-b border-muted">
@@ -37,19 +57,33 @@ function CustomerInfo({
 
       <div className="flex flex-col gap-[6px] px-6 py-6">
         <p className="text-[16px] font-[600] text-black mb-1">{user.name}</p>
-        <p className="text-[13px] text-neutral mb-3">{user.email}</p>
+        <p className="text-[13px] text-info-text font-[500] mb-3">
+          {user.email}
+        </p>
 
         <div
-          className="flex items-center gap-[12px] text-[13px] text-[#6B7280] mb-2"
+          className="flex items-center gap-[12px] text-[13px] text-info-text font-[400] mb-2"
           style={{ wordBreak: "break-all" }}
         >
-          <Phone size={16} className="text-[#9CA3AF] shrink-0" />
+          <Image
+            src="/assets/phone.svg"
+            width={18}
+            height={18}
+            alt="Phone"
+            className="shrink-0"
+          />
           <span>{user.phone || "—"}</span>
         </div>
 
-        <div className="flex items-start gap-[12px] text-[13px] text-[#6B7280]">
-          <MapPin size={16} className="text-[#9CA3AF] shrink-0 mt-[2px]" />
-          <span className="leading-[1.4]">{user.address || "—"}</span>
+        <div className="flex items-start gap-[12px] text-[13px] text-info-text font-[400]">
+          <Image
+            src="/assets/address.svg"
+            width={18}
+            height={18}
+            alt="Address"
+            className="shrink-0 mt-[2px]"
+          />
+          <span className="leading-[1.4]">{fullAddress}</span>
         </div>
       </div>
     </Card>

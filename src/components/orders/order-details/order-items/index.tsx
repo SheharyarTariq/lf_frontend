@@ -10,8 +10,9 @@ import Select from "@/components/common/Select";
 import { validateAndSetErrors } from "@/utils/validation";
 import { openItemSchema, regularItemSchema } from "../../schema";
 import { poundsToPence, penceToPounds } from "@/utils/helper";
-import { Trash2 } from "lucide-react";
+import { Printer } from "lucide-react";
 import Button from "@/components/common/Button";
+import { printTickets } from "@/utils/print-tickets";
 
 interface OrderItem {
   "@context"?: string;
@@ -65,16 +66,29 @@ const cleaningMethodOptions = [
   { label: "Dry Clean", value: "dry_cleaning" },
 ];
 
+interface OrderInfoForPrint {
+  orderNumber?: number;
+  createdAt?: string;
+  customerName?: string;
+  customerEmail?: string;
+  customerPhone?: string;
+  customerAddress?: string;
+  pickupDate?: string;
+  dropoffDate?: string;
+}
+
 function OrderItems({
   orderId,
   revenue,
   onItemsChange,
   status,
+  orderInfo,
 }: {
   orderId: string;
   revenue: number;
   onItemsChange?: () => void;
   status?: string;
+  orderInfo?: OrderInfoForPrint;
 }) {
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [openItemData, setOpenItemData] = useState({
@@ -92,6 +106,7 @@ function OrderItems({
   const [isDeletingItem, setIsDeletingItem] = useState(false);
   const [deleteItemId, setDeleteItemId] = useState<string>("");
   const [loading, setLoading] = useState(true);
+  const [isOptionsLoading, setIsOptionsLoading] = useState(false);
 
   const [itemCategories, setItemCategories] = useState<ItemCategory[]>([]);
   const [allItems, setAllItems] = useState<RegularItemOption[]>([]);
@@ -177,15 +192,21 @@ function OrderItems({
     if (showLoader) setLoading(false);
   };
 
-  const getItemCategories = async () => {
+  const fetchOptionsIfNeeded = async () => {
+    if (itemCategories.length > 0) return allItems;
+    setIsOptionsLoading(true);
     const response = await apiCall<{ member: ItemCategory[] }>({
       endpoint: routes.api.getItemCategories,
       method: "GET",
     });
     if (response.success && response?.data) {
       setItemCategories(response.data.member);
-      await fetchAllItems(response.data.member);
+      const itemsList = await fetchAllItems(response.data.member);
+      setIsOptionsLoading(false);
+      return itemsList;
     }
+    setIsOptionsLoading(false);
+    return [];
   };
 
   const fetchAllItems = async (categories: ItemCategory[]) => {
@@ -218,6 +239,7 @@ function OrderItems({
       }
     }
     setAllItems(itemsList);
+    return itemsList;
   };
 
   const selectedItemData = allItems.find(
@@ -415,9 +437,18 @@ function OrderItems({
     return false;
   };
 
+  const handlePrintTickets = () => {
+    printTickets({
+      orderItems,
+      allItems,
+      orderId,
+      orderInfo,
+      cleaningMethodMap,
+    });
+  };
+
   useEffect(() => {
     getOrderItems();
-    getItemCategories();
   }, []);
 
   useEffect(() => {
@@ -578,7 +609,12 @@ function OrderItems({
     <div className="flex flex-col gap-[20px]">
       <div>
         <label className="text-black font-[500] text-[14px] mb-[8px] block">
-          Category
+          Category{" "}
+          {isOptionsLoading && (
+            <span className="text-sm text-gray-400 font-normal ml-2">
+              (Loading...)
+            </span>
+          )}
         </label>
         <Select
           options={itemCategories.map((cat) => ({
@@ -767,7 +803,7 @@ function OrderItems({
           <div className="flex items-center justify-end gap-[10px]">
             {!canManage ? (
               <img
-                src="/assets/Edit.svg"
+                src="/assets/edit.svg"
                 alt="Edit"
                 className="cursor-not-allowed h-[26px] w-[26px] opacity-50 grayscale"
               />
@@ -776,7 +812,7 @@ function OrderItems({
                 title="Edit Open Item"
                 buttonText={
                   <img
-                    src="/assets/Edit.svg"
+                    src="/assets/edit.svg"
                     alt="Edit"
                     className="cursor-pointer h-[26px] w-[26px]"
                   />
@@ -803,7 +839,7 @@ function OrderItems({
                 title="Edit Regular Item"
                 buttonText={
                   <img
-                    src="/assets/Edit.svg"
+                    src="/assets/edit.svg"
                     alt="Edit"
                     className="cursor-pointer h-[26px] w-[26px]"
                   />
@@ -812,16 +848,21 @@ function OrderItems({
                 onSubmit={() => handleUpdateRegularItem(row.id)}
                 loading={updateRegularLoading === row.id}
                 triggerVariant="icon"
-                onOpen={() => {
+                onOpen={async () => {
                   setRegularItemErrors({});
+                  const loadedItems = await fetchOptionsIfNeeded();
+                  const itemsToSearch = loadedItems?.length
+                    ? loadedItems
+                    : allItems;
+
                   let matchedItem = null;
                   if (typeof row.item === "object" && row.item !== null) {
-                    matchedItem = allItems.find(
+                    matchedItem = itemsToSearch.find(
                       (i) =>
                         i.atId === row.item?.["@id"] || i.id === row.item?.id
                     );
                   } else if (typeof row.item === "string") {
-                    matchedItem = allItems.find(
+                    matchedItem = itemsToSearch.find(
                       (i) =>
                         i.atId === row.item || `/items/${i.id}` === row.item
                     );
@@ -882,12 +923,20 @@ function OrderItems({
   ];
 
   return (
-    <Card className="mx-0 h-full p-0 flex flex-col">
+    <Card className="mx-0 p-0 flex flex-col">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between border-b border-muted py-4 md:py-6 px-4 md:px-6 gap-4 md:gap-0">
         <h3 className="text-[16px] md:text-[18px] font-[600] text-black uppercase ">
           Order Items
         </h3>
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 md:gap-[10px] w-full md:w-auto [&>button]:w-full md:[&>button]:w-auto">
+          <button
+            onClick={handlePrintTickets}
+            disabled={orderItems.length === 0}
+            className="flex items-center justify-center gap-2 px-5 py-[10px] md:px-[35px] md:py-[16px] text-[14px] md:text-[16px] rounded-[8px] font-[500] cursor-pointer transition-colors duration-200 [font-family:var(--font-poppins)] whitespace-nowrap bg-black text-white hover:bg-neutral-700 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <Printer size={16} />
+            Print Tickets
+          </button>
           {!status || status.toLowerCase() === "created" ? (
             <>
               <FormDialog
@@ -924,6 +973,7 @@ function OrderItems({
                     cleaningMethod: "",
                     pricePerUnit: "",
                   });
+                  fetchOptionsIfNeeded();
                 }}
               >
                 {renderRegularItemFormFields()}
@@ -948,11 +998,11 @@ function OrderItems({
         </div>
       </div>
 
-      <div className="flex-1">
+      <div className="mt-[20px] mx-[25px] mb-[30px]">
         <GenericTable data={orderItems} columns={columns} isLoading={loading} />
       </div>
 
-      <div className="flex items-center justify-between md:justify-end gap-4 md:gap-10 px-4 md:px-6 py-4 md:py-6 mt-auto">
+      <div className="flex items-center justify-between md:justify-end gap-4 md:gap-10 px-[25px] pb-[30px]">
         <p className="text-[14px] md:text-[16px] font-[700] text-black">
           Total Revenue
         </p>

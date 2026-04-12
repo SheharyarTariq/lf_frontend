@@ -7,13 +7,33 @@ interface AreaData {
   "@id": string;
   id: string;
   name: string;
-  code: string;
-  city: string;
-  status: string;
+  code?: string;
+  city?: string;
+  status?: string;
+  totalPostcodes?: number;
+  totalActivePostcodes?: number;
 }
 
 const columns: Column<AreaData>[] = [
-  { header: "Area Name", accessor: "name" },
+  { header: "Name", accessor: "name" },
+  {
+    header: "Total Postcodes",
+    accessor: (row) => (
+      <span className="bg-muted text-black font-[400] px-[10px] py-[3px] rounded-[5px] text-[18px]">
+        {row.totalPostcodes ?? 0}
+      </span>
+    ),
+    className: "text-center",
+  },
+  {
+    header: "Total Active Postcodes",
+    accessor: (row) => (
+      <span className="bg-muted text-black font-[400] px-[10px] py-[3px] rounded-[5px] text-[18px]">
+        {row.totalActivePostcodes ?? 0}
+      </span>
+    ),
+    className: "text-center",
+  },
   {
     header: "Action",
     accessor: () => (

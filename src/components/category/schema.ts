@@ -14,6 +14,8 @@ export const categorySchema = yup.object({
     .optional()
     .positive("Position must be a positive number")
     .integer("Position must be a whole number"),
+  washingLabel: yup.string().trim().optional(),
+  dryCleaningLabel: yup.string().trim().optional(),
 });
 
 export const categoryNameSchema = yup.object({

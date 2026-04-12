@@ -31,6 +31,13 @@ interface OrderUser {
   name: string;
   phone?: string;
   address?: string;
+  addressLine1?: string | null;
+  addressLine2?: string | null;
+  addressTown?: string | null;
+  addressCounty?: string | null;
+  postcode?: {
+    postcodeString?: string;
+  } | null;
   shirtHandling?: string;
   priceReviewRequired?: boolean;
   stainTreatmentEnabled?: boolean;
@@ -275,6 +282,16 @@ function OrderDetails() {
             revenue={order?.revenue || 0}
             onItemsChange={getOrderDetails}
             status={order?.status || ""}
+            orderInfo={{
+              orderNumber: order?.number,
+              createdAt: order?.createdAt,
+              customerName: order?.user?.name,
+              customerEmail: order?.user?.email,
+              customerPhone: order?.user?.phone,
+              customerAddress: order?.user?.address,
+              pickupDate: order?.pickupDate,
+              dropoffDate: order?.dropoffDate,
+            }}
           />
         </div>
       </div>
