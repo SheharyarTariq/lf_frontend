@@ -66,6 +66,7 @@ function Header() {
               loading={confirmLogout}
               triggerVariant="logout"
               submitVariant="delete"
+              triggerClassName="text-[18px] py-[10px] md:py-[12px]"
             >
               <p className="mt-3 text-[18px]">
                 Are you sure you want to logout?
@@ -110,7 +111,7 @@ function Header() {
                 loading={confirmLogout}
                 triggerVariant="logout"
                 submitVariant="delete"
-                triggerClassName="w-full"
+                triggerClassName="w-full text-[18px] py-[10px] md:py-[12px]"
               >
                 <p className="mt-3 text-[18px]">
                   Are you sure you want to logout?
