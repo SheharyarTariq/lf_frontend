@@ -10,6 +10,7 @@ export const routes = {
     categoryDetails: (id: string | number) => `category/${id}`,
     orderDetails: (id: string | number, number?: string | number) =>
       number ? `orders/${id}?number=${number}` : `orders/${id}`,
+    userDetails: (id: string | number) => `users/${id}`,
   },
 
   api: {
@@ -47,5 +48,6 @@ export const routes = {
     updateOrderItem: (id: string) => `order-items/${id}`,
     getItemCategoryById: (id: string) => `item-categories/${id}`,
     getUsers: "users/admin-list",
+    getUserDetails: (id: string) => `users/${id}/admin-detail`,
   },
 };

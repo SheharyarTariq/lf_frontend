@@ -2,7 +2,8 @@ import React from "react";
 import Image from "next/image";
 import Card from "@/components/common/Card";
 import Loader from "@/components/common/Loader";
-
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 interface OrderUser {
   "@context"?: string;
   "@id"?: string;
@@ -56,7 +57,17 @@ function CustomerInfo({
       </h3>
 
       <div className="flex flex-col gap-[6px] px-6 py-6">
-        <p className="text-[16px] font-[600] text-black mb-1">{user.name}</p>
+        <div className="flex items-center justify-between mb-1">
+          <p className="text-[16px] font-[600] text-black">{user.name}</p>
+          {user["@id"] && (
+            <Link
+              href={`/users/${user["@id"].split("/")[2]}`}
+              className="p-1 -my-1 rounded hover:bg-neutral-100 transition-colors cursor-pointer shrink-0"
+            >
+              <ArrowRight size={20} className="text-black" />
+            </Link>
+          )}
+        </div>
         <p className="text-[13px] text-info-text font-[500] mb-3">
           {user.email}
         </p>
