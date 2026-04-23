@@ -11,9 +11,11 @@ export interface Order {
   id: string;
   number: number;
   status: string;
+  pickupDate: string;
+  dropoffDate: string;
   revenue: number;
   createdAt: string;
-  orderItems?: { length: number }[];
+  orderItemCount: number;
 }
 
 interface OrdersData {
@@ -53,7 +55,7 @@ function RecentOrders({ userId }: { userId: string }) {
   const getOrders = async (page: number) => {
     setIsLoading(true);
     const response = await apiCall<OrdersData>({
-      endpoint: `${routes.api.getOrders}?exact[user.id][]=${userId}&page=${page}&itemsPerPage=${PAGE_SIZE}`,
+      endpoint: `${routes.api.getUserOrdersHistory(userId)}?page=${page}&itemsPerPage=${PAGE_SIZE}`,
       method: "GET",
     });
     if (response.success && response?.data) {
@@ -80,17 +82,24 @@ function RecentOrders({ userId }: { userId: string }) {
     {
       accessor: (row: Order) => (
         <span className="text-info-text text-[14px]">
-          {formatDate(row.createdAt)}
+          {formatDate(row.pickupDate)}
         </span>
       ),
-      header: "Order Date",
+      header: "Pickup Date",
       sortable: false,
     },
     {
       accessor: (row: Order) => (
-        <span className="font-[500] text-black">
-          {row.orderItems?.length || 0}
+        <span className="text-info-text text-[14px]">
+          {formatDate(row.dropoffDate)}
         </span>
+      ),
+      header: "Dropoff Date",
+      sortable: false,
+    },
+    {
+      accessor: (row: Order) => (
+        <span className="font-[500] text-black">{row.orderItemCount || 0}</span>
       ),
       header: "Items",
       sortable: false,

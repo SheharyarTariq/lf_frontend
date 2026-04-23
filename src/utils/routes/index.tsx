@@ -49,5 +49,6 @@ export const routes = {
     getItemCategoryById: (id: string) => `item-categories/${id}`,
     getUsers: "users/admin-list",
     getUserDetails: (id: string) => `users/${id}/admin-detail`,
+    getUserOrdersHistory: (id: string) => `users/${id}/orders-history`,
   },
 };
