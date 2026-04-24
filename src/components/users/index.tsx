@@ -45,28 +45,22 @@ function Users() {
             />
           </div>
           <div className="flex flex-col sm:flex-row gap-[16px] w-full lg:w-auto">
-            <div className="relative w-full sm:w-[170px] lg:w-[190px]">
-              <div className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 text-black font-[600] pointer-events-none z-10 text-[15px] md:text-[16px]">
-                Status
-              </div>
+            <div className="w-full sm:w-[220px] lg:w-[240px]">
               <Select
                 options={STATUS_OPTIONS}
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
                 fullWidth
-                className="pl-[70px] md:pl-[80px] text-[13px] md:text-[14px] font-[400]"
+                label="Status"
               />
             </div>
-            <div className="relative w-full sm:w-[300px] lg:w-[340px]">
-              <div className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 text-black font-[600] pointer-events-none z-10 text-[15px] md:text-[16px]">
-                Sort By
-              </div>
+            <div className="w-full sm:w-[340px] lg:w-[380px]">
               <Select
                 options={SORT_OPTIONS}
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
                 fullWidth
-                className="pl-[80px] md:pl-[90px] text-[13px] md:text-[14px] font-[400]"
+                label="Sort By"
               />
             </div>
           </div>
