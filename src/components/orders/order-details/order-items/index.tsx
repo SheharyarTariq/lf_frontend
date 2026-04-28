@@ -206,14 +206,7 @@ function OrderItems({
           Total Revenue
         </p>
         <p className="text-[16px] font-[700] text-black">
-          £
-          {orderItems
-            .reduce(
-              (acc, item) =>
-                acc + (penceToPounds(Number(item.totalPrice)) || 0),
-              0
-            )
-            .toFixed(2)}
+          £{(penceToPounds(Number(revenue)) || 0).toFixed(2)}
         </p>
       </div>
     </Card>
