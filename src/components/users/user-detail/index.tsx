@@ -35,6 +35,8 @@ interface UserDetailData {
     } | null;
   } | null;
   stripeCustomerId: string;
+  totalOrders: number;
+  totalSpent: number;
 }
 
 const statusStyles: Record<string, string> = {
@@ -129,7 +131,7 @@ function UserDetail() {
   const getUserOrders = async () => {
     setOrdersLoading(true);
     const response = await apiCall<{ member: Order[]; totalItems: number }>({
-      endpoint: `${routes.api.getOrders}?exact[user.id][]=${userId}`,
+      endpoint: `${routes.api.getOrders(1)}&exact[user.id][]=${userId}`,
       method: "GET",
     });
     if (response.success && response.data) {
@@ -159,11 +161,6 @@ function UserDetail() {
   const statusLabel = user.status.replace(/_/g, " ");
   const statusStyle =
     statusStyles[user.status.toLowerCase()] || "bg-gray-100 text-gray-600";
-
-  const totalSpent = recentOrders.reduce(
-    (sum, order) => sum + (order.revenue || 0),
-    0
-  );
 
   return (
     <div className="px-[50px] pt-[27px] pb-10">
@@ -304,7 +301,7 @@ function UserDetail() {
                       Total Orders
                     </span>
                     <span className="text-[28px] font-[700] text-black leading-none">
-                      {String(totalItems).padStart(2, "0")}
+                      {String(user.totalOrders || 0).padStart(2, "0")}
                     </span>
                   </div>
                   <div className="flex flex-1 items-center justify-between px-6 py-4">
@@ -312,7 +309,7 @@ function UserDetail() {
                       Total Spent
                     </span>
                     <span className="text-[28px] font-[700] text-black leading-[36px]">
-                      £{penceToPounds(totalSpent).toFixed(2)}
+                      £{penceToPounds(user.totalSpent || 0).toFixed(2)}
                     </span>
                   </div>
                 </div>

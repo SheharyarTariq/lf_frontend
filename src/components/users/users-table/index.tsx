@@ -70,7 +70,7 @@ interface UsersFilters {
 }
 
 function buildEndpoint(filters: UsersFilters, page: number): string {
-  const parts: string[] = [`page=${page}`];
+  const parts: string[] = [];
   if (filters.search)
     parts.push(`search=${encodeURIComponent(filters.search)}`);
   if (filters.status)
@@ -81,7 +81,8 @@ function buildEndpoint(filters: UsersFilters, page: number): string {
       parts.push(`order[${field}]=${order.toUpperCase()}`);
     }
   }
-  return routes.api.getUsers + `?${parts.join("&")}`;
+  const base = routes.api.getUsers(page);
+  return parts.length > 0 ? `${base}&${parts.join("&")}` : base;
 }
 
 function UsersTable({ filters }: { filters: UsersFilters }) {

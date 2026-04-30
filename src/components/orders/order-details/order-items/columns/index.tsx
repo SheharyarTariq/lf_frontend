@@ -74,7 +74,10 @@ export const getColumns = ({
     sortable: false,
   },
   {
-    accessor: (row: OrderItem) => (row.isApproved ? "Yes" : "No"),
+    accessor: (row: OrderItem) => {
+      if (row.isApproved === false) return "No";
+      return "Yes";
+    },
     header: "Approved?",
     sortable: false,
   },
