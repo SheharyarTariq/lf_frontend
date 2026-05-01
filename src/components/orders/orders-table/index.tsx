@@ -79,14 +79,15 @@ interface OrdersFilters {
 }
 
 function buildEndpoint(filters: OrdersFilters, page: number): string {
-  const parts: string[] = [`page=${page}`];
+  const parts: string[] = [];
   if (filters.search)
     parts.push(`search=${encodeURIComponent(filters.search)}`);
   if (filters.status)
     parts.push(`exact[status][]=${encodeURIComponent(filters.status)}`);
   if (filters.type)
     parts.push(`exact[type][]=${encodeURIComponent(filters.type)}`);
-  return routes.api.getOrders + `?${parts.join("&")}`;
+  const base = routes.api.getOrders(page);
+  return parts.length > 0 ? `${base}&${parts.join("&")}` : base;
 }
 
 function OrdersTable({ filters }: { filters: OrdersFilters }) {
