@@ -40,6 +40,12 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-CLAUDE.md
-GEMINI.md
 config.bat
+
+# md files (except README)
+*.md
+!README.md
+
+# rules files
+.cursorrules
+AGENT_RULES.md
