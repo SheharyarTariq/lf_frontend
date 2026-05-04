@@ -237,7 +237,7 @@ function GenericTable<T>({
           )}
         </tbody>
       </table>
-      {totalItems > effectivePageSize && (
+      {totalItems > 0 && (
         <div className="flex items-center justify-end gap-4 py-[14px] px-[25px]">
           <span className="text-[14px] text-black">
             {startIndex + 1}-{endIndex} of {totalItems}

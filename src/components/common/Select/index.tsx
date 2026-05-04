@@ -19,6 +19,7 @@ interface SelectProps extends Omit<
   fullWidth?: boolean;
   searchable?: boolean;
   error?: string;
+  label?: string;
 }
 
 function Select({
@@ -27,6 +28,7 @@ function Select({
   startIcon,
   fullWidth = false,
   searchable = false,
+  label,
   error,
   className = "",
   onChange,
@@ -59,49 +61,9 @@ function Select({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  if (!searchable) {
-    return (
-      <div className={cn(fullWidth ? "w-full" : "w-fit")}>
-        <div className="relative">
-          {startIcon && (
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral">
-              {startIcon}
-            </div>
-          )}
-          <select
-            className={cn(
-              baseStyles,
-              widthStyles,
-              iconStyles,
-              error ? "border-red-500" : "",
-              className
-            )}
-            onChange={onChange}
-            value={value}
-            disabled={disabled}
-            {...props}
-          >
-            {options.map((option) => (
-              <option
-                key={option.value}
-                value={option.value}
-                disabled={option.disabled}
-              >
-                {option.label}
-              </option>
-            ))}
-          </select>
-          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-neutral ">
-            <ChevronDown size={20} color="black" />
-          </div>
-        </div>
-        {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
-      </div>
-    );
-  }
-
   const selectedLabel =
-    options.find((o) => o.value === value)?.label || placeholder;
+    options.find((o) => String(o.value) === String(value))?.label ||
+    placeholder;
 
   const filteredOptions = options.filter((o) =>
     o.label.toLowerCase().includes(searchQuery.toLowerCase())
@@ -118,6 +80,83 @@ function Select({
     setSearchQuery("");
   };
 
+  const openDropdown = () => {
+    if (disabled) return;
+    if (!isOpen && triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      setDropdownStyle({
+        position: "fixed",
+        top: rect.bottom + 4,
+        left: rect.left,
+        width: rect.width,
+        zIndex: 9999,
+      });
+    }
+    setIsOpen(!isOpen);
+  };
+
+  if (!searchable) {
+    return (
+      <div className={cn(fullWidth ? "w-full" : "w-fit")}>
+        <div className="relative w-full" ref={dropdownRef}>
+          {startIcon && (
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral">
+              {startIcon}
+            </div>
+          )}
+          <div
+            ref={triggerRef}
+            className={cn(
+              baseStyles,
+              widthStyles,
+              iconStyles,
+              disabled ? "opacity-50 cursor-not-allowed" : "",
+              error ? "border-red-500" : "",
+              className
+            )}
+            onClick={openDropdown}
+          >
+            <span className="text-black flex items-center gap-1.5 whitespace-nowrap overflow-hidden">
+              {!isOpen && label && (
+                <span className="font-[600] shrink-0">{label}</span>
+              )}
+              <span className="truncate">{selectedLabel}</span>
+            </span>
+          </div>
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-neutral">
+            <ChevronDown size={20} color="black" />
+          </div>
+          {isOpen && (
+            <div
+              style={dropdownStyle}
+              className="bg-white border border-muted rounded-[8px] shadow-lg max-h-[300px] overflow-y-auto"
+            >
+              {options.map((option, index) => (
+                <div
+                  key={option.value}
+                  className={cn(
+                    "py-3.5 px-5 text-[15px] cursor-pointer hover:bg-[#F5F5F5] transition-colors text-black",
+                    option.value === value ? "font-[500]" : "font-[400]",
+                    option.disabled
+                      ? "opacity-50 cursor-not-allowed pointer-events-none"
+                      : "",
+                    index < options.length - 1
+                      ? "border-b border-[#F0F0F0]"
+                      : ""
+                  )}
+                  onClick={() => !option.disabled && handleSelect(option.value)}
+                >
+                  {option.label}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+      </div>
+    );
+  }
+
   return (
     <div className={cn(fullWidth ? "w-full" : "w-fit")}>
       <div className={`relative w-full`} ref={dropdownRef}>
@@ -130,20 +169,7 @@ function Select({
             disabled ? "opacity-50 cursor-not-allowed" : "",
             className
           )}
-          onClick={() => {
-            if (disabled) return;
-            if (!isOpen && triggerRef.current) {
-              const rect = triggerRef.current.getBoundingClientRect();
-              setDropdownStyle({
-                position: "fixed",
-                top: rect.bottom + 4,
-                left: rect.left,
-                width: rect.width,
-                zIndex: 9999,
-              });
-            }
-            setIsOpen(!isOpen);
-          }}
+          onClick={openDropdown}
         >
           <span className={`${!value ? "text-[#C1C1C1]" : "text-black"}`}>
             {selectedLabel}

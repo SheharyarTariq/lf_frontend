@@ -25,6 +25,7 @@ function Header() {
     { name: "Category", path: routes.ui.category },
     { name: "Orders", path: routes.ui.orders },
     { name: "User", path: routes.ui.users },
+    { name: "Feedback", path: routes.ui.feedback },
   ];
 
   const handleNavClick = (path: string) => {

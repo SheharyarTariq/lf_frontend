@@ -6,10 +6,12 @@ export const routes = {
     category: "/category",
     orders: "/orders",
     users: "/users",
+    feedback: "/feedback",
     areaDetails: (id: string | number) => `area/${id}`,
     categoryDetails: (id: string | number) => `category/${id}`,
     orderDetails: (id: string | number, number?: string | number) =>
       number ? `orders/${id}?number=${number}` : `orders/${id}`,
+    userDetails: (id: string | number) => `users/${id}`,
   },
 
   api: {
@@ -35,7 +37,7 @@ export const routes = {
     createItems: "items",
     deleteItems: (id: string) => `items/${id}`,
     updateItems: (id: string) => `items/${id}`,
-    getOrders: "orders/admin-list",
+    getOrders: (page: number | string = 1) => `orders/admin-list?page=${page}`,
     getOrderDetails: (id: string) => `orders/${id}/admin-detail`,
     getOrderItems: (id: string) => `orders/${id}/order-items`,
     cancelOrder: (id: string) => `orders/${id}/mark-as-cancelled`,
@@ -46,6 +48,13 @@ export const routes = {
     deleteOrderItem: (id: string) => `order-items/${id}`,
     updateOrderItem: (id: string) => `order-items/${id}`,
     getItemCategoryById: (id: string) => `item-categories/${id}`,
-    getUsers: "users/admin-list",
+    getUsers: (page: number | string = 1) => `users/admin-list?page=${page}`,
+    getUserDetails: (id: string) => `users/${id}/admin-detail`,
+    getUserOrdersHistory: (id: string) => `users/${id}/orders-history`,
+    getFeedback: (page: number | string = 1) =>
+      `feedback/admin-list?page=${page}`,
+    markFeedbackFeatured: (id: string) => `feedbacks/${id}/mark-as-featured`,
+    markFeedbackUnfeatured: (id: string) =>
+      `feedbacks/${id}/mark-as-unfeatured`,
   },
 };
