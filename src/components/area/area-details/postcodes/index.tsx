@@ -171,10 +171,14 @@ function Postcodes({ areaId, onPostcodesChange }: Readonly<PostcodesProps>) {
           data={filteredPostcodes}
           isLoading={loading}
           columns={[
-            { accessor: "postcodeString", header: "Postcode" },
+            {
+              accessor: "postcodeString",
+              header: "Postcode",
+              className: "w-[75%]",
+            },
             {
               accessor: (row) => (
-                <div className="flex items-center gap-[16px] justify-end">
+                <div className="flex items-center gap-[16px] justify-start">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -221,7 +225,7 @@ function Postcodes({ areaId, onPostcodesChange }: Readonly<PostcodesProps>) {
                 </div>
               ),
               header: "Action",
-              className: "text-right",
+              className: "text-left",
               sortable: false,
               isAction: true,
             },

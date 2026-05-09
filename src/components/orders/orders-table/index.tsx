@@ -126,7 +126,7 @@ function OrdersTable({ filters }: { filters: OrdersFilters }) {
     },
     {
       accessor: (row: Order) => {
-        const label = row.status.replace(/-/g, " ");
+        const label = row.status.replace(/[-_]/g, " ");
         const style =
           statusStyles[row.status.toLowerCase()] || "bg-gray-100 text-gray-600";
         return (
