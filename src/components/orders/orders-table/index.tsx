@@ -4,8 +4,9 @@ import { useRouter } from "next/navigation";
 import apiCall from "@/utils/api-call";
 import { routes } from "@/utils/routes";
 import { penceToPounds } from "@/utils/helper";
-import GenericTable from "@/components/common/GenericTable";
+import GenericTable, { Column } from "@/components/common/GenericTable";
 import Image from "next/image";
+import { cn } from "@/utils/cn";
 
 interface OrderSlot {
   "@context"?: string;
@@ -36,7 +37,9 @@ interface Order {
   dropoffDate: string;
   dropoffSlot: OrderSlot;
   note: string;
-  revenue: number;
+  subtotal: number;
+  discountAmount: number;
+  total: number;
   createdAt: string;
   user: OrderUser;
 }
@@ -78,7 +81,12 @@ interface OrdersFilters {
   type: string;
 }
 
-function buildEndpoint(filters: OrdersFilters, page: number): string {
+function buildEndpoint(
+  filters: OrdersFilters,
+  page: number,
+  sortKey?: string,
+  sortDir?: string
+): string {
   const parts: string[] = [];
   if (filters.search)
     parts.push(`search=${encodeURIComponent(filters.search)}`);
@@ -86,6 +94,7 @@ function buildEndpoint(filters: OrdersFilters, page: number): string {
     parts.push(`exact[status][]=${encodeURIComponent(filters.status)}`);
   if (filters.type)
     parts.push(`exact[type][]=${encodeURIComponent(filters.type)}`);
+  if (sortKey && sortDir) parts.push(`order[${sortKey}]=${sortDir}`);
   const base = routes.api.getOrders(page);
   return parts.length > 0 ? `${base}&${parts.join("&")}` : base;
 }
@@ -95,13 +104,15 @@ function OrdersTable({ filters }: { filters: OrdersFilters }) {
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
+  const [sortKey, setSortKey] = useState<string | undefined>();
+  const [sortDir, setSortDir] = useState<"asc" | "desc" | undefined>();
   const PAGE_SIZE = 30;
   const router = useRouter();
 
   const getOrders = async (page: number) => {
     setIsLoading(true);
     const response = await apiCall<OrdersData>({
-      endpoint: buildEndpoint(filters, page),
+      endpoint: buildEndpoint(filters, page, sortKey, sortDir),
       method: "GET",
     });
     if (response.success && response?.data) {
@@ -117,96 +128,128 @@ function OrdersTable({ filters }: { filters: OrdersFilters }) {
 
   useEffect(() => {
     getOrders(currentPage);
-  }, [currentPage, filters.search, filters.status, filters.type]);
+  }, [
+    currentPage,
+    filters.search,
+    filters.status,
+    filters.type,
+    sortKey,
+    sortDir,
+  ]);
 
-  const columns = [
-    {
-      accessor: "number" as keyof Order,
-      header: "#",
-    },
-    {
-      accessor: (row: Order) => {
-        const label = row.status.replace(/[-_]/g, " ");
-        const style =
-          statusStyles[row.status.toLowerCase()] || "bg-gray-100 text-gray-600";
-        return (
-          <span
-            className={`inline-block w-[140px] py-[4px] rounded-full text-[13px] font-[500] capitalize text-center ${style}`}
-          >
-            {label}
-          </span>
-        );
+  const columns: Column<Order>[] = (
+    [
+      {
+        accessor: "number" as keyof Order,
+        header: "#",
+        sortable: true,
+        sortKey: "number" as keyof Order,
       },
-      header: "Status",
-      sortable: false,
-      className: "w-[140px] text-center",
-    },
-    {
-      accessor: "type" as keyof Order,
-      header: "Type",
-    },
-    {
-      accessor: (row: Order) => `£${penceToPounds(row.revenue).toFixed(2)}`,
-      header: "Revenue",
-      sortable: true,
-      sortKey: "revenue" as keyof Order,
-    },
-    {
-      accessor: (row: Order) => (
-        <div>
-          <div className="font-[500]">{formatDate(row.pickupDate)}</div>
-          <div className="text-[13px] text-neutral">
-            {row.pickupSlot?.startTime || ""} – {row.pickupSlot?.endTime || ""}
+      {
+        accessor: (row: Order) => {
+          const label = row.status.replace(/[-_]/g, " ");
+          const style =
+            statusStyles[row.status.toLowerCase()] ||
+            "bg-gray-100 text-gray-600";
+          return (
+            <span
+              className={`inline-block w-[140px] py-[4px] rounded-full text-[13px] font-[500] capitalize text-center ${style}`}
+            >
+              {label}
+            </span>
+          );
+        },
+        header: "Status",
+        sortable: false,
+        className: "w-[140px] text-center",
+      },
+      {
+        accessor: "type" as keyof Order,
+        header: "Type",
+        sortable: false,
+      },
+      {
+        accessor: (row: Order) => `£${penceToPounds(row.subtotal).toFixed(2)}`,
+        header: "Subtotal",
+        sortable: false,
+      },
+      {
+        accessor: (row: Order) => (
+          <span className="text-[#70B652]">
+            £{penceToPounds(row.discountAmount).toFixed(2)}
+          </span>
+        ),
+        header: "Discount",
+        sortable: false,
+      },
+      {
+        accessor: (row: Order) => `£${penceToPounds(row.total).toFixed(2)}`,
+        header: "Total",
+        sortable: true,
+        sortKey: "total" as keyof Order,
+      },
+      {
+        accessor: (row: Order) => (
+          <div>
+            <div className="font-[500]">{formatDate(row.pickupDate)}</div>
+            <div className="text-[13px] text-neutral">
+              {row.pickupSlot?.startTime || ""} –{" "}
+              {row.pickupSlot?.endTime || ""}
+            </div>
           </div>
-        </div>
-      ),
-      header: "Pickup",
-      sortable: true,
-      sortKey: "pickupDate" as keyof Order,
-    },
-    {
-      accessor: (row: Order) => (
-        <div>
-          <div className="font-[500]">{formatDate(row.dropoffDate)}</div>
-          <div className="text-[13px] text-neutral">
-            {row.dropoffSlot?.startTime || ""} –{" "}
-            {row.dropoffSlot?.endTime || ""}
+        ),
+        header: "Pickup",
+        sortable: true,
+        sortKey: "pickupDate" as keyof Order,
+      },
+      {
+        accessor: (row: Order) => (
+          <div>
+            <div className="font-[500]">{formatDate(row.dropoffDate)}</div>
+            <div className="text-[13px] text-neutral">
+              {row.dropoffSlot?.startTime || ""} –{" "}
+              {row.dropoffSlot?.endTime || ""}
+            </div>
           </div>
-        </div>
-      ),
-      header: "Dropoff",
-      sortable: true,
-      sortKey: "dropoffDate" as keyof Order,
-    },
-    {
-      accessor: (row: Order) => (
-        <div>
-          <div className="font-[500]">{row.user?.name}</div>
-          <div className="text-[13px] text-neutral">{row.user?.email}</div>
-        </div>
-      ),
-      header: "Customer",
-      sortable: false,
-      className: "text-left",
-    },
-    {
-      accessor: () => (
-        <div className="flex items-center justify-end">
-          <Image
-            src="/assets/ArrowRight.svg"
-            alt="Details"
-            width={24}
-            height={24}
-            className="cursor-pointer"
-          />
-        </div>
-      ),
-      header: "Action",
-      className: "text-right",
-      sortable: false,
-      isAction: true,
-    },
-  ];
+        ),
+        header: "Dropoff",
+        sortable: true,
+        sortKey: "dropoffDate" as keyof Order,
+      },
+      {
+        accessor: (row: Order) => (
+          <div>
+            <div className="font-[500]">{row.user?.name}</div>
+            <div className="text-[13px] text-neutral">{row.user?.email}</div>
+          </div>
+        ),
+        header: "Customer",
+        sortable: false,
+        className: "text-left",
+      },
+      {
+        accessor: () => (
+          <div className="flex items-center justify-end">
+            <Image
+              src="/assets/ArrowRight.svg"
+              alt="Details"
+              width={24}
+              height={24}
+              className="cursor-pointer"
+            />
+          </div>
+        ),
+        header: "Action",
+        className: "text-right",
+        sortable: false,
+        isAction: true,
+      },
+    ] as Column<Order>[]
+  ).map((col) => ({
+    ...col,
+    className: cn(col.className, "text-[13px] md:text-[14px]"),
+    headerClassName: cn(col.headerClassName, "text-[13px] md:text-[14px]"),
+  }));
 
   return (
     <div className="mt-[30px] px-[50px] mb-10">
@@ -219,6 +262,10 @@ function OrdersTable({ filters }: { filters: OrdersFilters }) {
           totalItems,
           pageSize: PAGE_SIZE,
           onPageChange: setCurrentPage,
+          onSortChange: (key, direction) => {
+            setSortKey(key);
+            setSortDir(direction);
+          },
         }}
         onRowClick={(row) =>
           router.push(routes.ui.orderDetails(row.id, row.number))

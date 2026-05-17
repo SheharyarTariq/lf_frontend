@@ -19,6 +19,7 @@ export interface BackendPaginationConfig {
   totalItems: number;
   pageSize: number;
   onPageChange: (page: number) => void;
+  onSortChange?: (key: string, direction: "asc" | "desc") => void;
 }
 
 export interface GenericTableProps<T> {
@@ -59,13 +60,24 @@ function GenericTable<T>({
 
   const handleSort = (column: Column<T>) => {
     const key = getSortKey(column);
+    let newDirection: SortDirection = "asc";
+
     setSortConfig((prev) => {
       if (prev && prev.key === key) {
-        return { key, direction: prev.direction === "asc" ? "desc" : "asc" };
+        newDirection = prev.direction === "asc" ? "desc" : "asc";
       }
-      return { key, direction: "asc" };
+      return { key, direction: newDirection };
     });
-    setCurrentPage(0);
+
+    if (backendPagination?.onSortChange) {
+      backendPagination.onSortChange(key, newDirection);
+    }
+
+    if (backendPagination) {
+      backendPagination.onPageChange(1);
+    } else {
+      setCurrentPage(0);
+    }
   };
 
   const sortedData = useMemo(() => {

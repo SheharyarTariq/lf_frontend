@@ -76,7 +76,9 @@ interface OrderDetail {
   dropoffDate: string;
   dropoffSlot: OrderSlot;
   note: string;
-  revenue: number;
+  subtotal: number;
+  discountAmount: number;
+  total: number;
   createdAt: string;
   user: OrderUser;
   orderItems: OrderItemData[];
@@ -278,7 +280,7 @@ function OrderDetails() {
           />
           <OrderItems
             orderId={orderId}
-            revenue={order?.revenue || 0}
+            total={order?.total || 0}
             onItemsChange={getOrderDetails}
             status={order?.status || ""}
             orderInfo={{
