@@ -17,13 +17,13 @@ import { printTickets } from "@/utils/print-tickets";
 
 function OrderItems({
   orderId,
-  revenue,
+  total,
   onItemsChange,
   status,
   orderInfo,
 }: {
   orderId: string;
-  revenue: number;
+  total: number;
   onItemsChange?: () => void;
   status?: string;
   orderInfo?: OrderInfoForPrint;
@@ -203,10 +203,10 @@ function OrderItems({
 
       <div className="flex items-center justify-between md:justify-end gap-4 md:gap-10 px-[25px] pb-[30px]">
         <p className="text-[14px] md:text-[16px] font-[700] text-black">
-          Total Revenue
+          Total Amount
         </p>
         <p className="text-[16px] font-[700] text-black">
-          £{(penceToPounds(Number(revenue)) || 0).toFixed(2)}
+          £{(penceToPounds(Number(total)) || 0).toFixed(2)}
         </p>
       </div>
     </Card>
