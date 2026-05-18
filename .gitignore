@@ -40,10 +40,15 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-CLAUDE.md
-GEMINI.md
 config.bat
 
-# AI Agent Context Rules
-AGENT_RULES.md
+# md files (except README)
+*.md
+!README.md
+
+# rules files
 .cursorrules
+AGENT_RULES.md
+
+# Sentry Config File
+.env.sentry-build-plugin

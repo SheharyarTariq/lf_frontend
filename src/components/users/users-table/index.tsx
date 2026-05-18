@@ -132,14 +132,23 @@ function UsersTable({ filters }: { filters: UsersFilters }) {
       sortable: false,
     },
     {
-      accessor: (row: User) => (
-        <div>
-          <div className="font-[500]">{row.postcode?.area?.name || "N/A"}</div>
-          <div className="text-[13px] text-neutral">
-            {row.postcode?.postcodeString || "N/A"}
+      accessor: (row: User) => {
+        const hasAddress =
+          row.postcode?.area?.name || row.postcode?.postcodeString;
+
+        if (!hasAddress) {
+          return <div className="w-full text-center">—</div>;
+        }
+
+        return (
+          <div>
+            <div className="font-[500]">{row.postcode?.area?.name || "—"}</div>
+            <div className="text-[13px] text-neutral">
+              {row.postcode?.postcodeString || "—"}
+            </div>
           </div>
-        </div>
-      ),
+        );
+      },
       header: "Address",
       sortable: false,
       className: "text-left",
