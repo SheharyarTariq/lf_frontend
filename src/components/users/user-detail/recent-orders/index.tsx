@@ -13,7 +13,9 @@ export interface Order {
   status: string;
   pickupDate: string;
   dropoffDate: string;
-  revenue: number;
+  subtotal: number;
+  discountAmount: number;
+  total: number;
   createdAt: string;
   orderItemCount: number;
 }
@@ -107,7 +109,7 @@ function RecentOrders({ userId }: { userId: string }) {
     {
       accessor: (row: Order) => (
         <span className="font-[600] text-black">
-          £{penceToPounds(row.revenue).toFixed(2)}
+          £{penceToPounds(row.total || 0).toFixed(2)}
         </span>
       ),
       header: "Total",
