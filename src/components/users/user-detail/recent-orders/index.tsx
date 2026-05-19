@@ -109,7 +109,7 @@ function RecentOrders({ userId }: { userId: string }) {
     {
       accessor: (row: Order) => (
         <span className="font-[600] text-black">
-          £{penceToPounds(row.total).toFixed(2)}
+          £{penceToPounds(row.total || 0).toFixed(2)}
         </span>
       ),
       header: "Total",
