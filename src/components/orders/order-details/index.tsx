@@ -76,7 +76,9 @@ interface OrderDetail {
   dropoffDate: string;
   dropoffSlot: OrderSlot;
   note: string;
-  revenue: number;
+  subtotal: number;
+  discountAmount: number;
+  total: number;
   createdAt: string;
   user: OrderUser;
   orderItems: OrderItemData[];
@@ -174,11 +176,10 @@ function OrderDetails() {
   const hasOrderItems = order
     ? order.orderItems && order.orderItems.length > 0
     : false;
-  const statusLabel = order ? order.status.replace(/-/g, " ") : "";
+  const statusLabel = order ? order.status.replace(/[-_]/g, " ") : "";
   const statusStyle = order
     ? statusStyles[order.status.toLowerCase()] || "bg-gray-100 text-gray-600"
     : "";
-
   return (
     <div className="px-4 md:px-[30px] pt-6 md:pt-3 pb-10">
       <div className="flex flex-col md:flex-row justify-between border-b border-muted mb-7 gap-4 md:gap-0 pb-4 md:pb-0">
@@ -279,7 +280,7 @@ function OrderDetails() {
           />
           <OrderItems
             orderId={orderId}
-            revenue={order?.revenue || 0}
+            total={order?.total || 0}
             onItemsChange={getOrderDetails}
             status={order?.status || ""}
             orderInfo={{
