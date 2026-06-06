@@ -17,12 +17,16 @@ import { printTickets } from "@/utils/print-tickets";
 
 function OrderItems({
   orderId,
+  subtotal,
+  discountAmount,
   total,
   onItemsChange,
   status,
   orderInfo,
 }: {
   orderId: string;
+  subtotal: number;
+  discountAmount: number;
   total: number;
   onItemsChange?: () => void;
   status?: string;
@@ -201,13 +205,31 @@ function OrderItems({
         <GenericTable data={orderItems} columns={columns} isLoading={loading} />
       </div>
 
-      <div className="flex items-center justify-between md:justify-end gap-4 md:gap-10 px-[25px] pb-[30px]">
-        <p className="text-[14px] md:text-[16px] font-[700] text-black">
-          Total Amount
-        </p>
-        <p className="text-[16px] font-[700] text-black">
-          £{(penceToPounds(Number(total)) || 0).toFixed(2)}
-        </p>
+      <div className="flex flex-col items-end gap-3 px-[25px] pb-[30px]">
+        <div className="flex items-center justify-between w-full md:w-[300px]">
+          <p className="text-[14px] md:text-[15px] font-[500] text-neutral">
+            Subtotal
+          </p>
+          <p className="text-[14px] md:text-[15px] font-[500] text-black">
+            £{(penceToPounds(Number(subtotal)) || 0).toFixed(2)}
+          </p>
+        </div>
+        <div className="flex items-center justify-between w-full md:w-[300px]">
+          <p className="text-[14px] md:text-[15px] font-[500] text-neutral">
+            Discount
+          </p>
+          <p className="text-[14px] md:text-[15px] font-[500] text-[#70B652]">
+            £{(penceToPounds(Number(discountAmount)) || 0).toFixed(2)}
+          </p>
+        </div>
+        <div className="flex items-center justify-between w-full md:w-[300px] pt-3 border-t border-muted">
+          <p className="text-[14px] md:text-[16px] font-[700] text-black">
+            Total Amount
+          </p>
+          <p className="text-[16px] font-[700] text-black">
+            £{(penceToPounds(Number(total)) || 0).toFixed(2)}
+          </p>
+        </div>
       </div>
     </Card>
   );

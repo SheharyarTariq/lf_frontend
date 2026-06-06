@@ -10,26 +10,26 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Laundry-Admin",
-  description: "Laundry Admin Panel",
+  title: "Laundry Free",
+  description: "Laundry Free Admin Panel",
   openGraph: {
-    title: "Laundry-Admin",
-    description: "Laundry Admin Panel",
+    title: "Laundry Free",
+    description: "Laundry Free Admin Panel",
     images: [
       {
-        url: "/assets/washingMachine.jpg",
+        url: "/assets/lfFavicon.svg",
         width: 1200,
         height: 630,
-        alt: "Laundry Admin Panel",
+        alt: "Laundry Free Admin Panel",
       },
     ],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Laundry-Admin",
-    description: "Laundry Admin Panel",
-    images: ["/assets/washingMachine.jpg"],
+    title: "Laundry Free",
+    description: "Laundry Free Admin Panel",
+    images: ["/assets/lfFavicon.svg"],
   },
 };
 

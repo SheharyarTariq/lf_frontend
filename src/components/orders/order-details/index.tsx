@@ -280,6 +280,8 @@ function OrderDetails() {
           />
           <OrderItems
             orderId={orderId}
+            subtotal={order?.subtotal || 0}
+            discountAmount={order?.discountAmount || 0}
             total={order?.total || 0}
             onItemsChange={getOrderDetails}
             status={order?.status || ""}

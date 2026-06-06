@@ -7,11 +7,11 @@ export const routes = {
     orders: "/orders",
     users: "/users",
     feedback: "/feedback",
-    areaDetails: (id: string | number) => `area/${id}`,
-    categoryDetails: (id: string | number) => `category/${id}`,
+    areaDetails: (id: string | number) => `/area/${id}`,
+    categoryDetails: (id: string | number) => `/category/${id}`,
     orderDetails: (id: string | number, number?: string | number) =>
-      number ? `orders/${id}?number=${number}` : `orders/${id}`,
-    userDetails: (id: string | number) => `users/${id}`,
+      number ? `/orders/${id}?number=${number}` : `/orders/${id}`,
+    userDetails: (id: string | number) => `/users/${id}`,
   },
 
   api: {
